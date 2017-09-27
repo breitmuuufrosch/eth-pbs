@@ -1,0 +1,24 @@
+
+EXE=exercise1_linux
+SOURCES = $(wildcard *.cpp)
+OBJECTS = $(patsubst %.cpp,%.o,$(SOURCES))
+
+# how to install glut
+# ubuntu: sudo apt-get install freeglut3 freeglut3-dev
+# >= 11.10: sudo apt-get install binutils-gold
+# fedora/redhat: sudo yum install freeglut-devel
+LDFLAGS    = -lGL -lglut
+CFLAGS     = -c -O2 -DLINUXVERSION=1
+
+
+default: $(EXE)
+
+$(EXE): $(OBJECTS)
+	$(CXX) -o $(EXE) $(OBJECTS) $(LDFLAGS)
+
+%.o : %.cpp
+	$(CXX) $(CFLAGS) -o $@ $<
+
+clean:
+	 rm -f *.o $(EXE)
+
