@@ -5,7 +5,7 @@
 \author{ 
     Alexander Lelidis (14-907-562), \\
     Andy Emch (XX-XXX-XXX), \\
-    Uro\v{s} Te\v{s}i\'{c} (XX-XXX-XXX)
+    Uro\v{s} Te\v{s}i\'{c} (17-950-346)
 }
 \date{\today}
 
@@ -16,20 +16,48 @@
 
 \maketitle
 
-\section{Introduction}
-There is a theory which states that if ever anyone discovers exactly what the Universe is for and why it is here, it will instantly disappear and be replaced by something even more bizarre and inexplicable.
-There is another theory which states that this has already happened.
+\section{Analytic solution and results analysis}
+\subsection{Analytic solution}
+To find the parameters $c_1$ and $c_2$ we use the inital values from the given codebase. The starting position ($t = 0$) is at $y = -1$.
+\begin{equation}
+    y(t) = c_1 e^{\alpha  t} \cos(\beta t) + c_2 e^{\beta  t} \sin(\beta t) - L - \frac{mg}{k}
+\end{equation}
+By  differentiating this equation with respect to t we get.
+\begin{equation}
+    y'(t) = c_1 e^{\alpha  t} (\alpha \cos(\beta t) - \beta \sin(\beta t) )+ c_2 e^{\alpha  t} (\alpha \sin(\beta t) + \beta \cos(\beta t)) 
+\end{equation}
+By inserting $t = 0$ and $y_0 = -1$ into (1) we get:
+\begin{equation}
+    -1 = c_1 e^{\alpha  0} \cos(\beta 0) + c_2 e^{\beta  0} \sin(\beta 0) - L - \frac{mg}{k} 
+\end{equation}
+\begin{equation}
+    -1 = c_1 e^{\alpha  0} - L - \frac{mg}{k} 
+\end{equation}
+\begin{equation}
+    c_1 = -1 + L + \frac{mg}{k}
+\end{equation}
+To calculate $c_2$ we replace the starting speed with $y'(0) = 0$.
+\begin{equation}
+    0 = c_1 e^{\alpha  0} (\alpha \cos(\beta 0) - \beta \sin(\beta 0) )+ c_2 e^{\alpha  0} (\alpha \sin(\beta 0) + \beta \cos(\beta 0)) 
+\end{equation}
+\begin{equation}
+    0 = c_1 \alpha \cos(\beta 0) + c_2  \beta \cos(\beta 0)
+\end{equation}
+\begin{equation}
+    0 = c_1 \alpha + c_2  \beta
+\end{equation}
+\begin{equation}
+    c_2 =  \frac{- c_1 \alpha}{  \beta}
+\end{equation}
+Subsituting $c_1$ to ge the value for $c_2$.
+\begin{equation}
+    c_2 =  - \frac{ \alpha}{  \beta} (-1 + L + \frac{mg}{k})
+\end{equation}
 
-\begin{figure}[h!]
-\centering
-\includegraphics[scale=1.7]{universe.jpg}
-\caption{The Universe}
-\label{fig:univerise}
-\end{figure}
+\subsection{Error convergence analysis}
+TODO
 
-\section{Conclusion}
-``I always thought something was fundamentally wrong with the universe'' \citep{adams1995hitchhiker}
+\subsection{Stability analysis}
+TODO
 
-\bibliographystyle{plain}
-\bibliography{references}
 \end{document}
