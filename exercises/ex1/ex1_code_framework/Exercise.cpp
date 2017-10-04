@@ -20,18 +20,27 @@ void explicitEuler(double k, double m, double d, double L, double dt, double p1,
     // use old value for velocity computation
     double p2Old = p2;
     p2 = p2 + dt * v2;
-    v2 = v2 + dt * (1 / m) * (- Fint(k, fabs(p1 - p2Old), L) + Fext(m) - d * v2);
+    v2 = v2 + dt * (1.0 / m) * (- Fint(k, fabs(p1 - p2Old), L) + Fext(m) - d * v2);
 
 }
-// NEEDS TO BE DOUBLE CHEKED
+
 void symplecticEuler(double k, double m, double d, double L, double dt, double p1, double v1, double& p2, double& v2) {
-    v2 = v2 + dt * (1 / m) * (- Fint(k, fabs(p1 - p2), L) + Fext(m) - d * v2);
+    v2 = v2 + dt * (1.0 / m) * (- Fint(k, fabs(p1 - p2), L) + Fext(m) - d * v2);
     p2 = p2 + dt * v2;
 }
-
+// USING THE EXLICIT SCHEME
 void midPoint(double k, double m, double d, double L, double dt, double p1, double v1, double& p2, double& v2) {
     // impl me
+    double p2Midpoint = p2;
+    double v2Midpoint = v2;
+
+    // make an explicit euler step iwth half the step size
+    explicitEuler(k, m, d, L, dt / 2.0, p1, v1, p2Midpoint, v2Midpoint);
+
+    p2 = p2 + dt * v2Midpoint;
+    v2 = v2 + dt * (1.0 / m) * (- Fint(k, fabs(p1 - p2Midpoint), L) + Fext(m) - d * v2Midpoint);
 }
+
 void backwardEuler(double k, double m, double d, double L, double dt, double p1, double v1, double& p2, double& v2) {
     // impl me
 }
