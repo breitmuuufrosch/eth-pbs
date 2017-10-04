@@ -32,3 +32,9 @@
 *.exe
 *.out
 *.app
+
+# Windows Visual Studio
+/**/.vs/*
+Debug
+*.vcxproj
+*.vcxproj.*
