@@ -3,6 +3,7 @@
 
 // gravitational acceleration (9.81)
 static const double g = 9.81;
+static const double kr = 100.0;
 
 
 // get the external force
@@ -43,6 +44,7 @@ void midPoint(double k, double m, double d, double L, double dt, double p1, doub
 
 void backwardEuler(double k, double m, double d, double L, double dt, double p1, double v1, double& p2, double& v2) {
     // impl me
+
 }
 
 
@@ -88,12 +90,74 @@ void AdvanceTimeStep1(double k, double m, double d, double L, double dt, int met
     }
 
 }
-
-
+// -------------------------------------------------------------------------------------
 // Exercise 3
+// -------------------------------------------------------------------------------------
+Vec2 FextTri(double m, Vec2 p) { 
+    double k_r = 0.0;
+    // only aply forces if p.y is below the ground y = -1
+    if(p.y < -1.0 ) {
+        k_r = kr * (-1.0 - p.y);
+    } 
+
+    return Vec2(0.0, k_r + (m * (- g)));
+
+}
+Vec2 FintTri(double k, double L, Vec2 p1, Vec2 p2) {
+    // compute the length 
+    double y = (p2 - p1).length();
+
+    // get the direction
+    Vec2 direction = (1.0 / y) * (p2 - p1) ;
+    
+    return (k * (L - y) ) * direction;
+}
+
+void symplecticEuler(double k, double m, double d, double L, double dt,
+                      Vec2& p1, Vec2& v1, Vec2& p2, Vec2& v2, Vec2& p3, Vec2& v3) {
+
+    Vec2 p1Old = p1;
+    Vec2 p2Old = p2;
+    Vec2 p3Old = p3;
+
+    // First node
+    Vec2 Fint1 = FintTri(k, L, p1Old, p2Old);
+    Fint1 += FintTri(k, L, p1Old, p3Old);
+
+    Vec2 Fext1 = FextTri(m, p1Old);
+
+
+    v1 = v1 + dt * (1.0 / m) * (Fext1 - Fint1  - d * v1);
+    p1 = p1 + dt * v1;
+
+    // Second node
+    Vec2 Fint2 = FintTri(k, L, p2Old, p1Old);
+    Fint2 += FintTri(k, L, p2Old, p3Old);
+
+    Vec2 Fext2 = FextTri(m, p2Old);
+
+
+    v2 = v2 + dt * (1.0 / m) * (Fext2 - Fint2  - d * v2);
+    p2 = p2 + dt * v2;
+
+    // Thrid node
+    Vec2 Fint3 = FintTri(k, L, p3Old, p1Old);
+    Fint3 += FintTri(k, L, p3Old, p2Old);
+
+    Vec2 Fext3 = FextTri(m, p3Old);
+
+
+    v3 = v3 + dt * (1.0 / m) * (Fext3 - Fint3  - d * v3);
+    p3 = p3 + dt * v3;
+
+}
+
 // falling triangle
+// iterate over strings for internal forces
+// iterate over masses for the external forces
+// check for ground condiction
 void AdvanceTimeStep3(double k, double m, double d, double L, double dt,
                       Vec2& p1, Vec2& v1, Vec2& p2, Vec2& v2, Vec2& p3, Vec2& v3)
 {
-	//p1 += Vec2(1,1);
+    symplecticEuler(k, m, d, L, dt, p1, v1, p2, v2, p3, v3);
 }
