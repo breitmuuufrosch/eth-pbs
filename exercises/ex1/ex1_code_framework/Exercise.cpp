@@ -12,7 +12,7 @@ double Fext(double m) {
 
 // get the internal force
 double Fint(double k, double y, double L) {
-    return k * (L + y);
+    return k * (L - y);
 }
 
 
@@ -20,12 +20,12 @@ void explicitEuler(double k, double m, double d, double L, double dt, double p1,
     // use old value for velocity computation
     double p2Old = p2;
     p2 = p2 + dt * v2;
-    v2 = v2 + (1 / m) * (- Fint(k, p2Old, L) + Fext(m) - d * v2);
+    v2 = v2 + dt * (1 / m) * (- Fint(k, fabs(p1 - p2Old), L) + Fext(m) - d * v2);
 
 }
 // NEEDS TO BE DOUBLE CHEKED
 void symplecticEuler(double k, double m, double d, double L, double dt, double p1, double v1, double& p2, double& v2) {
-    v2 = v2 + (1 / m) * (- Fint(k, p2, L) + Fext(m) - d * v2);
+    v2 = v2 + dt * (1 / m) * (- Fint(k, fabs(p1 - p2), L) + Fext(m) - d * v2);
     p2 = p2 + dt * v2;
 }
 
