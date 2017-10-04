@@ -55,6 +55,7 @@ void analytic(double k, double m, double d, double L, double t, double p1, doubl
     double c_2 = (c_1 * alpha)  / beta;
 
     p2 = c_1 * exp(alpha * t) * cos(beta * t) + c_2 * exp(beta * t) * sin(beta *  t) - L - ((m * g) / k); 
+    v2 = c_1 * exp(alpha * t) * (alpha * cos(beta * t) - beta * sin(beta *  t)) + c_2 * exp(alpha * t) * (alpha * sin(beta * t) - beta * cos(beta *  t));
 }
 
 // Exercise 1
