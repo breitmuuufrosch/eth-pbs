@@ -43,18 +43,21 @@ void midPoint(double k, double m, double d, double L, double dt, double p1, doub
 }
 
 void backwardEuler(double k, double m, double d, double L, double dt, double p1, double v1, double& p2, double& v2) {
-    // impl me
 	double p2_old = p2;
 	double v2_old = v2;
-	if (p2_old > p1)
+
+	double p2Solution1 = -d*dt*dt*m*v2_old + d*dt*dt*v2_old - d*dt*m*p2_old + g*dt*dt*m + dt*dt*k*L + dt*dt*k*p1 - dt*m*v2_old - m*p2_old;
+	p2Solution1 /= (-d*dt*m + dt*dt*k - m);
+
+	double p2Solution2 = d*dt*dt*m*v2_old - d*dt*dt*v2_old + d*dt*m*p2_old - g*dt*dt*m - dt*dt*k*L + dt*dt*k*p1 + dt*m*v2_old + m*p2_old;
+	p2Solution2 /= (d*dt*m + dt*dt*k + m);
+	if (p2Solution1 > p1)
 	{
-		p2 = -d*dt*dt*m*v2_old + d*dt*dt*v2_old - d*dt*m*p2_old + g*dt*dt*m + dt*dt*k*L + dt*dt*k*p1 - dt*m*v2_old - m*p2_old;
-		p2 /= (-d*dt*m + dt*dt*k - m);
+		p2 = p2Solution1;
 	}
 	else
 	{
-		p2 = d*dt*dt*m*v2_old - d*dt*dt*v2_old + d*dt*m*p2_old - g*dt*dt*m - dt*dt*k*L + dt*dt*k*p1 + dt*m*v2_old + m*p2_old;
-		p2 /= (d*dt*m + dt*dt*k + m);
+		p2 = p2Solution2;
 	}
 
 	v2 = (p2 - p2_old) / dt;
