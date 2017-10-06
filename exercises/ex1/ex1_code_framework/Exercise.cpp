@@ -6,42 +6,128 @@ static const double g = 9.81;
 static const double kr = 100.0;
 
 
-// get the external force
+/**
+ * \brief Calculate the external force of an object in the mass-spring-system
+ * 
+ * \param m Mass of the object
+ * 
+ * \return External force of the object
+ */
 double Fext(double m) {
     return m * (- g);
 }
 
-// get the internal force
+
+/**
+ * \brief Calculate the internal force of an object in the mass-spring-system
+ * 
+ * \param k Stiffness of the spring
+ * \param y Length of the deformed spring
+ * \param L Length of the spring in rest-mode
+ *		
+ * \return
+ *		Internal force of the object
+ */
 double Fint(double k, double y, double L) {
     return k * (L - y);
 }
 
 
+/**
+ * \brief Calculate the new state of the mass-spring-system with the Explicit Euler.
+ * 
+ * \param k  Stiffness of the spring
+ * \param m  Mass of the objects (the same for all)
+ * \param d  Damping factor
+ * \param L  Length of the spring in rest-mode
+ * \param dt Time-step
+ * \param p1 Position of point 1 at begining of time-frame
+ * \param v1 Velocity of point 1 at begining of time-frame
+ * \param p2 Output-parameter
+ *           Input:  Position of point 2 at beginning of time-frame
+ *           Output: Position of point 2 after applying the time-step
+ * \param v2 Output-parameter
+ *           Input:  Velocity of point 2 at begining of time-frame
+ *           Output: Velocity of point 2 after applying the time-step
+ */
 void explicitEuler(double k, double m, double d, double L, double dt, double p1, double v1, double& p2, double& v2) {
     // use old value for velocity computation
     double p2Old = p2;
     p2 = p2 + dt * v2;
     v2 = v2 + dt * (1.0 / m) * (- Fint(k, fabs(p1 - p2Old), L) + Fext(m) - d * v2);
-
 }
 
+
+/**
+* \brief Calculate the new state of the mass-spring-system with the Symplectic Euler.
+*
+* \param k  Stiffness of the spring
+* \param m  Mass of the objects (the same for all)
+* \param d  Damping factor
+* \param L  Length of the spring in rest-mode
+* \param dt Time-step
+* \param p1 Position of point 1 at begining of time-frame
+* \param v1 Velocity of point 1 at begining of time-frame
+* \param p2 Output-parameter
+*           Input:  Position of point 2 at beginning of time-frame
+*           Output: Position of point 2 after applying the time-step
+* \param v2 Output-parameter
+*           Input:  Velocity of point 2 at begining of time-frame
+*           Output: Velocity of point 2 after applying the time-step
+*/
 void symplecticEuler(double k, double m, double d, double L, double dt, double p1, double v1, double& p2, double& v2) {
     v2 = v2 + dt * (1.0 / m) * (- Fint(k, fabs(p1 - p2), L) + Fext(m) - d * v2);
     p2 = p2 + dt * v2;
 }
-// USING THE EXLICIT SCHEME
+
+
+/**
+* \brief Calculate the new state of the mass-spring-system with the Explicit Midpoint.
+* \description This used the Explicit Euler to generate the midpoints
+*
+* \param k  Stiffness of the spring
+* \param m  Mass of the objects (the same for all)
+* \param d  Damping factor
+* \param L  Length of the spring in rest-mode
+* \param dt Time-step
+* \param p1 Position of point 1 at begining of time-frame
+* \param v1 Velocity of point 1 at begining of time-frame
+* \param p2 Output-parameter
+*           Input:  Position of point 2 at beginning of time-frame
+*           Output: Position of point 2 after applying the time-step
+* \param v2 Output-parameter
+*           Input:  Velocity of point 2 at begining of time-frame
+*           Output: Velocity of point 2 after applying the time-step
+*/
 void midPoint(double k, double m, double d, double L, double dt, double p1, double v1, double& p2, double& v2) {
-    // impl me
     double p2Midpoint = p2;
     double v2Midpoint = v2;
 
-    // make an explicit euler step iwth half the step size
+    // make an explicit euler step with half the step size
     explicitEuler(k, m, d, L, dt / 2.0, p1, v1, p2Midpoint, v2Midpoint);
 
     p2 = p2 + dt * v2Midpoint;
     v2 = v2 + dt * (1.0 / m) * (- Fint(k, fabs(p1 - p2Midpoint), L) + Fext(m) - d * v2Midpoint);
 }
 
+
+/**
+* \brief Calculate the new state of the mass-spring-system with the Semi-Implicit Euler.
+*
+* \param k  Stiffness of the spring
+* \param m  Mass of the objects (the same for all)
+* \param d  Damping factor
+* \param L  Length of the spring in rest-mode
+* \param dt Time-step
+* \param p1 Position of point 1 at begining of time-frame
+* \param v1 Velocity of point 1 at begining of time-frame
+* \param p2 Output-parameter
+*           Input:  Position of point 2 at beginning of time-frame
+*           Output: Position of point 2 after applying the time-step
+* \param v2 Output-parameter
+*           Input:  Velocity of point 2 at begining of time-frame
+*           Output: Velocity of point 2 after applying the time-step
+*/
 void backwardEuler(double k, double m, double d, double L, double dt, double p1, double v1, double& p2, double& v2) {
 	double p2_old = p2;
 	double v2_old = v2;
@@ -52,22 +138,15 @@ void backwardEuler(double k, double m, double d, double L, double dt, double p1,
 	double p2Solution2 = d*dt*p2_old - g*dt*dt*m - dt*dt*k*L + dt*dt*k*p1 + dt*m*v2_old + m*p2_old;
 	p2Solution2 /= (d*dt + dt*dt*k + m);
 
-
-	//if (p2Solution1 > p1)
-	//{
+	//if (p2Solution1 > p1) {
 		//p2 = p2Solution1;
-	//}
-	//else
-	//{
+	//} else {
 		//p2 = p2Solution2;
 	//}
 
-	if (p2Solution2 < p1)
-	{
+	if (p2Solution2 < p1) {
 		p2 = p2Solution2;
-	}
-	else
-	{
+	} else {
 		p2 = p2Solution1;
 	}
 
@@ -75,32 +154,64 @@ void backwardEuler(double k, double m, double d, double L, double dt, double p1,
 }
 
 
+/**
+* \brief Calculate the new state of the mass-spring-system analytically.
+* \description Derived formulas can be found in the report.
+*
+* \param k  Stiffness of the spring
+* \param m  Mass of the objects (the same for all)
+* \param d  Damping factor
+* \param L  Length of the spring in rest-mode
+* \param t  Current time
+* \param p1 Position of point 1 at begining of time-frame
+* \param v1 Velocity of point 1 at begining of time-frame
+* \param p2 Output-parameter
+*           Input:  Position of point 2 at beginning of time-frame
+*           Output: Position of point 2 after applying the time-step
+* \param v2 Output-parameter
+*           Input:  Velocity of point 2 at begining of time-frame
+*           Output: Velocity of point 2 after applying the time-step
+*/
 void analytic(double k, double m, double d, double L, double t, double p1, double v1, double& p2, double& v2) {
     double alpha = - d / (2.0 *  m);
-    double beta = sqrt(4.0 * k * m - (d * d)) / (2.0 * m);
-    double c_1 = ((m * g) / k) + L - 1;
-    double c_2 = (c_1 * alpha)  / beta;
+    double beta = sqrt(4.0 * k * m - d * d) / (2.0 * m);
+    double c_1 = m * g / k + L - 1;
+    double c_2 = - c_1 * alpha / beta;
 
-    p2 = c_1 * exp(alpha * t) * cos(beta * t) + c_2 * exp(beta * t) * sin(beta *  t) - L - ((m * g) / k); 
-    v2 = c_1 * exp(alpha * t) * (alpha * cos(beta * t) - beta * sin(beta *  t)) + c_2 * exp(alpha * t) * (alpha * sin(beta * t) - beta * cos(beta *  t));
+    p2 = c_1 * exp(alpha * t) * cos(beta * t) + c_2 * exp(alpha * t) * sin(beta *  t) - L - ((m * g) / k); 
+    v2 = c_1 * exp(alpha * t) * (alpha * cos(beta * t) - beta * sin(beta * t)) + c_2 * exp(alpha * t) * (alpha * sin(beta * t) - beta * cos(beta * t));
 }
 
-// Exercise 1
-// hanging mass point
-// Program the updates per-time-step of the position p2 and velocity
-// v2 of the bottom point for the following integration methods:
-// explicit Euler (method = 1) 
-// symplectic Euler (method = 2) 
-// explicit midpoint (method = 3)
-// semi-implicit Euler (method = 4)
-// analytic (method = 5)
 
-void AdvanceTimeStep1(double k, double m, double d, double L, double dt, int method, double p1, double v1, double& p2, double& v2)
-{
+/**
+* \brief Exercise 1: hanging mass point
+* \description Calculate the new state of the mass-spring-system by given method.
+*              Supported methods are:
+*               - explicit Euler       method = 1
+*               - symplectic Euler     method = 2
+*               - explicit midpoint    method = 3
+*               - semi-implicit Euler  method = 4
+*               - analytic             method = 5
+*
+* \param k  Stiffness of the spring
+* \param m  Mass of the objects (the same for all)
+* \param d  Damping factor
+* \param L  Length of the spring in rest-mode
+* \param dt Time-step or current time (for analytic-method)
+* \param p1 Position of point 1 at begining of time-frame
+* \param v1 Velocity of point 1 at begining of time-frame
+* \param p2 Output-parameter
+*           Input:  Position of point 2 at beginning of time-frame
+*           Output: Position of point 2 after applying the time-step
+* \param v2 Output-parameter
+*           Input:  Velocity of point 2 at begining of time-frame
+*           Output: Velocity of point 2 after applying the time-step
+*/
+void AdvanceTimeStep1(double k, double m, double d, double L, double dt, int method, double p1, double v1, double& p2, double& v2) {
     switch(method) {
         case 1 : 
             explicitEuler(k, m, d, L, dt, p1, v1, p2, v2);
-            break;       // and exits the switch
+            break;
         case 2 : 
             symplecticEuler(k, m, d, L, dt, p1, v1, p2, v2);
             break;
@@ -116,8 +227,9 @@ void AdvanceTimeStep1(double k, double m, double d, double L, double dt, int met
         default: 
             break;
     }
-
 }
+
+
 // -------------------------------------------------------------------------------------
 // Exercise 3
 // -------------------------------------------------------------------------------------
