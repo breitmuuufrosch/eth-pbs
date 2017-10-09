@@ -1,0 +1,5 @@
+Velocity,damp = 0,damp = 0.5
+euler,3.712112,2.904297
+symplectic_euler,3.712112,4.486432
+midpoint,14.047521,7.696831
+backwards_euler,2.451280,-0.194707

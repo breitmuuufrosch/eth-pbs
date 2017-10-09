@@ -1,0 +1,5 @@
+Displacement,damp = 0,damp = 0.5
+euler,2.873876,1.982390
+symplectic_euler,2.943878,2.004505
+midpoint,2.892508,1.993519
+backwards_euler,1.271855,1.998346

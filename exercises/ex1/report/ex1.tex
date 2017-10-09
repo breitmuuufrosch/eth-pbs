@@ -18,29 +18,29 @@
 
 \begin{filecontents*}{error_convergence_analysis_velocity.csv}
 step,euler,symplectic-euler,midpoint,backwards-euler
-0.500000,,,,
-0.250000,1.503101,1.503101,77.334118,0.636422
-0.125000,3.442190,3.442190,-1.064007,-3.509106
-0.062500,4.090020,4.090020,4.998766,1.235972
-0.031250,4.153509,4.153509,6.778438,3.245808
-0.015630,4.104957,4.104957,7.453338,4.044384
-0.007810,4.059688,4.059688,7.747549,4.169692
-0.003910,4.031496,4.031496,7.846154,4.125019
-0.001950,4.016445,4.016445,8.666667,4.074097
-0.000980,4.007605,4.007605,6.666667,4.039235
+0.5,1.503101,1.503101,77.334118,0.636422
+0.25,3.44219,3.44219,-1.064007,-3.509106
+0.125,4.09002,4.09002,4.998766,1.235972
+0.0625,4.153509,4.153509,6.778438,3.245808
+0.03125,4.104957,4.104957,7.453338,4.044384
+0.01563,4.059688,4.059688,7.747549,4.169692
+0.00781,4.031496,4.031496,7.846154,4.125019
+0.00391,4.016445,4.016445,8.666667,4.074097
+0.00195,4.007605,4.007605,6.666667,4.039235
+0.00098,,,,
 \end{filecontents*}
 \begin{filecontents*}{error_convergence_analysis_displacement.csv}
 step,euler,symplectic-euler,midpoint,backwards-euler
-0.500000,,,,
-0.250000,7.380872,4.529371,4.915443,-1.527721
-0.125000,-5.375022,5.502809,7.579571,1.682016
-0.062500,1.701236,5.106089,8.263111,6.642051
-0.031250,3.129251,4.618190,8.264813,-23.329893
-0.015630,3.622619,4.319823,8.171322,0.748414
-0.007810,3.825027,4.161173,8.087349,2.847380
-0.003910,3.914942,4.081192,8.097561,3.514909
-0.001950,3.958042,4.041136,8.200000,3.776851
-0.000980,3.981702,4.018103,7.692308,3.893626
+0.5,7.380872,4.529371,4.915443,-1.527721
+0.25,-5.375022,5.502809,7.579571,1.682016
+0.125,1.701236,5.106089,8.263111,6.642051
+0.0625,3.129251,4.61819,8.264813,-23.329893
+0.03125,3.622619,4.319823,8.171322,0.748414
+0.01563,3.825027,4.161173,8.087349,2.84738
+0.00781,3.914942,4.081192,8.097561,3.514909
+0.00391,3.958042,4.041136,8.2,3.776851
+0.00195,3.981702,4.018103,7.692308,3.893626
+0.00098,,,,
 \end{filecontents*}
 \begin{filecontents*}{stability_analysis_damp_0.csv}
 step,euler,symplectic-euler,midpoint,backwards-euler,analytic
@@ -67,6 +67,20 @@ step,euler,symplectic-euler,midpoint,backwards-euler,analytic
 0.0128,2.15194,2.14111,2.1415,2.13367,2.00079
 0.0256,2.16469,2.14079,2.14087,2.12741,2.00307
 0.0512,3.25774,2.14033,2.14088,2.11877,2.01158
+\end{filecontents*}
+\begin{filecontents*}{stability_analysis_average_error_velocity.csv}
+Velocity,damp = 0,damp = 0.5
+euler,3.712112,2.904297
+symplectic_euler,3.712112,4.486432
+midpoint,14.047521,7.696831
+backwards_euler,2.451280,-0.194707
+\end{filecontents*}
+\begin{filecontents*}{stability_analysis_average_error_displacement.csv}
+Displacement,damp = 0,damp = 0.5
+euler,2.873876,1.982390
+symplectic_euler,2.943878,2.004505
+midpoint,2.892508,1.993519
+backwards_euler,1.271855,1.998346
 \end{filecontents*}
 
 \begin{document}
@@ -135,8 +149,30 @@ Subsituting $c_1$ to ge the value for $c_2$.
 ]
 {error_convergence_analysis_displacement.csv}
 
+
+\subsubsection{Average error table:}
+
+\pgfplotstabletypeset[
+	col sep = comma,
+	string replace*={_}{\textsubscript},
+	every head row/.style={before row=\toprule,after row=\midrule},
+	every last row/.style={after row=\bottomrule},
+	display columns/0/.style={string type},
+]
+{stability_analysis_average_error_velocity.csv}
+\\
+\pgfplotstabletypeset[
+	col sep = comma,
+	string replace*={_}{\textsubscript},
+	every head row/.style={before row=\toprule,after row=\midrule},
+	every last row/.style={after row=\bottomrule},
+	display columns/0/.style={string type},
+]
+{stability_analysis_average_error_displacement.csv}
+
 \subsubsection{Analysis:}
-Based on the top two tables, we can see that the explicit, sympletic- and backward-euler converges with $O(h^2)$ and the midpoint-method with $O(h^3)$.
+Based on the top two tables, we can see that the explicit, sympletic- and backward-euler converges with $O(h^2)$ and the midpoint-method with $O(h^3)$. Therefore, the error converges faster only for the midpoint-method. This holds for both, the velocity change as well the displacement.
+If the damping is set to 0.5, the errors for all methods does not converge as fast anymore as without damping. It seems like there is an additional error by adding the damping-factor (due to additional terms and roundings probably).
 
 
 \subsection{Stability analysis}
@@ -162,6 +198,6 @@ Based on the top two tables, we can see that the explicit, sympletic- and backwa
 
 \subsubsection{Analysis:}
 Two methods tend to gain energy over the time (explicit euler and midpoint euler), the others seem relatively stable and do not gain energy by doubling the step-sizes. The more accurate a method is, the more stable it seems to be. \\
-After adding a 0.5 damping, the results changed significantly. Most of the methods are stable now, but still the explicit euler seems to gain energy after doubling the steps 10 times. If one starts with higher step-sizes (0.0512), then only the backward-euler and the analytic solution are stable.
+After adding a 0.5 damping, the results changed significantly. Most of the methods are stable now, but still the explicit euler seems to gain energy after doubling the steps 10 times. The damping factor works as a regularizer and keeps the energy mostly within the correct range. However, when the step-sizes are too large for the euler, it will still fail.
 
 \end{document}
