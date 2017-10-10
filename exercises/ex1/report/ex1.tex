@@ -19,7 +19,7 @@
 \begin{filecontents*}{error_convergence_analysis_velocity.csv}
 step,euler,symplectic-euler,midpoint,backwards-euler
 0.5,1.503101,1.503101,77.334118,0.636422
-0.25,3.44219,3.44219,-1.064007,-3.509106
+0.25,3.44219,3.44219,1.064007,3.509106
 0.125,4.09002,4.09002,4.998766,1.235972
 0.0625,4.153509,4.153509,6.778438,3.245808
 0.03125,4.104957,4.104957,7.453338,4.044384
@@ -31,10 +31,10 @@ step,euler,symplectic-euler,midpoint,backwards-euler
 \end{filecontents*}
 \begin{filecontents*}{error_convergence_analysis_displacement.csv}
 step,euler,symplectic-euler,midpoint,backwards-euler
-0.5,7.380872,4.529371,4.915443,-1.527721
-0.25,-5.375022,5.502809,7.579571,1.682016
+0.5,7.380872,4.529371,4.915443,1.527721
+0.25,5.375022,5.502809,7.579571,1.682016
 0.125,1.701236,5.106089,8.263111,6.642051
-0.0625,3.129251,4.61819,8.264813,-23.329893
+0.0625,3.129251,4.61819,8.264813,23.329893
 0.03125,3.622619,4.319823,8.171322,0.748414
 0.01563,3.825027,4.161173,8.087349,2.84738
 0.00781,3.914942,4.081192,8.097561,3.514909
@@ -70,17 +70,17 @@ step,euler,symplectic-euler,midpoint,backwards-euler,analytic
 \end{filecontents*}
 \begin{filecontents*}{stability_analysis_average_error_velocity.csv}
 Velocity,damp = 0,damp = 0.5
-euler,3.712112,2.904297
-symplectic_euler,3.712112,4.486432
-midpoint,14.047521,7.696831
-backwards_euler,2.451280,-0.194707
+euler,3.712112,2.117509
+symplectic-euler,3.712112,2.117509
+midpoint,14.283967,12.611934
+backwards-euler,3.231082,1.890506
 \end{filecontents*}
 \begin{filecontents*}{stability_analysis_average_error_displacement.csv}
 Displacement,damp = 0,damp = 0.5
-euler,2.873876,1.982390
-symplectic_euler,2.943878,2.004505
-midpoint,2.892508,1.993519
-backwards_euler,1.271855,1.998346
+euler,4.098746,2.400098
+symplectic-euler,4.486432,2.589986
+midpoint,7.696831,2.510173
+backwards-euler,5.329207,2.111750
 \end{filecontents*}
 
 \begin{document}
@@ -126,6 +126,9 @@ Subsituting $c_1$ to ge the value for $c_2$.
 \end{equation}
 
 \subsection{Error convergence analysis}
+
+Please note that in the following two tables only the error convergence ($\frac{e_i}{e_{i+1}}$) with no damping for each method is shown.
+
 \subsubsection{Velocity change table:}
   
 \pgfplotstabletypeset[
@@ -134,6 +137,10 @@ Subsituting $c_1$ to ge the value for $c_2$.
 	every head row/.style={before row=\toprule,after row=\midrule},
 	every last row/.style={after row=\bottomrule},
 	display columns/0/.style={fixed, fixed zerofill, precision=6},
+	display columns/1/.style={fixed, fixed zerofill, precision=6},
+	display columns/2/.style={fixed, fixed zerofill, precision=6},
+	display columns/3/.style={fixed, fixed zerofill, precision=6},
+	display columns/4/.style={fixed, fixed zerofill, precision=6},
 ]
 {error_convergence_analysis_velocity.csv}
 
@@ -146,18 +153,26 @@ Subsituting $c_1$ to ge the value for $c_2$.
 	every head row/.style={before row=\toprule,after row=\midrule},
 	every last row/.style={after row=\bottomrule},
 	display columns/0/.style={fixed, fixed zerofill, precision=6},
+	display columns/1/.style={fixed, fixed zerofill, precision=6},
+	display columns/2/.style={fixed, fixed zerofill, precision=6},
+	display columns/3/.style={fixed, fixed zerofill, precision=6},
+	display columns/4/.style={fixed, fixed zerofill, precision=6},
 ]
 {error_convergence_analysis_displacement.csv}
 
 
 \subsubsection{Average error table:}
 
+The following tables shows the average error of the velocity change and displacement. (The data for the damping factor 0.5 can be found in the attached excel).
+\\
 \pgfplotstabletypeset[
 	col sep = comma,
 	string replace*={_}{\textsubscript},
 	every head row/.style={before row=\toprule,after row=\midrule},
 	every last row/.style={after row=\bottomrule},
 	display columns/0/.style={string type},
+	display columns/1/.style={fixed, fixed zerofill, precision=6},
+	display columns/2/.style={fixed, fixed zerofill, precision=6},
 ]
 {stability_analysis_average_error_velocity.csv}
 \\
@@ -167,12 +182,14 @@ Subsituting $c_1$ to ge the value for $c_2$.
 	every head row/.style={before row=\toprule,after row=\midrule},
 	every last row/.style={after row=\bottomrule},
 	display columns/0/.style={string type},
+	display columns/1/.style={fixed, fixed zerofill, precision=6},
+	display columns/2/.style={fixed, fixed zerofill, precision=6},
 ]
 {stability_analysis_average_error_displacement.csv}
 
 \subsubsection{Analysis:}
-Based on the top two tables, we can see that the explicit, sympletic- and backward-euler converges with $O(h^2)$ and the midpoint-method with $O(h^3)$. Therefore, the error converges faster only for the midpoint-method. This holds for both, the velocity change as well the displacement.
-If the damping is set to 0.5, the errors for all methods does not converge as fast anymore as without damping. It seems like there is an additional error by adding the damping-factor (due to additional terms and roundings probably).
+Based on the top two tables, we can see that the explicit, sympletic- and backward-Euler converge with $O(h^2)$ and the midpoint-method with $O(h^3)$. Therefore, the error converges faster only for the midpoint-method. This holds for both, the velocity change as well the displacement.
+If the damping is set to 0.5, the errors for all methods does not converge as fast anymore as without damping. It seems like there is an additional error by adding the damping-factor. Some of the causes of the slower convergence and larger error could be rounding errors due to more calculations involved, and different methods underestimating or overestimating the damping.
 
 
 \subsection{Stability analysis}
@@ -197,7 +214,8 @@ If the damping is set to 0.5, the errors for all methods does not converge as fa
 {stability_analysis_damp_0.5.csv}
 
 \subsubsection{Analysis:}
-Two methods tend to gain energy over the time (explicit euler and midpoint euler), the others seem relatively stable and do not gain energy by doubling the step-sizes. The more accurate a method is, the more stable it seems to be. \\
-After adding a 0.5 damping, the results changed significantly. Most of the methods are stable now, but still the explicit euler seems to gain energy after doubling the steps 10 times. The damping factor works as a regularizer and keeps the energy mostly within the correct range. However, when the step-sizes are too large for the euler, it will still fail.
+Two methods tend to gain energy over the time (explicit Euler and midpoint Euler), the others seem relatively stable and do not gain energy by doubling the step-sizes. The more accurate a method is, the more stable it seems to be. \\
+After adding a 0.5 damping, the results changed significantly. Most of the methods are stable now, but still the explicit Euler seems to gain energy after doubling the steps 10 times. The damping factor works as a regularizer and keeps the energy mostly within the correct range. However, when the step-sizes are too large for the Euler, it will still fail. \\
+Furthermore, backwards Euler tends to lose energy, which can be just barely seen from the maximum amplitude shrinking, but is evident during a transient simulation.
 
 \end{document}
