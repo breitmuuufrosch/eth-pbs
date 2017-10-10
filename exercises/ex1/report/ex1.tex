@@ -19,7 +19,7 @@
 \begin{filecontents*}{error_convergence_analysis_velocity.csv}
 step,euler,symplectic-euler,midpoint,backwards-euler
 0.5,1.503101,1.503101,77.334118,0.636422
-0.25,3.44219,3.44219,-1.064007,-3.509106
+0.25,3.44219,3.44219,1.064007,3.509106
 0.125,4.09002,4.09002,4.998766,1.235972
 0.0625,4.153509,4.153509,6.778438,3.245808
 0.03125,4.104957,4.104957,7.453338,4.044384
@@ -31,10 +31,10 @@ step,euler,symplectic-euler,midpoint,backwards-euler
 \end{filecontents*}
 \begin{filecontents*}{error_convergence_analysis_displacement.csv}
 step,euler,symplectic-euler,midpoint,backwards-euler
-0.5,7.380872,4.529371,4.915443,-1.527721
-0.25,-5.375022,5.502809,7.579571,1.682016
+0.5,7.380872,4.529371,4.915443,1.527721
+0.25,5.375022,5.502809,7.579571,1.682016
 0.125,1.701236,5.106089,8.263111,6.642051
-0.0625,3.129251,4.61819,8.264813,-23.329893
+0.0625,3.129251,4.61819,8.264813,23.329893
 0.03125,3.622619,4.319823,8.171322,0.748414
 0.01563,3.825027,4.161173,8.087349,2.84738
 0.00781,3.914942,4.081192,8.097561,3.514909
@@ -70,17 +70,17 @@ step,euler,symplectic-euler,midpoint,backwards-euler,analytic
 \end{filecontents*}
 \begin{filecontents*}{stability_analysis_average_error_velocity.csv}
 Velocity,damp = 0,damp = 0.5
-euler,3.712112,2.904297
-symplectic_euler,3.712112,4.486432
-midpoint,14.047521,7.696831
-backwards_euler,2.451280,-0.194707
+euler,3.712112,2.117509
+symplectic_euler,3.712112,2.117509
+midpoint,14.283967,12.611934
+backwards_euler,3.231082,1.890506
 \end{filecontents*}
 \begin{filecontents*}{stability_analysis_average_error_displacement.csv}
 Displacement,damp = 0,damp = 0.5
-euler,2.873876,1.982390
-symplectic_euler,2.943878,2.004505
-midpoint,2.892508,1.993519
-backwards_euler,1.271855,1.998346
+euler,4.098746,2.400098
+symplectic_euler,4.486432,2.589986
+midpoint,7.696831,2.510173
+backwards_euler,5.329207,2.111750
 \end{filecontents*}
 
 \begin{document}
@@ -126,6 +126,9 @@ Subsituting $c_1$ to ge the value for $c_2$.
 \end{equation}
 
 \subsection{Error convergence analysis}
+
+Please note that in the following two tables only the error convergence ($\frac{e_i}{e_{i+1}}$) with no damping for each method is shown.
+
 \subsubsection{Velocity change table:}
   
 \pgfplotstabletypeset[
@@ -134,6 +137,10 @@ Subsituting $c_1$ to ge the value for $c_2$.
 	every head row/.style={before row=\toprule,after row=\midrule},
 	every last row/.style={after row=\bottomrule},
 	display columns/0/.style={fixed, fixed zerofill, precision=6},
+	display columns/1/.style={fixed, fixed zerofill, precision=6},
+	display columns/2/.style={fixed, fixed zerofill, precision=6},
+	display columns/3/.style={fixed, fixed zerofill, precision=6},
+	display columns/4/.style={fixed, fixed zerofill, precision=6},
 ]
 {error_convergence_analysis_velocity.csv}
 
@@ -146,18 +153,26 @@ Subsituting $c_1$ to ge the value for $c_2$.
 	every head row/.style={before row=\toprule,after row=\midrule},
 	every last row/.style={after row=\bottomrule},
 	display columns/0/.style={fixed, fixed zerofill, precision=6},
+	display columns/1/.style={fixed, fixed zerofill, precision=6},
+	display columns/2/.style={fixed, fixed zerofill, precision=6},
+	display columns/3/.style={fixed, fixed zerofill, precision=6},
+	display columns/4/.style={fixed, fixed zerofill, precision=6},
 ]
 {error_convergence_analysis_displacement.csv}
 
 
 \subsubsection{Average error table:}
 
+The following tables shows the average error of the velocity change and displacement. (The data for the damping factor 0.5 can be found in the attached excel).
+\\
 \pgfplotstabletypeset[
 	col sep = comma,
 	string replace*={_}{\textsubscript},
 	every head row/.style={before row=\toprule,after row=\midrule},
 	every last row/.style={after row=\bottomrule},
 	display columns/0/.style={string type},
+	display columns/1/.style={fixed, fixed zerofill, precision=6},
+	display columns/2/.style={fixed, fixed zerofill, precision=6},
 ]
 {stability_analysis_average_error_velocity.csv}
 \\
@@ -167,6 +182,8 @@ Subsituting $c_1$ to ge the value for $c_2$.
 	every head row/.style={before row=\toprule,after row=\midrule},
 	every last row/.style={after row=\bottomrule},
 	display columns/0/.style={string type},
+	display columns/1/.style={fixed, fixed zerofill, precision=6},
+	display columns/2/.style={fixed, fixed zerofill, precision=6},
 ]
 {stability_analysis_average_error_displacement.csv}
 
