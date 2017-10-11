@@ -1,0 +1,1 @@
+/home/ax/master/2017_01/PhysicallyBasedSimulation/exercises/ex2/ex2_code_framework/build/Release/CMakeFiles/Exercise2.dir
