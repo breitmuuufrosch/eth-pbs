@@ -351,7 +351,8 @@ void symplecticEuler(double k, double m, double d, double L, double dt,
  * \param p2 Position of point 2 at the end of time-frame
  * \param v2 Velocity of point 2 at the end of time-frame
  * \param p3 Position of point 3 at the end of time-frame
- * \param v3 Velocity of point 3 at the end of time-frame*/
+ * \param v3 Velocity of point 3 at the end of time-frame
+ */
 void AdvanceTimeStep3(double k, double m, double d, double L, double dt,
                       Vec2& p1, Vec2& v1, Vec2& p2, Vec2& v2, Vec2& p3, Vec2& v3) {
     symplecticEuler(k, m, d, L, dt, p1, v1, p2, v2, p3, v3);
