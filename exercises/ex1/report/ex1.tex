@@ -188,8 +188,8 @@ The following tables shows the average error of the velocity change and displace
 {stability_analysis_average_error_displacement.csv}
 
 \subsubsection{Analysis:}
-Based on the top two tables, we can see that the explicit, sympletic- and backward-euler converges with $O(h^2)$ and the midpoint-method with $O(h^3)$. Therefore, the error converges faster only for the midpoint-method. This holds for both, the velocity change as well the displacement.
-If the damping is set to 0.5, the errors for all methods does not converge as fast anymore as without damping. It seems like there is an additional error by adding the damping-factor (due to additional terms and roundings probably).
+Based on the top two tables, we can see that the explicit, sympletic- and backward-Euler converge with $O(h^2)$ and the midpoint-method with $O(h^3)$. Therefore, the error converges faster only for the midpoint-method. This holds for both, the velocity change as well the displacement.
+If the damping is set to 0.5, the errors for all methods does not converge as fast anymore as without damping. It seems like there is an additional error by adding the damping-factor. Some of the causes of the slower convergence and larger error could be rounding errors due to more calculations involved, and different methods underestimating or overestimating the damping.
 
 
 \subsection{Stability analysis}
@@ -214,7 +214,8 @@ If the damping is set to 0.5, the errors for all methods does not converge as fa
 {stability_analysis_damp_0.5.csv}
 
 \subsubsection{Analysis:}
-Two methods tend to gain energy over the time (explicit euler and midpoint euler), the others seem relatively stable and do not gain energy by doubling the step-sizes. The more accurate a method is, the more stable it seems to be. \\
-After adding a 0.5 damping, the results changed significantly. Most of the methods are stable now, but still the explicit euler seems to gain energy after doubling the steps 10 times. The damping factor works as a regularizer and keeps the energy mostly within the correct range. However, when the step-sizes are too large for the euler, it will still fail.
+Two methods tend to gain energy over the time (explicit Euler and midpoint Euler), the others seem relatively stable and do not gain energy by doubling the step-sizes. The more accurate a method is, the more stable it seems to be. \\
+After adding a 0.5 damping, the results changed significantly. Most of the methods are stable now, but still the explicit Euler seems to gain energy after doubling the steps 10 times. The damping factor works as a regularizer and keeps the energy mostly within the correct range. However, when the step-sizes are too large for the Euler, it will still fail. \\
+Furthermore, backwards Euler tends to lose energy, which can be just barely seen from the maximum amplitude shrinking, but is evident during a transient simulation.
 
 \end{document}
