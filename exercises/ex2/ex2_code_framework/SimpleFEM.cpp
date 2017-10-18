@@ -10,13 +10,15 @@
 #include "MeshViewer.h"
 
 // size of grid
-static const int gridSize = 20;
+static const int gridSize = 8;
 // use a graded mesh, or a regular mesh
-static const bool gradedMesh = false;
+static const bool gradedMesh = true;
 // laplace or poisson problem?
-static const bool laplaceProblem = false;
+static const bool laplaceProblem = true;
 // display debug information?
 static const bool debugOut = false;
+// use geometric construction
+static const bool useGeometric = false;
 
 
 double eval_u(double x, double y)
@@ -128,7 +130,17 @@ void SimpleFEM::ComputeRHS(const FEMMesh &mesh, std::vector<double> &rhs)
 		const FEMElementTri& elem = mesh.GetElement(ie);
 
 		//Task4 starts here
-		
+		Vector2 bary(0, 0);
+		for (int i = 0; i < 3; i++) {
+			bary += mesh.GetNodePosition(elem.GetGlobalNodeForElementNode(i));
+		}
+		bary /= 3.0;
+
+		for (int i = 0; i < 3; i++) {
+			int globalI = elem.GetGlobalNodeForElementNode(i);
+
+			rhs[globalI] += eval_f(bary.x(), bary.y()) * elem.evalSingleBasisGlobalLES(i, &mesh, bary.x(), bary.y());
+		}
 		//Task4 ends here
 	}
 }
@@ -137,7 +149,22 @@ void SimpleFEM::ComputeRHS(const FEMMesh &mesh, std::vector<double> &rhs)
 void SimpleFEM::computeError(FEMMesh &mesh, const std::vector<double> &sol_num, std::vector<double> &verror, double &err_nrm)
 {
 	//Task 5 starts here
-	
+	std::cout.precision(17);
+	for (int i = 0; i < mesh.GetNumNodes(); i++) {
+		Vector2 pos = mesh.GetNodePosition(i);
+		verror[i] = fabs(eval_u(pos.x(), pos.y()) - sol_num[i]); 
+	}
+
+	std::vector<double> k_verror(mesh.GetNumNodes());
+	mesh.getMat().MultVector(verror, k_verror);
+
+	err_nrm = 0.0;
+
+	for (int i = 0; i < mesh.GetNumNodes(); i++) {
+		err_nrm += verror[i] * k_verror[i];
+	}
+
+	err_nrm = sqrt(err_nrm);
 	//Task 5 ends here
 }
 

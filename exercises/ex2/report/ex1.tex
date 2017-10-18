@@ -1,0 +1,221 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+\usepackage{csvsimple}
+\usepackage{pgfplotstable,booktabs,filecontents}
+\pgfplotsset{compat=1.9}% supress warning
+
+\title{Physically-based Simulation \\ Exercise 1}
+\author{ 
+    Alexander Lelidis (14-907-562), \\
+    Andreas Emch (08-631-384), \\
+    Uro\v{s} Te\v{s}i\'{c} (17-950-346)
+}
+\date{\today}
+
+\usepackage{natbib}
+\usepackage{graphicx}
+
+\begin{filecontents*}{error_convergence_analysis_velocity.csv}
+step,euler,symplectic-euler,midpoint,backwards-euler
+0.5,1.503101,1.503101,77.334118,0.636422
+0.25,3.44219,3.44219,1.064007,3.509106
+0.125,4.09002,4.09002,4.998766,1.235972
+0.0625,4.153509,4.153509,6.778438,3.245808
+0.03125,4.104957,4.104957,7.453338,4.044384
+0.01563,4.059688,4.059688,7.747549,4.169692
+0.00781,4.031496,4.031496,7.846154,4.125019
+0.00391,4.016445,4.016445,8.666667,4.074097
+0.00195,4.007605,4.007605,6.666667,4.039235
+0.00098,,,,
+\end{filecontents*}
+\begin{filecontents*}{error_convergence_analysis_displacement.csv}
+step,euler,symplectic-euler,midpoint,backwards-euler
+0.5,7.380872,4.529371,4.915443,1.527721
+0.25,5.375022,5.502809,7.579571,1.682016
+0.125,1.701236,5.106089,8.263111,6.642051
+0.0625,3.129251,4.61819,8.264813,23.329893
+0.03125,3.622619,4.319823,8.171322,0.748414
+0.01563,3.825027,4.161173,8.087349,2.84738
+0.00781,3.914942,4.081192,8.097561,3.514909
+0.00391,3.958042,4.041136,8.2,3.776851
+0.00195,3.981702,4.018103,7.692308,3.893626
+0.00098,,,,
+\end{filecontents*}
+\begin{filecontents*}{stability_analysis_damp_0.csv}
+step,euler,symplectic-euler,midpoint,backwards-euler,analytic
+0.0001,2.2011,2.1962,2.1962,2.19605,2
+0.0002,2.21767,2.1962,2.1962,2.19589,2
+0.0004,2.31598,2.1962,2.1962,2.19559,2
+0.0008,8.47E+34,2.1962,2.1962,2.19498,2
+0.0016,inf,2.1962,2.19628,2.19377,2.00001
+0.0032,inf,2.19621,2.19749,2.1914,2.00005
+0.0064,inf,2.19625,2.21907,2.18685,2.0002
+0.0128,inf,2.1964,1.89E+307,2.17852,2.0008
+0.0256,inf,2.19701,1.84E+307,2.16453,2.0032
+0.0512,inf,2.19958,inf,2.14468,2.01258
+\end{filecontents*}
+\begin{filecontents*}{stability_analysis_damp_0.5.csv}
+step,euler,symplectic-euler,midpoint,backwards-euler,analytic
+0.0001,2.14176,2.14169,2.14169,2.14162,2
+0.0002,2.14183,2.14168,2.14169,2.14155,2
+0.0004,2.14197,2.14167,2.14169,2.14141,2
+0.0008,2.14226,2.14165,2.14169,2.14113,2
+0.0016,2.14284,2.14162,2.14169,2.14058,2.00001
+0.0032,2.14402,2.14154,2.14168,2.13949,2.00005
+0.0064,2.14649,2.14141,2.14164,2.13743,2.0002
+0.0128,2.15194,2.14111,2.1415,2.13367,2.00079
+0.0256,2.16469,2.14079,2.14087,2.12741,2.00307
+0.0512,3.25774,2.14033,2.14088,2.11877,2.01158
+\end{filecontents*}
+\begin{filecontents*}{stability_analysis_average_error_velocity.csv}
+Velocity,damp = 0,damp = 0.5
+euler,3.712112,2.117509
+symplectic_euler,3.712112,2.117509
+midpoint,14.283967,12.611934
+backwards_euler,3.231082,1.890506
+\end{filecontents*}
+\begin{filecontents*}{stability_analysis_average_error_displacement.csv}
+Displacement,damp = 0,damp = 0.5
+euler,4.098746,2.400098
+symplectic_euler,4.486432,2.589986
+midpoint,7.696831,2.510173
+backwards_euler,5.329207,2.111750
+\end{filecontents*}
+
+\begin{document}
+
+\maketitle
+
+\section{Analytic solution and results analysis}
+\subsection{Analytic solution}
+To find the parameters $c_1$ and $c_2$ we use the inital values from the given codebase. The starting position ($t = 0$) is at $y = -1$.
+\begin{equation}
+    y(t) = c_1 e^{\alpha  t} \cos(\beta t) + c_2 e^{\alpha  t} \sin(\beta t) - L - \frac{mg}{k}
+\end{equation}
+By  differentiating this equation with respect to t we get.
+\begin{equation}
+    y'(t) = c_1 e^{\alpha  t} (\alpha \cos(\beta t) - \beta \sin(\beta t) )+ c_2 e^{\alpha  t} (\alpha \sin(\beta t) + \beta \cos(\beta t)) 
+\end{equation}
+By inserting $t = 0$ and $y_0 = -1$ into (1) we get:
+\begin{equation}
+    -1 = c_1 e^{\alpha  0} \cos(\beta 0) + c_2 e^{\beta  0} \sin(\beta 0) - L - \frac{mg}{k} 
+\end{equation}
+\begin{equation}
+    -1 = c_1 e^{\alpha  0} - L - \frac{mg}{k} 
+\end{equation}
+\begin{equation}
+    c_1 = -1 + L + \frac{mg}{k}
+\end{equation}
+To calculate $c_2$ we replace the starting speed with $y'(0) = 0$.
+\begin{equation}
+    0 = c_1 e^{\alpha  0} (\alpha \cos(\beta 0) - \beta \sin(\beta 0) )+ c_2 e^{\alpha  0} (\alpha \sin(\beta 0) + \beta \cos(\beta 0)) 
+\end{equation}
+\begin{equation}
+    0 = c_1 \alpha \cos(\beta 0) + c_2  \beta \cos(\beta 0)
+\end{equation}
+\begin{equation}
+    0 = c_1 \alpha + c_2  \beta
+\end{equation}
+\begin{equation}
+    c_2 =  \frac{- c_1 \alpha}{  \beta}
+\end{equation}
+Subsituting $c_1$ to ge the value for $c_2$.
+\begin{equation}
+    c_2 =  - \frac{ \alpha}{  \beta} (-1 + L + \frac{mg}{k})
+\end{equation}
+
+\subsection{Error convergence analysis}
+
+Please note that in the following two tables only the error convergence ($\frac{e_i}{e_{i+1}}$) with no damping for each method is shown.
+
+\subsubsection{Velocity change table:}
+  
+\pgfplotstabletypeset[
+	col sep = comma,
+	string replace*={_}{\textsubscript},
+	every head row/.style={before row=\toprule,after row=\midrule},
+	every last row/.style={after row=\bottomrule},
+	display columns/0/.style={fixed, fixed zerofill, precision=6},
+	display columns/1/.style={fixed, fixed zerofill, precision=6},
+	display columns/2/.style={fixed, fixed zerofill, precision=6},
+	display columns/3/.style={fixed, fixed zerofill, precision=6},
+	display columns/4/.style={fixed, fixed zerofill, precision=6},
+]
+{error_convergence_analysis_velocity.csv}
+
+
+\subsubsection{Displacement table:}
+  
+\pgfplotstabletypeset[
+	col sep = comma,
+	string replace*={_}{\textsubscript},
+	every head row/.style={before row=\toprule,after row=\midrule},
+	every last row/.style={after row=\bottomrule},
+	display columns/0/.style={fixed, fixed zerofill, precision=6},
+	display columns/1/.style={fixed, fixed zerofill, precision=6},
+	display columns/2/.style={fixed, fixed zerofill, precision=6},
+	display columns/3/.style={fixed, fixed zerofill, precision=6},
+	display columns/4/.style={fixed, fixed zerofill, precision=6},
+]
+{error_convergence_analysis_displacement.csv}
+
+
+\subsubsection{Average error table:}
+
+The following tables shows the average error of the velocity change and displacement. (The data for the damping factor 0.5 can be found in the attached excel).
+\\
+\pgfplotstabletypeset[
+	col sep = comma,
+	string replace*={_}{\textsubscript},
+	every head row/.style={before row=\toprule,after row=\midrule},
+	every last row/.style={after row=\bottomrule},
+	display columns/0/.style={string type},
+	display columns/1/.style={fixed, fixed zerofill, precision=6},
+	display columns/2/.style={fixed, fixed zerofill, precision=6},
+]
+{stability_analysis_average_error_velocity.csv}
+\\
+\pgfplotstabletypeset[
+	col sep = comma,
+	string replace*={_}{\textsubscript},
+	every head row/.style={before row=\toprule,after row=\midrule},
+	every last row/.style={after row=\bottomrule},
+	display columns/0/.style={string type},
+	display columns/1/.style={fixed, fixed zerofill, precision=6},
+	display columns/2/.style={fixed, fixed zerofill, precision=6},
+]
+{stability_analysis_average_error_displacement.csv}
+
+\subsubsection{Analysis:}
+Based on the top two tables, we can see that the explicit, sympletic- and backward-Euler converge with $O(h^2)$ and the midpoint-method with $O(h^3)$. Therefore, the error converges faster only for the midpoint-method. This holds for both, the velocity change as well the displacement.
+If the damping is set to 0.5, the errors for all methods does not converge as fast anymore as without damping. It seems like there is an additional error by adding the damping-factor. Some of the causes of the slower convergence and larger error could be rounding errors due to more calculations involved, and different methods underestimating or overestimating the damping.
+
+
+\subsection{Stability analysis}
+\subsubsection{Damping: 0}
+\pgfplotstabletypeset[
+	col sep = comma,
+	string replace*={_}{\textsubscript},
+	every head row/.style={before row=\toprule,after row=\midrule},
+	every last row/.style={after row=\bottomrule},
+	display columns/0/.style={fixed, fixed zerofill, precision=6},
+]
+{stability_analysis_damp_0.csv}
+
+\subsubsection{Damping: 0.5}
+\pgfplotstabletypeset[
+	col sep = comma,
+	string replace*={_}{\textsubscript},
+	every head row/.style={before row=\toprule,after row=\midrule},
+	every last row/.style={after row=\bottomrule},
+	display columns/0/.style={fixed, fixed zerofill, precision=6},
+]
+{stability_analysis_damp_0.5.csv}
+
+\subsubsection{Analysis:}
+Two methods tend to gain energy over the time (explicit Euler and midpoint Euler), the others seem relatively stable and do not gain energy by doubling the step-sizes. The more accurate a method is, the more stable it seems to be. \\
+After adding a 0.5 damping, the results changed significantly. Most of the methods are stable now, but still the explicit Euler seems to gain energy after doubling the steps 10 times. The damping factor works as a regularizer and keeps the energy mostly within the correct range. However, when the step-sizes are too large for the Euler, it will still fail. \\
+Furthermore, backwards Euler tends to lose energy, which can be just barely seen from the maximum amplitude shrinking, but is evident during a transient simulation.
+
+\end{document}
