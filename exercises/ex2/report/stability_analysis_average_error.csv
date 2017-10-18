@@ -1,5 +1,0 @@
-description,euler,symplectic_euler,midpoint,backwards_euler
-velocity (damp = 0),3.712112,3.712112,14.047521,2.451280
-velocity (damp = 0.5),2.117509,2.117509,-8.435254,1.890506
-displacement (damp = 0),2.904297,4.486432,7.696831,-0.194707
-displacement (damp = 0.5),2.400098,2.589986,2.510173,0.542703
