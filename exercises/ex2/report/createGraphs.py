@@ -16,7 +16,7 @@ pylab.plot(x, y["Laplace"], label="Laplace")
 pylab.legend(loc='upper right')
 pylab.ylabel('Error')
 pylab.xlabel('Grid size')
-pylab.savefig('images/laplace.png')
+pylab.savefig('images/laplace.png'
 pylab.show()
 
 pylab.plot(x, y["Poisson (uniform)"], label="Poisson (uniform)")
