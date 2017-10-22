@@ -16,6 +16,7 @@ static const bool useGeometric = true;
 // TASK 3
 void FEMElementTri::Assemble(FEMMesh *pMesh) const
 {
+	// Calculate gradients for all three vertices
 	std::vector<Vector2> gradients(3);
 
 	for (int i = 0; i < 3; i++) {
@@ -26,10 +27,13 @@ void FEMElementTri::Assemble(FEMMesh *pMesh) const
 		}
 	}
 
+	// Calculate element area. We will use it to calcualte stiffness later
 	double area;
 	computeElementArea(pMesh, area);
 
 	// TODO: @utesic Check order
+	//
+	// DONE: Order here doesn't matter. globalI, globalJ and dot product are symmetric/commutative
 	for (int i = 0; i < 3; i++) {
 		for (int j = 0; j < 3; ++j) {
 			int globalI = GetGlobalNodeForElementNode(i);
@@ -44,13 +48,17 @@ void FEMElementTri::Assemble(FEMMesh *pMesh) const
 
 // TASK 2
 void FEMElementTri::computeSingleBasisDerivGlobalGeom(int nodeId, Vector2 &basisDerivGlobal, const FEMMesh *pMesh) const {
+
+	// Get other indices of other two vertices
 	int x1 = (nodeId + 1) % 3;
 	int x2 = (nodeId + 2) % 3;
 
+	// Get coordinates of all vertices
 	Vector2 X0 = pMesh->GetNodePosition(GetGlobalNodeForElementNode(nodeId));
 	Vector2 X1 = pMesh->GetNodePosition(GetGlobalNodeForElementNode(x1));
 	Vector2 X2 = pMesh->GetNodePosition(GetGlobalNodeForElementNode(x2));
 
+	// Get the opposite edge and find the normal
 	Vector2 edge = X2 - X1;
 	Vector2 normal(-edge.y(), edge.x());
 	normal = normal.normalized();
@@ -58,6 +66,7 @@ void FEMElementTri::computeSingleBasisDerivGlobalGeom(int nodeId, Vector2 &basis
 	double area;
 	computeElementArea(pMesh, area);
 
+	// Area = 0.5 * edge * height
 	double height = 2 * area / edge.length(); // abs((edge.x() * X0.y() - edge.y() * X0.x())) / edge.length();
 
 	if (height == 0) {
@@ -69,26 +78,36 @@ void FEMElementTri::computeSingleBasisDerivGlobalGeom(int nodeId, Vector2 &basis
 
 // TASK 1
 void FEMElementTri::computeSingleBasisDerivGlobalLES(int nodeId, Vector2 &basisDerivGlobal, const FEMMesh *pMesh) const {
+	
+	// We set the Kronecker delta symbols
 	Vector3 roh(0, 0, 0);
+
+	// Kronecker delta is one only for nodeId
 	roh[nodeId] = 1;
 
+	// Index used to fill the matrix
 	std::vector<int> index({ 0, 1, 2 });
 	//index.erase(remove(index.begin(), index.end(), nodeId), index.end());
 
 	Matrix3x3 A;
 
 	for (auto const& c : index) {
+
+		// Get node coordinates
 		int globalNode = GetGlobalNodeForElementNode(c);
 		Vector2 position = pMesh->GetNodePosition(globalNode);
 
+		// Set them accordingly
 		A(c, 0) = position.x();
 		A(c, 1) = position.y();
 		A(c, 2) = 1;
 	}
 
+	// Calculate the coefficients a, b and c
 	Matrix3x3 A_inv = A.inverse();
 	Vector3 linear = A_inv * roh;
 
+	// Partial derivatives in x and in y leave us with a and b respectively
 	basisDerivGlobal = Vector2(linear.x(), linear.y());
 }
 

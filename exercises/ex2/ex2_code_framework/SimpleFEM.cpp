@@ -12,9 +12,9 @@
 // size of grid
 static const int gridSize = 8;
 // use a graded mesh, or a regular mesh
-static const bool gradedMesh = true;
+static const bool gradedMesh = false;
 // laplace or poisson problem?
-static const bool laplaceProblem = true;
+static const bool laplaceProblem = false;
 // display debug information?
 static const bool debugOut = false;
 // use geometric construction
@@ -129,13 +129,15 @@ void SimpleFEM::ComputeRHS(const FEMMesh &mesh, std::vector<double> &rhs)
 	{
 		const FEMElementTri& elem = mesh.GetElement(ie);
 
-		//Task4 starts here
+		// Task4 ends here
+		// Get the barycenter
 		Vector2 bary(0, 0);
 		for (int i = 0; i < 3; i++) {
 			bary += mesh.GetNodePosition(elem.GetGlobalNodeForElementNode(i));
 		}
 		bary /= 3.0;
 
+		// Evaluate the value at the barycenter once for each vertex
 		for (int i = 0; i < 3; i++) {
 			int globalI = elem.GetGlobalNodeForElementNode(i);
 
@@ -149,21 +151,27 @@ void SimpleFEM::ComputeRHS(const FEMMesh &mesh, std::vector<double> &rhs)
 void SimpleFEM::computeError(FEMMesh &mesh, const std::vector<double> &sol_num, std::vector<double> &verror, double &err_nrm)
 {
 	//Task 5 starts here
+	// Set the precision of the output
 	std::cout.precision(17);
+
+	// Fill the error vector
 	for (int i = 0; i < mesh.GetNumNodes(); i++) {
 		Vector2 pos = mesh.GetNodePosition(i);
 		verror[i] = fabs(eval_u(pos.x(), pos.y()) - sol_num[i]); 
 	}
 
+	// Calculate K * v_err
 	std::vector<double> k_verror(mesh.GetNumNodes());
 	mesh.getMat().MultVector(verror, k_verror);
 
 	err_nrm = 0.0;
 
+	// Calculate v_err^T * (K * v_err)
 	for (int i = 0; i < mesh.GetNumNodes(); i++) {
 		err_nrm += verror[i] * k_verror[i];
 	}
 
+	// Take the square root to obtain the norm
 	err_nrm = sqrt(err_nrm);
 	//Task 5 ends here
 }
