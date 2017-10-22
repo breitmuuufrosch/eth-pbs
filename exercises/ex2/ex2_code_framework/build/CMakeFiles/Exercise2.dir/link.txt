@@ -1,0 +1,1 @@
+/usr/bin/c++    -std=c++11    CMakeFiles/Exercise2.dir/SimpleFEM.cpp.o CMakeFiles/Exercise2.dir/MeshViewer.cpp.o CMakeFiles/Exercise2.dir/FEMElementTri.cpp.o  -o Exercise2 -rdynamic -lGLU -lGL -lSM -lICE -lX11 -lXext -lglut -lXmu -lXi 
