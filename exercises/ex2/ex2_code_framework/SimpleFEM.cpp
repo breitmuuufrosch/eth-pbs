@@ -122,22 +122,31 @@ bool SimpleFEM::isOnBoundary(const Vector2 &pos)
 	return pos[0] <= 0. || pos[0] >= 1. || pos[1] <= 0. || pos[1] >= 1.;
 }
 
-// TASK 4
+
+/**
+ * \brief TASK 4: Assemble the right-hand side
+ * 
+ * \param mesh  Mesh for which the right-hand side has to be computed.
+ * \param rhs   Output-parameter: (1 x #nodes)-vector which holds the values for the right-hand side.
+ */
 void SimpleFEM::ComputeRHS(const FEMMesh &mesh, std::vector<double> &rhs)
 {
 	for (int ie = 0; ie < mesh.GetNumElements(); ie++)
 	{
 		const FEMElementTri& elem = mesh.GetElement(ie);
 
-		// Task4 ends here
+		// Task4 starts here
 		// Get the barycenter
 		Vector2 bary(0, 0);
+
 		for (int i = 0; i < 3; i++) {
 			bary += mesh.GetNodePosition(elem.GetGlobalNodeForElementNode(i));
 		}
+
 		bary /= 3.0;
 
-		// Evaluate the value at the barycenter once for each vertex
+		// Evaluate the value at the barycenter once for each vertex and multiply it with the elements contribution
+		// using the source-term (eval_f).
 		for (int i = 0; i < 3; i++) {
 			int globalI = elem.GetGlobalNodeForElementNode(i);
 
@@ -147,7 +156,17 @@ void SimpleFEM::ComputeRHS(const FEMMesh &mesh, std::vector<double> &rhs)
 	}
 }
 
-// TASK 5
+/**
+ * \brief TASK 5: Convergence of the solution
+ * Compute the error between the derived and analytic solution with the given formula in the exercise.
+ * |err| = sqrt(v_err^T * K * v_err), where K is the stiffness matrix and v_err the difference between the derived and
+ * analytic solution elementwise.
+ * 
+ * \param mesh     Mesh for which the right-hand side has to be computed.
+ * \param sol_num  Numerical-solution given by the derivates.
+ * \param verror   Output-parameter: Elementwise difference between the derived and analytic solution.
+ * \param err_nrm  Output-parameter: Norm of the error given by the formula in the exercise.
+ */
 void SimpleFEM::computeError(FEMMesh &mesh, const std::vector<double> &sol_num, std::vector<double> &verror, double &err_nrm)
 {
 	//Task 5 starts here
