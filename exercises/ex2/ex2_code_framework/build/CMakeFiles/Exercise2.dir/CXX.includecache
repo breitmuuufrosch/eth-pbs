@@ -20,34 +20,6 @@ FEMMesh.h
 FEMElementTri.h
 /home/ax/master/2017_01/PhysicallyBasedSimulation/exercises/ex2/ex2_code_framework/FEMElementTri.h
 
-/home/ax/master/2017_01/PhysicallyBasedSimulation/exercises/ex2/ex2_code_framework/GL/glut.h
-windows.h
--
-OpenGL/gl.h
--
-OpenGL/glu.h
--
-GL/gl.h
--
-GL/glu.h
--
-
-/home/ax/master/2017_01/PhysicallyBasedSimulation/exercises/ex2/ex2_code_framework/MeshViewer.cpp
-stdlib.h
--
-SimpleFEMDefs.h
-/home/ax/master/2017_01/PhysicallyBasedSimulation/exercises/ex2/ex2_code_framework/SimpleFEMDefs.h
-MeshViewer.h
-/home/ax/master/2017_01/PhysicallyBasedSimulation/exercises/ex2/ex2_code_framework/MeshViewer.h
-FEMMesh.h
-/home/ax/master/2017_01/PhysicallyBasedSimulation/exercises/ex2/ex2_code_framework/FEMMesh.h
-algorithm
--
-GLUT/glut.h
--
-GL/glut.h
-/home/ax/master/2017_01/PhysicallyBasedSimulation/exercises/ex2/ex2_code_framework/GL/glut.h
-
 /home/ax/master/2017_01/PhysicallyBasedSimulation/exercises/ex2/ex2_code_framework/MeshViewer.h
 
 /home/ax/master/2017_01/PhysicallyBasedSimulation/exercises/ex2/ex2_code_framework/SimpleFEM.cpp
