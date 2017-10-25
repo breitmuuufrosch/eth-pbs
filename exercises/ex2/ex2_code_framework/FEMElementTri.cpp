@@ -73,7 +73,6 @@ void FEMElementTri::computeSingleBasisDerivGlobalLES(int nodeId, Vector2 &basisD
 	roh[nodeId] = 1;
 
 	std::vector<int> index({ 0, 1, 2 });
-	//index.erase(remove(index.begin(), index.end(), nodeId), index.end());
 
 	Matrix3x3 A;
 
@@ -109,12 +108,10 @@ void FEMElementTri::computeElementArea(const FEMMesh* pMesh, double& area) const
 
 double FEMElementTri::evalSingleBasisGlobalLES(int nodeId, const FEMMesh* pMesh, double x, double y) const
 {
-	// TODO: refactor
 	Vector3 roh(0, 0, 0);
 	roh[nodeId] = 1;
 
 	std::vector<int> index({ 0, 1, 2 });
-	//index.erase(remove(index.begin(), index.end(), nodeId), index.end());
 
 	Matrix3x3 A;
 
