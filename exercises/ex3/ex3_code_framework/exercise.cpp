@@ -26,11 +26,17 @@ void ExSolvePoisson(int _xRes, int _yRes, int _iterations, double _accuracy, Arr
 			for (int x = 1; x < _xRes - 1; x++) {
 				// Todo: dx??
 				_field(x, y) = (dx * dx * _b(x, y) + _field(x - 1, y) + _field(x, y - 1) + _field(x + 1, y) + _field(x, y + 1)) * 0.25;
-				residual += std::powf(_b(x, y) - _field(x, y), 2);
+			}
+		}
+		double rij = 0.0;
+		for (int y = 1; y < _yRes - 1; y++) {
+			for (int x = 1; x < _xRes - 1; x++) {
+				rij = (4.0 * _field(x, y) - _field(x - 1, y) - _field(x + 1, y) - _field(x, y - 1) - _field(x, y + 1)) / (dx * dx);
+				residual += std::pow(_b(x, y) - rij, 2);
 			}
 		}
 
-		residual = std::sqrtf(residual) / gridCells;
+		residual = std::sqrt(residual) / gridCells;
 
 
 		// For your debugging, and ours, please add these prints after every iteration
@@ -76,6 +82,11 @@ void BilinearInterpolation(double dx, double dy, Vector2T<int> &q11Index, Vector
 
 }
 
+void Clamp(Vector2T<double> &P, double dx, double dy) {
+	P.x() = min(max(P.x(), dx), 1 - dx);
+	P.y() = min(max(P.y(), dy), 1 - dy);
+}
+
 void ExAdvectWithSemiLagrange(int _xRes, int _yRes, double _dt, Array2d &_xVelocity, Array2d &_yVelocity, Array2d &_density, Array2d &_densityTemp, Array2d &_xVelocityTemp, Array2d &_yVelocityTemp) {
 
 	double dx = (1.0 / _xRes);
@@ -84,25 +95,29 @@ void ExAdvectWithSemiLagrange(int _xRes, int _yRes, double _dt, Array2d &_xVeloc
 	// Note: velocity u_{i+1/2} is practically stored at i+1
 	for (int y = 1; y < _yRes - 1; y++) {
 		for (int x = 1; x < _xRes - 1; x++) {
-			Vector2T<double> u((_xVelocity(x, y) + _xVelocity(x + 1, y)) / 2.0, (_yVelocity(x, y) + _yVelocity(x, y + 1)) / 2.0);
+			Vector2T<double> u_x((_xVelocity(x, y) + _xVelocity(x+1, y)) / 2.0, (_yVelocity(x, y) + _yVelocity(x, y + 1)) / 2.0);
 			//Vector2T<double> u(_xVelocity(x, y), _yVelocity(x, y));
-			Vector2T<double> p(x * dx, y * dy);
-			Vector2T<double> Xp = p - _dt * u;
+			Vector2T<double> p((x) * dx, y * dy);
+			Vector2T<double> Xp_x = p - _dt * u_x;
+			Vector2T<double> X_density = Xp_x;
+			Clamp(Xp_x, 2.5*dx, 2.5*dy);
+			Clamp(X_density, 2.*dx, 2.*dy);
 
-			int index_x0 = std::floor(Xp.x() * _xRes);
-			int index_y0 = std::floor(Xp.y() * _yRes);
+			int index_x0 = std::floor(Xp_x.x() * _xRes);
+			int index_y0 = std::floor(Xp_x.y() * _yRes);
 
 			Vector2T<int> q11(index_x0, index_y0);
 			Vector2T<int> destinationIndex(x, y);
 
-			BilinearInterpolation(dx, dy, q11, Xp, destinationIndex, _xVelocity, _xVelocityTemp);
-			BilinearInterpolation(dx, dy, q11, Xp, destinationIndex, _yVelocity, _yVelocityTemp);
-			BilinearInterpolation(dx, dy, q11, Xp, destinationIndex, _density, _densityTemp);
+			BilinearInterpolation(dx, dy, q11, Xp_x, destinationIndex, _xVelocity, _xVelocityTemp);
+			
+			BilinearInterpolation(dx, dy, q11, Xp_x, destinationIndex, _yVelocity, _yVelocityTemp);
+			
+			BilinearInterpolation(dx, dy, q11, X_density, destinationIndex, _density, _densityTemp);
 		}
 	}
 
 	// copy results from tmp buffers
-	// Todo: Check copy
 	_density = _densityTemp;
 	_xVelocity = _xVelocityTemp;
 	_yVelocity = _yVelocityTemp;
