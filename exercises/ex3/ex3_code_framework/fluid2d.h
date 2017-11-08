@@ -18,14 +18,14 @@
 #endif  
 
 // resolution of the simulation
-const int simulationResolution = 64;
+const int simulationResolution = 200;
 
 // global control defines
 #define OUTPATH "./output/"
 
 const double timestep = 0.005;
 // accuracy for gauss seidel solver
-const double solverAccuracy = 1e-5;
+const double solverAccuracy = 1e-2;
 // max. number of iterations
 const int solverIterations = 1000;
 
