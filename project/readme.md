@@ -23,12 +23,12 @@ I suggest to use the cmake-gui, since it most likely does not find the variables
 * Specify the location for source to "physSim/project/code" and for binaries to "physSim/project/code/build".
 * Hit configure (Windows => make sure to select 64Bit-version)
 * Verify or set these variables:
-** OPENSCENEGRAPH_INCLUDE_DIR:
-*** Windows: <path_to_osg>/include
-*** Ubuntu: /usr/include
-** OPENSCENEGRAPH_LIB_DIR:
-*** Windows: <path_to_osg>/lib
-*** Ubuntu: /usr/lib/x86_64-linux-gnu (for me)
+    * OPENSCENEGRAPH_INCLUDE_DIR:
+        * Windows: <path_to_osg>/include
+        * Ubuntu: /usr/include
+    * OPENSCENEGRAPH_LIB_DIR:
+        * Windows: <path_to_osg>/lib
+        * Ubuntu: /usr/lib/x86_64-linux-gnu (for me)
 * Generate
 
 Open the project, build and run it and enjoy :-)
