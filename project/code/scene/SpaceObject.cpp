@@ -39,8 +39,8 @@ void SpaceObject::init(osg::Vec3 translate) {
 	osg::ref_ptr<osg::Node> modelFile = osgDB::readNodeFile(modelPath);
 
 	if (!modelFile) {
-		std::cout << "File not found! Aborting...";
-		abort();
+		std::cout << "File not found! Aborting..." << std::endl;
+		exit(0);
 	}
 
 	// Scale the model if desired
