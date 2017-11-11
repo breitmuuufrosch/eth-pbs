@@ -8,7 +8,7 @@
 
 Windows:
 * Download the libraries of OSG from here: http://objexx.com/OpenSceneGraph.html (debug and release if you want to build in both)
-* Extract to <path_to_osg>/ (I pasted release and debug in the same, since they use a "d" as postfix for each files => no problems with overwritting etc)
+* Extract to `<path_to_osg>`/ (I pasted release and debug in the same, since they use a "d" as postfix for each files => no problems with overwritting etc)
 * Use Path-variable to <path_to_osg>/bin
 
 Ubuntu:
