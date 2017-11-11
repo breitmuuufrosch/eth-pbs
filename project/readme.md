@@ -1,4 +1,4 @@
-# Project: Asteroid Fields
+﻿# Project: Asteroid Fields
 
 
 ## Getting Started
@@ -13,7 +13,7 @@ Windows:
 
 Ubuntu:
 * Install the libraries with "sudo apt-get install openscenegraph
- libopenscenegraph-dev"
+ libopenscenegraph-dev libopenscenegraph100v5"
 * For the examples one can use "sudo apt-get install openscenegraph-examples". These can then simply called by the command "osgteapot" for example.
 * Includes should be at "/usr/include" and libraries at `/usr/lib/x86_64-linux-gnu` (at least for me.. ;-) )
 
