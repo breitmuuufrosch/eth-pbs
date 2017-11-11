@@ -15,14 +15,14 @@ namespace pbs17 {
 		 * 
 		 * \param filename
 		 *      Relative location to the object-file. (Relative from the data-directory in the source).
-		 * \param translate
-		 *      Initial translation of the object.
 		 * \param center
 		 *      Center of the global-rotation.
 		 * \param scaling
 		 *      Scaling of the model. (1.0 => not scaled, < 1.0 => smaller, > 1.0 => larger)
 		 */
-		SpaceObject(std::string filename, osg::Vec3 translate, osg::Vec3 center, double scaling);
+		SpaceObject(std::string filename, osg::Vec3 center, double scaling);
+
+		virtual ~SpaceObject();
 
 
 		/**
@@ -31,7 +31,7 @@ namespace pbs17 {
 		 * \param translate
 		 *      Initial translation of the object.
 		 */
-		void init(osg::Vec3 translate);
+		virtual void init(osg::Vec3 translate) = 0;
 
 
 		/**
@@ -62,9 +62,10 @@ namespace pbs17 {
 		 * \param axis
 		 *      Axis of the rotation.
 		 */
-		void setLocalRotation(double angle, osg::Vec3 axis) const;
+		virtual void setLocalRotation(double angle, osg::Vec3 axis) const;
 
-	private:
+
+	protected:
 		///! Filename of the loaded object
 		std::string _filename;
 
@@ -80,15 +81,15 @@ namespace pbs17 {
 
 
 		/**
-		 * \brief Scales a OSG-node to the desired size (by ratio). All axis are scaled uniformly.
-		 * 
-		 * \param node
-		 *      Node which is scaled.
-		 * \param scaling
-		 *      Scaling-factor.
-		 * 
-		 * \return Scaled OSG-node.
-		 */
+		* \brief Scales a OSG-node to the desired size (by ratio). All axis are scaled uniformly.
+		*
+		* \param node
+		*      Node which is scaled.
+		* \param scaling
+		*      Scaling-factor.
+		*
+		* \return Scaled OSG-node.
+		*/
 		static osg::ref_ptr<osg::MatrixTransform> scaleNode(osg::ref_ptr<osg::Node> node, double scaling);
 	};
 

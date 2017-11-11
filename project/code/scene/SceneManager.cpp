@@ -2,6 +2,8 @@
 
 #include <osgGA/TrackballManipulator>
 #include <osgViewer/Viewer>
+#include "Asteroid.h"
+#include "Planet.h"
 
 using namespace pbs17;
 
@@ -24,13 +26,21 @@ SceneManager::SceneManager() {
  */
 osg::ref_ptr<osg::Node> SceneManager::loadScene() {
 	osg::ref_ptr<osg::Group> scene = new osg::Group();
-	SpaceObject* model = new SpaceObject("A2.obj", osg::Vec3(10.0, 0.0, 0.0), osg::Vec3(-10.0, 0.0, 0.0), 1.0);
-	_spaceObjects.push_back(model);
-	scene->addChild(model->getModel());
+	SpaceObject* asteroid1 = new Asteroid("A2.obj", osg::Vec3(10.0, 0.0, 0.0), osg::Vec3(-10.0, 0.0, 0.0), 1.0);
+	_spaceObjects.push_back(asteroid1);
+	scene->addChild(asteroid1->getModel());
 
-	SpaceObject* model2 = new SpaceObject("asteroid OBJ.obj", osg::Vec3(-10.0, 0.0, 0.0), osg::Vec3(10.0, 0.0, 0.0), 0.1);
-	_spaceObjects.push_back(model2);
-	scene->addChild(model2->getModel());
+	SpaceObject* asteroid2 = new Asteroid("asteroid OBJ.obj", osg::Vec3(-10.0, 0.0, 0.0), osg::Vec3(10.0, 0.0, 0.0), 0.1);
+	_spaceObjects.push_back(asteroid2);
+	scene->addChild(asteroid2->getModel());
+
+	SpaceObject* planet1 = new Planet(2.0, 5.0, osg::Vec3(10.0, 0.0, -10.0), osg::Vec3(-10.0, 0.0, 10.0), 1.0);
+	_spaceObjects.push_back(planet1);
+	scene->addChild(planet1->getModel());
+
+	SpaceObject* planet2 = new Planet(5.0, 10.0, osg::Vec3(-10.0, 0.0, -10.0), osg::Vec3(10.0, 0.0, 10.0), 0.1);
+	_spaceObjects.push_back(planet2);
+	scene->addChild(planet2->getModel());
 
 	return scene;
 }
