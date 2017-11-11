@@ -1,5 +1,6 @@
 #include "Planet.h"
 
+#include <osg/Geode>
 #include <osg/ShapeDrawable>
 #include <osg/TexGen>
 
@@ -43,9 +44,12 @@ void Planet::init(osg::Vec3 translate) {
 	model->setShape(new osg::Sphere(osg::Vec3(0.0f, 0.0f, 0.0f), _size));
 	model->setColor(osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
+	osg::ref_ptr<osg::Geode> geometry = new osg::Geode;
+	geometry->addDrawable(model);
+
 	// First transformation-node to handle locale-rotations easier
 	_rotation = new osg::MatrixTransform;
-	_rotation->addChild(model);
+	_rotation->addChild(geometry);
 
 	// Second transformation-node for global rotations and translations
 	_model = new osg::MatrixTransform;
