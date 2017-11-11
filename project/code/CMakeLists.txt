@@ -48,6 +48,7 @@ FIND_PATH(OPENSCENEGRAPH_LIB_DIR libso.so osg.lib
 	$ENV{OSG_ROOT}/lib
 	/usr/lib
 	/usr/local/lib
+	/usr/lib/x86_64-linux-gnu
 )
 
 # apply them to following projects

@@ -11,6 +11,6 @@
 #define VERSION ""
 #define NUMBER  
 
-const std::string DATA_PATH = "D:/Clouds/OneDrive/Education/ETH/5. semester/Physically-Based Simulation in Computer Graphics/project/code/data";
+const std::string DATA_PATH = "D:/Clouds/OneDrive/Education/ETH/5. semester/Physically-Based Simulation in Computer Graphics/physSim/project/code/data";
 
 #endif /* EXAMPLE_H */
