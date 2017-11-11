@@ -1,0 +1,16 @@
+#cmakedefine _DATA_MODEL_PATH_
+#cmakedefine OTHER_CONSTANT
+
+#ifndef EXAMPLE_H
+#define EXAMPLE_H
+
+/*
+ * These values are automatically set according to their cmake variables.
+ */
+#define EXAMPLE "${VALUE}"
+#define VERSION "${VERSION}"
+#define NUMBER  ${NUMBER}
+
+const std::string DATA_PATH = "${DATA_MODEL_PATH}";
+
+#endif /* EXAMPLE_H */
