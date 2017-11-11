@@ -24,11 +24,11 @@ SceneManager::SceneManager() {
  */
 osg::ref_ptr<osg::Node> SceneManager::loadScene() {
 	osg::ref_ptr<osg::Group> scene = new osg::Group();
-	SpaceObject* model = new SpaceObject("A2.obj", osg::Vec3(10.0, 0.0, 0.0), osg::Vec3(5.0, 0.0, 0.0), 1.0);
+	SpaceObject* model = new SpaceObject("A2.obj", osg::Vec3(10.0, 0.0, 0.0), osg::Vec3(-10.0, 0.0, 0.0), 1.0);
 	_spaceObjects.push_back(model);
 	scene->addChild(model->getModel());
 
-	SpaceObject* model2 = new SpaceObject("asteroid OBJ.obj", osg::Vec3(-10.0, 0.0, 0.0), osg::Vec3(-5.0, 0.0, 0.0), 0.1);
+	SpaceObject* model2 = new SpaceObject("asteroid OBJ.obj", osg::Vec3(-10.0, 0.0, 0.0), osg::Vec3(10.0, 0.0, 0.0), 0.1);
 	_spaceObjects.push_back(model2);
 	scene->addChild(model2->getModel());
 

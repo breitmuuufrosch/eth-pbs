@@ -20,7 +20,7 @@ SimulationManager::SimulationManager(std::vector<SpaceObject*> spaceObjects)
  *      Time difference since between the last frames.
  */
 void SimulationManager::simulate(double dt) {
-	for (auto it = _spaceObjects.begin(); it != _spaceObjects.end(); ++it) {
+	for (std::vector<SpaceObject*>::iterator it = _spaceObjects.begin(); it != _spaceObjects.end(); ++it) {
 		SpaceObject* spaceObject = *it;
 
 		// Calculate a rotation around the rotation-center of the object

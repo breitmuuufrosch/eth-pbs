@@ -34,11 +34,19 @@ SpaceObject::SpaceObject(std::string filename, osg::Vec3 translate, osg::Vec3 ce
 */
 void SpaceObject::init(osg::Vec3 translate) {
 	// Load the model
-	osg::ref_ptr<osg::Node> modelFile = osgDB::readNodeFile(DATA_PATH + "/" + _filename);
+	std::string modelPath = DATA_PATH + "/" + _filename;
+	std::cout << "Load model \"" << modelPath << "\"..." << std::endl;
+	osg::ref_ptr<osg::Node> modelFile = osgDB::readNodeFile(modelPath);
+
+	if (!modelFile) {
+		std::cout << "File not found! Aborting...";
+		abort();
+	}
 
 	// Scale the model if desired
-	if (_scaling != 1.0)
+	if (_scaling != 1.0) {
 		modelFile = scaleNode(modelFile, _scaling);
+	}
 
 	// First transformation-node to handle locale-rotations easier
 	_rotation = new osg::MatrixTransform;
