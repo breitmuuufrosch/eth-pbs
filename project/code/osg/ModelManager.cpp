@@ -40,12 +40,12 @@ ModelManager* ModelManager::Instance() {
 osg::ref_ptr<osg::Node> ModelManager::loadModel(std::string filePath, float ratio, float scaling) {
 	// try to find the model, if it's found => return it and otherwise load it new
 	osg::ref_ptr<osg::Node> retModel;
-	std::map<std::string, osg::ref_ptr<osg::Node>>::iterator found = _loaded.find(filePath);
+	std::map<std::string, osg::ref_ptr<osg::Node> >::iterator found = _loaded.find(filePath);
 
 	if (found == _loaded.end()) {
 		// model wasn't found => load and store it in the manager and return it
 		retModel = ModelLoader::loadModel(filePath, ratio, scaling);
-		_loaded.insert(std::pair<std::string, osg::ref_ptr<osg::Node>>(filePath, retModel));
+		_loaded.insert(std::pair<std::string, osg::ref_ptr<osg::Node> >(filePath, retModel));
 	} else {
 		// take found.
 		retModel = _loaded[filePath];

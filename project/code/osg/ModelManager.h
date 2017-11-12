@@ -45,7 +45,7 @@ namespace pbs17 {
 	private:
 
 		//! All models which have been loaded already.
-		std::map<std::string, osg::ref_ptr<osg::Node>> _loaded;
+		std::map<std::string, osg::ref_ptr<osg::Node> > _loaded;
 
 		//! Private constructor to be sure the class can't be created outside of this class.
 		ModelManager() {};
