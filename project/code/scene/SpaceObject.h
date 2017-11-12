@@ -1,6 +1,7 @@
 #pragma once
 
 #include <osg/Node>
+#include <Eigen/Core>
 #include <osg/MatrixTransform>
 
 namespace pbs17 {
@@ -17,10 +18,8 @@ namespace pbs17 {
 		 *      Relative location to the object-file. (Relative from the data-directory in the source).
 		 * \param center
 		 *      Center of the global-rotation.
-		 * \param scaling
-		 *      Scaling of the model. (1.0 => not scaled, < 1.0 => smaller, > 1.0 => larger)
 		 */
-		SpaceObject(std::string filename, osg::Vec3 center, double scaling);
+		SpaceObject(std::string filename, Eigen::Vector3d center);
 
 		virtual ~SpaceObject();
 
@@ -28,10 +27,33 @@ namespace pbs17 {
 		/**
 		 * \brief Initialize the space-object for OSG.
 		 * 
-		 * \param translate
-		 *      Initial translation of the object.
+		 * \param position
+		 *      Initial position of the object.
+		 * \param scaling
+		 *      Scaling of the model. (1.0 => not scaled, < 1.0 => smaller, > 1.0 => larger)
 		 */
-		virtual void init(osg::Vec3 translate) = 0;
+		virtual void initOsg(Eigen::Vector3d position, double scaling) = 0;
+
+
+		/**
+		 * \brief Initialize the space-object for physics.
+		 * 
+		 * \param mass
+		 *      Mass: unit = kg
+		 * \param linearMomentum
+		 *      Linear momentum: unit = kg*m/s
+		 * \param angularMomentum
+		 *      Angular Momentum: unit = kg*m^2/s
+		 * \param linearVelocity
+		 *      Linear velocity: unit = m/s
+		 * \param angularVelocity
+		 *      Angular velocity: unit = rad/s
+		 * \param force
+		 *      Global force: unit = vector with norm equals to N
+		 * \param torque
+		 *      Global torque: unit = vector with norm equals to N*m (newton metre)
+		 */
+		virtual void initPhysics(double mass, double linearMomentum, double angularMomentum, double linearVelocity, double angularVelocity, Eigen::Vector3d force, Eigen::Vector3d torque);
 
 
 		/**
@@ -49,7 +71,7 @@ namespace pbs17 {
 		 * 
 		 * \return Position of the rotation-center.
 		 */
-		osg::Vec3 getCenter() const {
+		Eigen::Vector3d getCenter() const {
 			return _center;
 		}
 
@@ -69,28 +91,33 @@ namespace pbs17 {
 		///! Filename of the loaded object
 		std::string _filename;
 
-		///! Scaling ratio
-		double _scaling;
 
 		///! Root of the model which is used for the scene
 		osg::ref_ptr<osg::MatrixTransform> _model;
 		///! Local-rotation-node for the object
 		osg::ref_ptr<osg::MatrixTransform> _rotation;
+
+		///! Scaling ratio
+		double _scaling;
+		///! Position
+		Eigen::Vector3d _position;
 		///! Rotation-center of the object
-		osg::Vec3 _center;
+		Eigen::Vector3d _center;
 
-
-		/**
-		* \brief Scales a OSG-node to the desired size (by ratio). All axis are scaled uniformly.
-		*
-		* \param node
-		*      Node which is scaled.
-		* \param scaling
-		*      Scaling-factor.
-		*
-		* \return Scaled OSG-node.
-		*/
-		static osg::ref_ptr<osg::MatrixTransform> scaleNode(osg::ref_ptr<osg::Node> node, double scaling);
+		///! Mass: unit = kg
+		double _mass;
+		///! Linear momentum : unit = kg*m / s
+		double _linearMomentum;
+		///! Angular Momentum : unit = kg*m ^ 2 / s
+		double _angularMomentum;
+		///! Linear velocity : unit = m / s
+		double _linearVelcoity;
+		///! Angular velocity : unit = rad / s
+		double _angularVelocity;
+		///! Global force : unit = vector with norm equals to N
+		Eigen::Vector3d _force;
+		///! Global torque : unit = vector with norm equals to N*m(newton metre)
+		Eigen::Vector3d _torque;
 	};
 
 }

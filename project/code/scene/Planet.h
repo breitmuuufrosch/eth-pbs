@@ -1,7 +1,6 @@
 #pragma once
 
 #include <osg/Node>
-#include <osg/MatrixTransform>
 
 #include "SpaceObject.h"
 
@@ -17,16 +16,10 @@ namespace pbs17 {
 		 * 
 		 * \param size
 		 *      Size of the planet.
-		 * \param mass
-		 *      Mass of the planet.
-		 * \param translate
-		 *      Initial translation of the object.
 		 * \param center
 		 *      Center of the global-rotation.
-		 * \param scaling
-		 *      Scaling of the model. (1.0 => not scaled, < 1.0 => smaller, > 1.0 => larger)
 		 */
-		Planet(double size, double mass, osg::Vec3 translate, osg::Vec3 center, double scaling);
+		Planet(double size, Eigen::Vector3d center);
 
 		~Planet();
 
@@ -34,17 +27,17 @@ namespace pbs17 {
 		/**
 		 * \brief Initialize the space-object for OSG.
 		 * 
-		 * \param translate
+		 * \param position
 		 *      Initial translation of the object.
+		 * \param scaling
+		 *      Scaling of the model. (1.0 => not scaled, < 1.0 => smaller, > 1.0 => larger)
 		 */
-		void init(osg::Vec3 translate) override;
+		void initOsg(Eigen::Vector3d position, double scaling) override;
 
 
 	private:
 		///! Size of the planet
 		double _size;
-		///! Mass of the planet
-		double _mass;
 
 	};
 

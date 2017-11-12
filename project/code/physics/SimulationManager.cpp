@@ -1,5 +1,6 @@
 #include "SimulationManager.h"
-#include "../visitors/GetWorldCoordOfNodeVisitor.h"
+
+#include "../OsgEigenVector.h"
 
 using namespace pbs17;
 
@@ -24,7 +25,7 @@ void SimulationManager::simulate(double dt) {
 		SpaceObject* spaceObject = *it;
 
 		// Calculate a rotation around the rotation-center of the object
-		osg::Vec3 toCenter = (*it)->getCenter();
+		osg::Vec3 toCenter = toOsg((*it)->getCenter());
 		osg::Matrix rotationGlobal = osg::Matrix::rotate(dt, osg::Vec3(0.0f, 0.0f, 1.0f));
 		osg::Matrixd translate1 = osg::Matrixd::translate(-toCenter);
 		osg::Matrixd translate2 = osg::Matrixd::translate(toCenter);

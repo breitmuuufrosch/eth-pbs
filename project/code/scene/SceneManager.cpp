@@ -26,21 +26,28 @@ SceneManager::SceneManager() {
  */
 osg::ref_ptr<osg::Node> SceneManager::loadScene() {
 	osg::ref_ptr<osg::Group> scene = new osg::Group();
-	SpaceObject* asteroid1 = new Asteroid("A2.obj", osg::Vec3(10.0, 0.0, 0.0), osg::Vec3(-10.0, 0.0, 0.0), 1.0);
-	_spaceObjects.push_back(asteroid1);
-	scene->addChild(asteroid1->getModel());
+	
+	for (int i = 0; i < 100; ++i) {
+		SpaceObject* asteroid1 = new Asteroid("A2.obj", Eigen::Vector3d(-10.0, -1.0 * i, 0.0));
+		asteroid1->initOsg(Eigen::Vector3d(10.0, 1.0 * i, 0.0), 1.0);
+		_spaceObjects.push_back(asteroid1);
+		scene->addChild(asteroid1->getModel());
 
-	SpaceObject* asteroid2 = new Asteroid("asteroid OBJ.obj", osg::Vec3(-10.0, 0.0, 0.0), osg::Vec3(10.0, 0.0, 0.0), 0.1);
-	_spaceObjects.push_back(asteroid2);
-	scene->addChild(asteroid2->getModel());
+		SpaceObject* asteroid2 = new Asteroid("asteroid OBJ.obj", Eigen::Vector3d(10.0, 1.0 * i, 0.0));
+		asteroid2->initOsg(Eigen::Vector3d(-10.0, 1.0 * i, 0.0), 0.1);
+		_spaceObjects.push_back(asteroid2);
+		scene->addChild(asteroid2->getModel());
 
-	SpaceObject* planet1 = new Planet(2.0, 5.0, osg::Vec3(10.0, 0.0, -10.0), osg::Vec3(-10.0, 0.0, 10.0), 1.0);
-	_spaceObjects.push_back(planet1);
-	scene->addChild(planet1->getModel());
+		SpaceObject* planet1 = new Planet(2.0, Eigen::Vector3d(-10.0, -1.0 * i, 10.0));
+		planet1->initOsg(Eigen::Vector3d(10.0, 1.0 * i, -10.0), 1.0);
+		_spaceObjects.push_back(planet1);
+		scene->addChild(planet1->getModel());
 
-	SpaceObject* planet2 = new Planet(5.0, 10.0, osg::Vec3(-10.0, 0.0, -10.0), osg::Vec3(10.0, 0.0, 10.0), 0.1);
-	_spaceObjects.push_back(planet2);
-	scene->addChild(planet2->getModel());
+		SpaceObject* planet2 = new Planet(5.0, Eigen::Vector3d(10.0, 1.0 * i, 10.0));
+		planet2->initOsg(Eigen::Vector3d(-10.0, 1.0 * i, -10.0), 0.1);
+		_spaceObjects.push_back(planet2);
+		scene->addChild(planet2->getModel());
+	}
 
 	return scene;
 }

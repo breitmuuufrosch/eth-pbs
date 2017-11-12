@@ -17,14 +17,10 @@ namespace pbs17 {
 		 * 
 		 * \param filename
 		 *      Relative location to the object-file. (Relative from the data-directory in the source).
-		 * \param translate
-		 *      Initial translation of the object.
 		 * \param center
 		 *      Center of the global-rotation.
-		 * \param scaling
-		 *      Scaling of the model. (1.0 => not scaled, < 1.0 => smaller, > 1.0 => larger)
 		 */
-		Asteroid(std::string filename, osg::Vec3 translate, osg::Vec3 center, double scaling);
+		Asteroid(std::string filename, Eigen::Vector3d center);
 
 
 		~Asteroid();
@@ -33,10 +29,12 @@ namespace pbs17 {
 		/**
 		 * \brief Initialize the space-object for OSG.
 		 * 
-		 * \param translate
-		 *      Initial translation of the object.
+		 * \param position
+		 *      Initial position of the object.
+		 * \param scaling
+		 *      Scaling of the model. (1.0 => not scaled, < 1.0 => smaller, > 1.0 => larger)
 		 */
-		void init(osg::Vec3 translate);
+		void initOsg(Eigen::Vector3d position, double scaling) override;
 
 	private:
 		
