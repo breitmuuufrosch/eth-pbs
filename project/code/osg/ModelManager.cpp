@@ -10,7 +10,7 @@
 
 using namespace pbs17;
 
-ModelManager* ModelManager::_pInstance = nullptr;
+ModelManager* ModelManager::_pInstance = NULL;
 
 
 /**
