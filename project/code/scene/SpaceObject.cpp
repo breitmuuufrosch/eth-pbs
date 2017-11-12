@@ -1,7 +1,6 @@
 #include "SpaceObject.h"
 
 #include <osgDB/ReadFile>
-#include <osg/TexGen>
 
 using namespace pbs17;
 
@@ -15,11 +14,18 @@ using namespace pbs17;
 *      Center of the global-rotation.
 */
 SpaceObject::SpaceObject(std::string filename, Eigen::Vector3d center)
-	: _filename(filename), _center(center) {
+	: _filename(filename), _center(center) {}
+
+
+/**
+ * \brief Destructor of SpaceObject.
+ */
+SpaceObject::~SpaceObject() {
+	if (_model) {
+		_model = nullptr;
+	}
 }
 
-
-SpaceObject::~SpaceObject() {}
 
 /**
  * \brief Initialize the space-object for physics.
@@ -50,7 +56,6 @@ void SpaceObject::initPhysics(double mass, double linearMomentum, double angular
 }
 
 
-
 /**
  * \brief Set the local rotation of the model. (Around it's local axis).
  *
@@ -59,8 +64,7 @@ void SpaceObject::initPhysics(double mass, double linearMomentum, double angular
  * \param axis
  *      Axis of the rotation.
  */
-void SpaceObject::setLocalRotation(double angle, osg::Vec3 axis) const
-{
+void SpaceObject::setLocalRotation(double angle, osg::Vec3d axis) const {
 	osg::Matrix rotationMatrix = osg::Matrix::rotate(angle, axis);
 	_rotation->setMatrix(rotationMatrix * _rotation->getMatrix());
 }

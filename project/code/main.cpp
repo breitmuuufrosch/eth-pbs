@@ -37,5 +37,8 @@ int main(int, char **) {
 		startTime = currentTime;
 	}
 
+	delete sceneManager;
+	delete simulationManager;
+
 	return 0;
 }

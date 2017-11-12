@@ -19,6 +19,12 @@ namespace pbs17
 
 
 		/**
+		 * \brief Destructor of the scene-manager.
+		 */
+		virtual ~SceneManager();
+
+
+		/**
 		 * \brief Load the scene
 		 * IMPORTANT: Add the "model" to the _spaceObjects for simulation-calculations and
 		 *            and the "model->getModel()" to the scene for rendering.
@@ -54,10 +60,10 @@ namespace pbs17
 
 	private:
 
-		///! Root-node of OSG which contains the whole scene (used for rendering)
+		//! Root-node of OSG which contains the whole scene (used for rendering)
 		osg::ref_ptr<osg::Group> _scene;
 
-		///! All space-objects in the scene (used for calcualtions)
+		//! All space-objects in the scene (used for calcualtions)
 		std::vector<SpaceObject*> _spaceObjects;
 	};
 }

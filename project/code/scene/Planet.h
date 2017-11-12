@@ -1,7 +1,5 @@
 #pragma once
 
-#include <osg/Node>
-
 #include "SpaceObject.h"
 
 namespace pbs17 {
@@ -12,7 +10,7 @@ namespace pbs17 {
 	class Planet : public SpaceObject {
 	public:
 		/**
-		 * \brief Constructor of SpaceObject.
+		 * \brief Constructor of Planet.
 		 * 
 		 * \param size
 		 *      Size of the planet.
@@ -21,7 +19,11 @@ namespace pbs17 {
 		 */
 		Planet(double size, Eigen::Vector3d center);
 
-		~Planet();
+
+		/**
+		 * \brief Destructor of Planet.
+		 */
+		virtual ~Planet();
 
 
 		/**
@@ -29,14 +31,16 @@ namespace pbs17 {
 		 * 
 		 * \param position
 		 *      Initial translation of the object.
+		 * \param ratio
+		 *      Ratio of the simplifier. (Supported values: [0..1])
 		 * \param scaling
 		 *      Scaling of the model. (1.0 => not scaled, < 1.0 => smaller, > 1.0 => larger)
 		 */
-		void initOsg(Eigen::Vector3d position, double scaling) override;
+		void initOsg(Eigen::Vector3d position, double ratio, double scaling) override;
 
 
 	private:
-		///! Size of the planet
+		//! Size of the planet
 		double _size;
 
 	};

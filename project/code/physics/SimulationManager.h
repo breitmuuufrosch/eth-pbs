@@ -30,7 +30,7 @@ namespace pbs17 {
 		void simulate(double dt);
 
 	private:
-		///! All space-objects in the scene
+		//! All space-objects in the scene
 		std::vector<SpaceObject*> _spaceObjects;
 	};
 

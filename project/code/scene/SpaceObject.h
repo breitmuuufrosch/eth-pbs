@@ -1,6 +1,5 @@
 #pragma once
 
-#include <osg/Node>
 #include <Eigen/Core>
 #include <osg/MatrixTransform>
 
@@ -21,6 +20,7 @@ namespace pbs17 {
 		 */
 		SpaceObject(std::string filename, Eigen::Vector3d center);
 
+
 		virtual ~SpaceObject();
 
 
@@ -29,10 +29,12 @@ namespace pbs17 {
 		 * 
 		 * \param position
 		 *      Initial position of the object.
+		 * \param ratio
+		 *      Ratio of the simplifier. (Supported values: [0..1])
 		 * \param scaling
 		 *      Scaling of the model. (1.0 => not scaled, < 1.0 => smaller, > 1.0 => larger)
 		 */
-		virtual void initOsg(Eigen::Vector3d position, double scaling) = 0;
+		virtual void initOsg(Eigen::Vector3d position, double ratio, double scaling) = 0;
 
 
 		/**
@@ -84,39 +86,41 @@ namespace pbs17 {
 		 * \param axis
 		 *      Axis of the rotation.
 		 */
-		virtual void setLocalRotation(double angle, osg::Vec3 axis) const;
+		virtual void setLocalRotation(double angle, osg::Vec3d axis) const;
 
 
 	protected:
-		///! Filename of the loaded object
+		//! Filename of the loaded object
 		std::string _filename;
 
 
-		///! Root of the model which is used for the scene
+		//! Root of the model which is used for the scene
 		osg::ref_ptr<osg::MatrixTransform> _model;
-		///! Local-rotation-node for the object
+		//! Local-rotation-node for the object
 		osg::ref_ptr<osg::MatrixTransform> _rotation;
 
-		///! Scaling ratio
+		//! Scaling ratio
 		double _scaling;
-		///! Position
+		//! Position
 		Eigen::Vector3d _position;
-		///! Rotation-center of the object
+		//! Orientation
+		Eigen::Vector3d _orientation;
+		//! Rotation-center of the object
 		Eigen::Vector3d _center;
 
-		///! Mass: unit = kg
+		//! Mass: unit = kg
 		double _mass;
-		///! Linear momentum : unit = kg*m / s
+		//! Linear momentum : unit = kg*m / s
 		double _linearMomentum;
-		///! Angular Momentum : unit = kg*m ^ 2 / s
+		//! Angular Momentum : unit = kg*m ^ 2 / s
 		double _angularMomentum;
-		///! Linear velocity : unit = m / s
+		//! Linear velocity : unit = m / s
 		double _linearVelcoity;
-		///! Angular velocity : unit = rad / s
+		//! Angular velocity : unit = rad / s
 		double _angularVelocity;
-		///! Global force : unit = vector with norm equals to N
+		//! Global force : unit = vector with norm equals to N
 		Eigen::Vector3d _force;
-		///! Global torque : unit = vector with norm equals to N*m(newton metre)
+		//! Global torque : unit = vector with norm equals to N*m(newton metre)
 		Eigen::Vector3d _torque;
 	};
 

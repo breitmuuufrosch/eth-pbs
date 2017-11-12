@@ -10,7 +10,7 @@ using namespace pbs17;
 
 
 /**
-* \brief Constructor of SpaceObject.
+* \brief Constructor of Asteroid.
 *
 * \param filename
 *      Relative location to the object-file. (Relative from the data-directory in the source).
@@ -22,6 +22,9 @@ Asteroid::Asteroid(std::string filename, Eigen::Vector3d center)
 }
 
 
+/**
+ * \brief Destructor of Asteroid.
+ */
 Asteroid::~Asteroid() {}
 
 
@@ -30,16 +33,19 @@ Asteroid::~Asteroid() {}
 *
 * \param position
 *      Initial position of the object.
+ * \param ratio
+ *      Ratio of the simplifier. (Supported values: [0..1])
 * \param scaling
 *      Scaling of the model. (1.0 => not scaled, < 1.0 => smaller, > 1.0 => larger)
 */
-void Asteroid::initOsg(Eigen::Vector3d position, double scaling) {
+void Asteroid::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 	// Set the position to the space-object
 	_position = position;
+	_center = -position + _center;
 
 	// Load the model
 	std::string modelPath = DATA_PATH + "/" + _filename;
-	osg::ref_ptr<osg::Node> modelFile = ModelManager::Instance()->loadModel(modelPath, 1.0, scaling);
+	osg::ref_ptr<osg::Node> modelFile = ModelManager::Instance()->loadModel(modelPath, ratio, scaling);
 
 	// First transformation-node to handle locale-rotations easier
 	_rotation = new osg::MatrixTransform;

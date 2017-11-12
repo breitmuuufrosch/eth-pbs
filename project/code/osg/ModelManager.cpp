@@ -18,8 +18,9 @@ ModelManager* ModelManager::_pInstance = NULL;
  */
 ModelManager* ModelManager::Instance() {
 	// singleton-implementation => if there is not yet an instance initialized, create one.
-	if (!_pInstance)
+	if (!_pInstance) {
 		_pInstance = new ModelManager();
+	}
 
 	return _pInstance;
 }

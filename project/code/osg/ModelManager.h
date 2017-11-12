@@ -22,7 +22,7 @@ namespace pbs17 {
 	public:
 
 		/**
-		 * \brief Singleton instance of the CGameState-class.
+		 * \brief Singleton instance of the ModelManager-class.
 		 */
 		static ModelManager* Instance();
 

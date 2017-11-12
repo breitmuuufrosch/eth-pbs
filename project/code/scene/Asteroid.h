@@ -13,7 +13,7 @@ namespace pbs17 {
 	class Asteroid : public SpaceObject {
 	public:
 		/**
-		 * \brief Constructor of SpaceObject.
+		 * \brief Constructor of Asteroid.
 		 * 
 		 * \param filename
 		 *      Relative location to the object-file. (Relative from the data-directory in the source).
@@ -23,6 +23,9 @@ namespace pbs17 {
 		Asteroid(std::string filename, Eigen::Vector3d center);
 
 
+		/**
+		 * \brief Destructor of Asteroid.
+		 */
 		~Asteroid();
 
 
@@ -31,10 +34,12 @@ namespace pbs17 {
 		 * 
 		 * \param position
 		 *      Initial position of the object.
+		 * \param ratio
+		 *      Ratio of the simplifier. (Supported values: [0..1])
 		 * \param scaling
 		 *      Scaling of the model. (1.0 => not scaled, < 1.0 => smaller, > 1.0 => larger)
 		 */
-		void initOsg(Eigen::Vector3d position, double scaling) override;
+		void initOsg(Eigen::Vector3d position, double ratio, double scaling) override;
 
 	private:
 		

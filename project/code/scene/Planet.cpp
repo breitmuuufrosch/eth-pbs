@@ -10,7 +10,7 @@ using namespace pbs17;
 
 
 /**
- * \brief Constructor of SpaceObject.
+ * \brief Constructor of Planet.
  *
  * \param size
  *      Size of the planet.
@@ -22,6 +22,9 @@ Planet::Planet(double size, Eigen::Vector3d center)
 }
 
 
+/**
+ * \brief Destructor of Planet.
+ */
 Planet::~Planet() {}
 
 
@@ -30,17 +33,20 @@ Planet::~Planet() {}
  *
  * \param position
  *      Initial position of the object.
+ * \param ratio
+ *      Ratio of the simplifier. (Supported values: [0..1])
  * \param scaling
  *      Scaling of the model. (1.0 => not scaled, < 1.0 => smaller, > 1.0 => larger)
  */
-void Planet::initOsg(Eigen::Vector3d position, double scaling) {
+void Planet::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 	// Set the position to the space-object
 	_position = position;
+	_center = -position + _center;
 
 	// Load the model
 	osg::ref_ptr<osg::ShapeDrawable> model = new osg::ShapeDrawable;
-	model->setShape(new osg::Sphere(osg::Vec3(0.0f, 0.0f, 0.0f), _size));
-	model->setColor(osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f));
+	model->setShape(new osg::Sphere(osg::Vec3d(0.0f, 0.0f, 0.0f), _size));
+	model->setColor(osg::Vec4d(1.0f, 1.0f, 1.0f, 1.0f));
 
 	osg::ref_ptr<osg::Geode> geometry = new osg::Geode;
 	geometry->addDrawable(model);
