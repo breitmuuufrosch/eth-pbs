@@ -3,7 +3,8 @@
 #include <osg/Geode>
 #include <osg/ShapeDrawable>
 #include <osg/TexGen>
-#include "../OsgEigenVector.h"
+
+#include "../osg/OsgEigenConversions.h"
 
 using namespace pbs17;
 

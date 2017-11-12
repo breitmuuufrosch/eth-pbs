@@ -1,11 +1,10 @@
 #include "Asteroid.h"
 
 #include <osgDB/ReadFile>
-#include <osg/TexGen>
 
 #include "../config.h"
-#include "../OsgEigenVector.h"
 #include "../osg/ModelManager.h"
+#include "../osg/OsgEigenConversions.h"
 
 using namespace pbs17;
 

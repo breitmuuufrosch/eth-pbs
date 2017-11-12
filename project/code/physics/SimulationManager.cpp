@@ -1,6 +1,6 @@
 #include "SimulationManager.h"
 
-#include "../OsgEigenVector.h"
+#include "../osg/OsgEigenConversions.h"
 
 using namespace pbs17;
 

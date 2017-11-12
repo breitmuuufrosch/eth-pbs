@@ -48,13 +48,13 @@ namespace pbs17 {
 		std::map<std::string, osg::ref_ptr<osg::Node> > _loaded;
 
 		//! Private constructor to be sure the class can't be created outside of this class.
-		ModelManager() {};
+		ModelManager() {}
 
 		//! Private copy-constructor to prevent copying the class.
-		ModelManager(ModelManager const&) {};
+		ModelManager(ModelManager const&) {}
 
 		//! Private assignment-operator to prevent copying/saving referencec to the class.
-		ModelManager& operator=(ModelManager const&) {};
+		ModelManager& operator=(ModelManager const&) = delete;
 
 		//! Private member-var which contains the singleton of the class.
 		static ModelManager* _pInstance;
