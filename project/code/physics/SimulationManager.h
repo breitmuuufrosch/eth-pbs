@@ -3,6 +3,8 @@
 #include <vector>
 
 #include "../scene/SpaceObject.h"
+#include "CollisionManager.h"
+#include "NBodyManager.h"
 
 namespace pbs17 {
 
@@ -32,6 +34,8 @@ namespace pbs17 {
 	private:
 		//! All space-objects in the scene
 		std::vector<SpaceObject*> _spaceObjects;
+        CollisionManager cManager;
+        NBodyManager nManager;
 	};
 
 }

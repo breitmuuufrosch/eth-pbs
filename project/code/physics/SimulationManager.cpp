@@ -21,17 +21,11 @@ SimulationManager::SimulationManager(std::vector<SpaceObject*> spaceObjects)
  *      Time difference since between the last frames.
  */
 void SimulationManager::simulate(double dt) {
-	for (std::vector<SpaceObject*>::iterator it = _spaceObjects.begin(); it != _spaceObjects.end(); ++it) {
-		SpaceObject* spaceObject = *it;
+    // simulate on step
+    this->nManager.simulateStep(dt, this->_spaceObjects);
 
-		// Calculate a rotation around the rotation-center of the object
-		osg::Vec3d toCenter = toOsg((*it)->getCenter());
-		osg::Matrix rotationGlobal = osg::Matrix::rotate(dt, osg::Vec3d(0.0f, 0.0f, 1.0f));
-		osg::Matrixd translate1 = osg::Matrixd::translate(-toCenter);
-		osg::Matrixd translate2 = osg::Matrixd::translate(toCenter);
+    // check for collisions
+    this->cManager.handleCollisions(dt, this->_spaceObjects);
 
-		// Apply rotation to the current position and also rotate the object localy (rotation around it's own axis)
-		spaceObject->getModel()->setMatrix(translate1 * rotationGlobal * translate2 * spaceObject->getModel()->getMatrix());
-		spaceObject->setLocalRotation(-dt * 10, osg::Vec3d(1.0f, 1.0f, 0.0f));
-	}
+    // TBD: check for fraction
 }
