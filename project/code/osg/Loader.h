@@ -80,6 +80,6 @@ namespace pbs17 {
 		 *
 		 * \return Image object to attach to osg-nodes.
 		 */
-		static osg::ref_ptr<osg::Image> Loader::loadImage(std::string filename);
+		static osg::ref_ptr<osg::Image> loadImage(std::string filename);
 	};
 }
