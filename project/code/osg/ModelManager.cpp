@@ -6,15 +6,17 @@
 */
 
 #include "ModelManager.h"
-#include "ModelLoader.h"
+#include "Loader.h"
 
 using namespace pbs17;
 
-ModelManager* ModelManager::_pInstance = NULL;
+
+//! Pointer to the only instance of this class.
+ModelManager* ModelManager::_pInstance = nullptr;
 
 
 /**
- * \brief Singleton instance of the CGameState-class.
+ * \brief Singleton instance of the ModelManager-class.
  */
 ModelManager* ModelManager::Instance() {
 	// singleton-implementation => if there is not yet an instance initialized, create one.
@@ -45,7 +47,7 @@ osg::ref_ptr<osg::Node> ModelManager::loadModel(std::string filePath, float rati
 
 	if (found == _loaded.end()) {
 		// model wasn't found => load and store it in the manager and return it
-		retModel = ModelLoader::loadModel(filePath, ratio, scaling);
+		retModel = Loader::loadModel(filePath, ratio, scaling);
 		_loaded.insert(std::pair<std::string, osg::ref_ptr<osg::Node> >(filePath, retModel));
 	} else {
 		// take found.
