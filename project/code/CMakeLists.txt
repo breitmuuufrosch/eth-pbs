@@ -1,6 +1,6 @@
 PROJECT(PBS17_group11_project)
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.4.7)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
 SET(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "add a postfix for Debug mode, usually d on windows")
 
 # set cmake policy
@@ -25,14 +25,12 @@ LINK_DIRECTORIES(${OPENGL_INCLUDE_DIR})
 # GLUT
 find_package(GLUT)
 if(NOT GLUT_FOUND)
-	set(GLUT_INCLUDE_DIRS ${CMAKE_CURRENT_LIST_DIR}/GL)
-	find_library(GLUT_LIBRARY glut32 PATHS ${CMAKE_CURRENT_LIST_DIR}/GL)
+	set(GLUT_INCLUDE_DIRS ${CMAKE_CURRENT_LIST_DIR}/libraries/GL)
+	find_library(GLUT_LIBRARY glut32 PATHS ${CMAKE_CURRENT_LIST_DIR}/libraries/GL)
 	set(GLUT_LIBRARIES ${GLUT_LIBRARY})
 endif(NOT GLUT_FOUND)
 include_directories(${GLUT_INCLUDE_DIRS})
 LINK_DIRECTORIES(${GLUT_INCLUDE_DIRS})
-
-
 
 # find include directory by looking for certain header file
 FIND_PATH(OPENSCENEGRAPH_INCLUDE_DIR osg/Referenced
@@ -58,6 +56,7 @@ LINK_DIRECTORIES(${OPENSCENEGRAPH_LIB_DIR})
 MACRO(START_PROJECT)
 
     INCLUDE_DIRECTORIES(${EXTERNAL_INCLUDE_DIR})
+	INCLUDE_DIRECTORIES(${CMAKE_CURRENT_LIST_DIR}/libraries/eigen)
     ADD_EXECUTABLE(${EXAMPLE_NAME} ${SOURCES} ${COMMON_FILES})
     SET_TARGET_PROPERTIES(${EXAMPLE_NAME} PROPERTIES DEBUG_POSTFIX "${CMAKE_DEBUG_POSTFIX}")
     
@@ -98,10 +97,10 @@ FILE(GLOB scene_HDRS "./scene/*.h")
 SOURCE_GROUP(Scene FILES ${scene_SRCS} ${scene_HDRS})
 LIST(APPEND SOURCES ${scene_SRCS} ${scene_HDRS})
 
-FILE(GLOB visitors_SRCS "./visitors/*.cpp")
-FILE(GLOB visitors_HDRS "./visitors/*.h")
-SOURCE_GROUP(Visitors FILES ${visitors_SRCS} ${visitors_HDRS})
-LIST(APPEND SOURCES ${visitors_SRCS} ${visitors_HDRS})
+FILE(GLOB osg_SRCS "./osg/*.cpp")
+FILE(GLOB osg_HDRS "./osg/*.h")
+SOURCE_GROUP(Osg FILES ${osg_SRCS} ${osg_HDRS})
+LIST(APPEND SOURCES ${osg_SRCS} ${osg_HDRS})
 
 FILE(GLOB physics_SRCS "./physics/*.cpp")
 FILE(GLOB physics_HDRS "./physics/*.h")
