@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "../scene/SpaceObject.h"
+#include "../scene/Planet.h"
 
 namespace pbs17 {
 
@@ -29,9 +30,12 @@ namespace pbs17 {
 
     private:
         //! All space-objects in the scene
-        void broadPhase();
-        void narrowPhase();
-        void insertionSort(std::vector<std::pair<double, SpaceObject*>> l);
+        void broadPhase(std::vector<std::pair<SpaceObject *, SpaceObject *>> &res);
+        void narrowPhase(std::vector<std::pair<SpaceObject *, SpaceObject *>> &collision);
+        void insertionSort(std::vector<SpaceObject *> &A, int dim);
+
+        bool checkIntersection(Planet *p1, Planet *p2);
+        void pruneAndSweep(std::vector<SpaceObject*> &A, int dim, std::vector<std::pair<SpaceObject *, SpaceObject *>> &res);
 
         std::vector<SpaceObject*> xList;
         std::vector<SpaceObject*> yList;

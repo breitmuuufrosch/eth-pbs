@@ -4,6 +4,7 @@
 #include <osg/ShapeDrawable>
 
 #include "../osg/OsgEigenConversions.h"
+#include "../osg/visitors/BoundingBoxVisitor.h"
 
 using namespace pbs17;
 
@@ -57,4 +58,8 @@ void Planet::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 	_model = new osg::MatrixTransform;
 	_model->setMatrix(osg::Matrix::translate(toOsg(position)));
 	_model->addChild(_rotation);
+
+    CalculateBoundingBox bbox;
+    _model->accept(bbox);
+    _aabb = bbox.getBoundBox();
 }

@@ -58,5 +58,5 @@ void Asteroid::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 
 	CalculateBoundingBox bbox;
 	_model->accept(bbox);
-	osg::BoundingBox boxExtents = bbox.getBoundBox();
+    _aabb = bbox.getBoundBox();
 }

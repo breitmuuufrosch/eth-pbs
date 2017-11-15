@@ -12,6 +12,9 @@ using namespace pbs17;
  */
 SimulationManager::SimulationManager(std::vector<SpaceObject*> spaceObjects)
 	: _spaceObjects(spaceObjects) {
+    nManager = new NBodyManager();
+    cManager = new CollisionManager(spaceObjects);
+
 }
 
 /**
@@ -22,10 +25,10 @@ SimulationManager::SimulationManager(std::vector<SpaceObject*> spaceObjects)
  */
 void SimulationManager::simulate(double dt) {
     // simulate on step
-    this->nManager.simulateStep(dt, this->_spaceObjects);
+    this->nManager->simulateStep(dt, this->_spaceObjects);
 
     // check for collisions
-    this->cManager.handleCollisions(dt, this->_spaceObjects);
+    this->cManager->handleCollisions(dt, this->_spaceObjects);
 
     // TBD: check for fraction
 }

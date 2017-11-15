@@ -39,6 +39,10 @@ namespace pbs17 {
 		void initOsg(Eigen::Vector3d position, double ratio, double scaling) override;
 
 
+        double getRadius() {
+            return _size;
+        }
+
 	private:
 		//! Size of the planet
 		double _size;

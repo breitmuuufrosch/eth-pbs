@@ -47,7 +47,6 @@ void NBodyManager::simulateStep(double dt, std::vector<SpaceObject *> _spaceObje
             // compute the square distance
             double r = (compareCenter - curCenter).norm();
             r *= r;
-            cout << "r= " << r << endl;
 
             // F is the force between the masses
             double f = (G * m * compareObject->getMass()) / (r + EPS);
@@ -60,15 +59,12 @@ void NBodyManager::simulateStep(double dt, std::vector<SpaceObject *> _spaceObje
         SpaceObject* spaceObject = _spaceObjects[i];
         Vector3d a = forces[i] / spaceObject->getMass();
         Vector3d v = spaceObject->getLinearVelocity() + (dt * a);
-        cout << "a= " << a << endl;
-        cout << "v= " << v << endl;
         spaceObject->setLinearVelocity(v);
 
         Vector3d dtv = dt * v;
         Vector3d p = spaceObject->getPosition() + dtv;
         spaceObject->setPosition(p);
 
-        cout << "p= " << p << endl;
         osg::Matrixd translate1 = osg::Matrixd::translate(toOsg(dtv));
         spaceObject->getModel()->setMatrix(translate1 * spaceObject->getModel()->getMatrix());
 

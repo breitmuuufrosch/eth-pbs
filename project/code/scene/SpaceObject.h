@@ -2,7 +2,7 @@
 
 #include <Eigen/Core>
 #include <osg/MatrixTransform>
-
+#include "../osg/visitors/BoundingBoxVisitor.h"
 namespace pbs17 {
 
 	/**
@@ -70,7 +70,10 @@ namespace pbs17 {
 		 * \brief Get the AABB of the space-object.
 		 */
 		osg::BoundingBox getAABB() const {
-			return _aabb;
+            //return _aabb;
+            CalculateBoundingBox bbox;
+            _model->accept(bbox);
+            return bbox.getBoundBox();
 		}
 
 
