@@ -16,7 +16,7 @@ namespace pbs17 {
         * \brief Constructor of the CollisionManager.
         *
         */
-        CollisionManager();
+        CollisionManager(std::vector<SpaceObject*> _spaceObjects);
 
 
         /**
@@ -31,6 +31,11 @@ namespace pbs17 {
         //! All space-objects in the scene
         void broadPhase();
         void narrowPhase();
+        void insertionSort(std::vector<std::pair<double, SpaceObject*>> l);
+
+        std::vector<SpaceObject*> xList;
+        std::vector<SpaceObject*> yList;
+        std::vector<SpaceObject*> zList;
     };
 
 }
