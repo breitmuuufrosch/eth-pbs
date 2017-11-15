@@ -14,11 +14,9 @@ long SpaceObject::RunningId = 0;
 *
 * \param filename
 *      Relative location to the object-file. (Relative from the data-directory in the source).
-* \param center
-*      Center of the global-rotation.
 */
-SpaceObject::SpaceObject(std::string filename, Eigen::Vector3d center)
-	: _filename(filename), _center(center) {
+SpaceObject::SpaceObject(std::string filename)
+	: _filename(filename) {
 	_id = RunningId;
 	++RunningId;
 }
