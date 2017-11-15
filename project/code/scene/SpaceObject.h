@@ -55,7 +55,7 @@ namespace pbs17 {
 		 * \param torque
 		 *      Global torque: unit = vector with norm equals to N*m (newton metre)
 		 */
-		virtual void initPhysics(double mass, double linearMomentum, double angularMomentum, double linearVelocity, double angularVelocity, Eigen::Vector3d force, Eigen::Vector3d torque);
+        virtual void initPhysics(double mass, double linearMomentum, double angularMomentum, Eigen::Vector3d linearVelocity, double angularVelocity, Eigen::Vector3d force, Eigen::Vector3d torque);
 
 
 		/**
@@ -98,6 +98,26 @@ namespace pbs17 {
 			return _id;
 		}
 
+        double getMass() const {
+            return _mass;
+        }
+
+        Eigen::Vector3d getLinearVelocity() const {
+            return _linearVelcoity;
+        }
+
+        Eigen::Vector3d getPosition() const {
+            return _position;
+        }
+
+        void setPosition(Eigen::Vector3d p) {
+            _position = p;
+        }
+
+        void setLinearVelocity(Eigen::Vector3d v) {
+            _linearVelcoity = v;
+        }
+
 
 	protected:
 		//! Filename of the loaded object
@@ -127,7 +147,7 @@ namespace pbs17 {
 		//! Angular Momentum : unit = kg*m ^ 2 / s
 		double _angularMomentum;
 		//! Linear velocity : unit = m / s
-		double _linearVelcoity;
+        Eigen::Vector3d _linearVelcoity;
 		//! Angular velocity : unit = rad / s
 		double _angularVelocity;
 		//! Global force : unit = vector with norm equals to N

@@ -1,5 +1,6 @@
 #include "SceneManager.h"
 
+#include <math.h>
 #include <osgGA/TrackballManipulator>
 #include <osgViewer/Viewer>
 #include "Asteroid.h"
@@ -79,10 +80,11 @@ osg::ref_ptr<osg::Node> SceneManager::loadScene() {
 	osg::ref_ptr<osg::Group> planets = new osg::Group;
 	_scene->addChild(planets);
 
-	int numObjects = 20;
+    int numObjects = 1;
 	double rad = 2.0 * osg::PI / numObjects;
 	
 	for (int i = 0; i < numObjects; ++i) {
+        /*
 		SpaceObject* asteroid1 = new Asteroid("A2.obj", Eigen::Vector3d(0.0, 0, 0.0));
 		asteroid1->initOsg(Eigen::Vector3d(-20.0 * sin(i * rad), -20.0 * cos(i * rad), 0.0), 1.0, 1.0);
 		_spaceObjects.push_back(asteroid1);
@@ -93,15 +95,29 @@ osg::ref_ptr<osg::Node> SceneManager::loadScene() {
 		_spaceObjects.push_back(asteroid2);
 		planets->addChild(asteroid2->getModel());
 
-		SpaceObject* planet1 = new Planet(2.0, Eigen::Vector3d(0.0, 0.0, -10.0));
-		planet1->initOsg(Eigen::Vector3d(-20.0 * sin(i * rad), -20.0 * cos(i * rad), -10.0), 1.0, 1.0);
+        */
+
+        // SUN
+        SpaceObject* planet1 = new Planet(5.0, Eigen::Vector3d(0.0, 0.0, 0.0));
+        planet1->initOsg(Eigen::Vector3d(-20.0 * sin(i * rad), -20.0 * cos(i * rad), 0.0), 1.0, 1.0);
+        planet1->initPhysics(1.989 * pow(10, 10), 0.0, 0.0, Eigen::Vector3d(0.0, 0.0, 0.0), 0.0, Eigen::Vector3d(0.0, 0.0, 0.0), Eigen::Vector3d(0.0, 0.0, 0.0));
 		_spaceObjects.push_back(planet1);
 		planets->addChild(planet1->getModel());
 
-		SpaceObject* planet2 = new Planet(5.0, Eigen::Vector3d(10.0, 0.0, -10.0));
-		planet2->initOsg(Eigen::Vector3d(-10.0 * sin(i * rad) + 10.0, -10.0 * cos(i * rad), -10.0), 1.0, 1.0);
+
+        // EARTH
+        SpaceObject* planet2 = new Planet(2.0, Eigen::Vector3d(10.0, 0.0, 0.0));
+        planet2->initOsg(Eigen::Vector3d(-10.0 * sin(i * rad) + 10.0, -10.0 * cos(i * rad), 0.0), 1.0, 1.0);
+        planet2->initPhysics(5.972 * pow(10, 7), 0.0, 0.0, Eigen::Vector3d(0.0, 0.0, 0.0), 0.0, Eigen::Vector3d(0.0, 0.0, 0.0), Eigen::Vector3d(0.0, 0.0, 0.0));
 		_spaceObjects.push_back(planet2);
 		planets->addChild(planet2->getModel());
+
+        // EARTH
+        SpaceObject* planet3 = new Planet(2.0, Eigen::Vector3d(10.0, 0.0, 0.0));
+        planet3->initOsg(Eigen::Vector3d(10.0, 10.0, 0.0), 1.0, 1.0);
+        planet3->initPhysics(6.39 * pow(10, 8), 0.0, 0.0, Eigen::Vector3d(0.0, 0.0, 0.0), 0.0, Eigen::Vector3d(0.0, 0.0, 0.0), Eigen::Vector3d(0.0, 0.0, 0.0));
+        _spaceObjects.push_back(planet3);
+        planets->addChild(planet3->getModel());
 	}
 
 	return _scene;
@@ -119,8 +135,8 @@ osg::ref_ptr<osg::Node> SceneManager::loadScene() {
  */
 osg::ref_ptr<osgViewer::Viewer> SceneManager::initViewer(osg::ref_ptr<osg::Node> scene) const {
 	osg::ref_ptr<osgViewer::Viewer> viewer = new osgViewer::Viewer;
-	viewer->setUpViewOnSingleScreen(0);
-	//viewer->setUpViewInWindow(80, 80, 1000, 600);
+    //viewer->setUpViewOnSingleScreen(0);
+    viewer->setUpViewInWindow(80, 80, 1000, 600);
 
 	viewer->setSceneData(scene);
 
