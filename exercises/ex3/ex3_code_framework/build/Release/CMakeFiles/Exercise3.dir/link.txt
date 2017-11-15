@@ -1,0 +1,1 @@
+/usr/bin/c++    -std=c++11 -O3 -DNDEBUG    CMakeFiles/Exercise3.dir/main.cpp.o CMakeFiles/Exercise3.dir/fluid2d.cpp.o CMakeFiles/Exercise3.dir/exercise.cpp.o CMakeFiles/Exercise3.dir/LodePNG/lodepng.cpp.o  -o Exercise3 -rdynamic -lGLU -lGL -lSM -lICE -lX11 -lXext -lglut -lXmu -lXi 
