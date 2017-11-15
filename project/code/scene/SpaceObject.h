@@ -89,9 +89,21 @@ namespace pbs17 {
 		virtual void setLocalRotation(double angle, osg::Vec3d axis) const;
 
 
+		/**
+		 * \brief Get the ID of the object.
+		 * 
+		 * \return Unique identifier of the object.
+		 */
+		long getId() const {
+			return _id;
+		}
+
+
 	protected:
 		//! Filename of the loaded object
 		std::string _filename;
+		//! Unique identifier for the object
+		long _id;
 
 
 		//! Root of the model which is used for the scene
@@ -122,6 +134,10 @@ namespace pbs17 {
 		Eigen::Vector3d _force;
 		//! Global torque : unit = vector with norm equals to N*m(newton metre)
 		Eigen::Vector3d _torque;
+
+	private:
+		//! Running Id for uniquely identifying the objects.
+		static long RunningId;
 	};
 
 }

@@ -5,6 +5,10 @@
 using namespace pbs17;
 
 
+//! ID's start from 0.
+long SpaceObject::RunningId = 0;
+
+
 /**
 * \brief Constructor of SpaceObject.
 *
@@ -14,7 +18,10 @@ using namespace pbs17;
 *      Center of the global-rotation.
 */
 SpaceObject::SpaceObject(std::string filename, Eigen::Vector3d center)
-	: _filename(filename), _center(center) {}
+	: _filename(filename), _center(center) {
+	_id = RunningId;
+	++RunningId;
+}
 
 
 /**
