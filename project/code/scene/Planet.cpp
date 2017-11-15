@@ -2,7 +2,10 @@
 
 #include <osg/Geode>
 #include <osg/ShapeDrawable>
+#include <osg/Texture2D>
+#include <osgDB/ReadFile>
 
+#include "../config.h"
 #include "../osg/OsgEigenConversions.h"
 #include "../osg/visitors/BoundingBoxVisitor.h"
 
@@ -19,6 +22,10 @@ using namespace pbs17;
  */
 Planet::Planet(double size, Eigen::Vector3d center)
 	: SpaceObject(""), _size(size) {
+}
+
+Planet::Planet(double size, Eigen::Vector3d center, std::string textureName)
+    : SpaceObject("", textureName), _size(size) {
 }
 
 
@@ -46,6 +53,12 @@ void Planet::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 	osg::ref_ptr<osg::ShapeDrawable> model = new osg::ShapeDrawable;
 	model->setShape(new osg::Sphere(osg::Vec3d(0.0f, 0.0f, 0.0f), _size));
 	model->setColor(osg::Vec4d(1.0f, 1.0f, 1.0f, 1.0f));
+
+    if(_textureName != "") {
+        std::string texturePath = DATA_PATH + "/texture/" + _textureName;
+        osg::ref_ptr<osg::Texture2D> myTex = new osg::Texture2D(osgDB::readImageFile(texturePath));
+        model->getOrCreateStateSet()->setTextureAttributeAndModes(0, myTex.get());
+    }
 
 	osg::ref_ptr<osg::Geode> geometry = new osg::Geode;
 	geometry->addDrawable(model);

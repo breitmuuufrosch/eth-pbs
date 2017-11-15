@@ -19,6 +19,8 @@ namespace pbs17 {
 		 */
 		Planet(double size, Eigen::Vector3d center);
 
+        Planet(double size, Eigen::Vector3d center, std::string textureName);
+
 
 		/**
 		 * \brief Destructor of Planet.

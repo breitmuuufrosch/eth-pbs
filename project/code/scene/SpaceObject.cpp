@@ -16,9 +16,14 @@ long SpaceObject::RunningId = 0;
 *      Relative location to the object-file. (Relative from the data-directory in the source).
 */
 SpaceObject::SpaceObject(std::string filename)
-	: _filename(filename) {
+    : _filename(filename) {
 	_id = RunningId;
 	++RunningId;
+}
+SpaceObject::SpaceObject(std::string filename, std::string textureName)
+    : _filename(filename), _textureName(textureName) {
+    _id = RunningId;
+    ++RunningId;
 }
 
 

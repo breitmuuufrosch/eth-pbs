@@ -35,6 +35,7 @@ namespace pbs17 {
         void insertionSort(std::vector<SpaceObject *> &A, int dim);
 
         bool checkIntersection(Planet *p1, Planet *p2);
+        void response(Planet *p1, Planet *p2);
         void pruneAndSweep(std::vector<SpaceObject*> &A, int dim, std::vector<std::pair<SpaceObject *, SpaceObject *>> &res);
 
         std::vector<SpaceObject*> xList;

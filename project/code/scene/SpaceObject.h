@@ -19,6 +19,9 @@ namespace pbs17 {
 		SpaceObject(std::string filename);
 
 
+        SpaceObject(std::string filename, std::string textureName);
+
+
 		virtual ~SpaceObject();
 
 
@@ -121,6 +124,8 @@ namespace pbs17 {
 	protected:
 		//! Filename of the loaded object
 		std::string _filename;
+
+        std::string _textureName = "";
 		//! Unique identifier for the object
 		long _id;
 
