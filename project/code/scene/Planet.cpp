@@ -2,7 +2,6 @@
 
 #include <osg/Geode>
 #include <osg/ShapeDrawable>
-#include <osg/TexGen>
 
 #include "../osg/OsgEigenConversions.h"
 
@@ -18,7 +17,7 @@ using namespace pbs17;
  *      Center of the global-rotation.
  */
 Planet::Planet(double size, Eigen::Vector3d center)
-	: SpaceObject("", center), _size(size) {
+	: SpaceObject(""), _size(size) {
 }
 
 
@@ -41,7 +40,6 @@ Planet::~Planet() {}
 void Planet::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 	// Set the position to the space-object
 	_position = position;
-	_center = -position + _center;
 
 	// Load the model
 	osg::ref_ptr<osg::ShapeDrawable> model = new osg::ShapeDrawable;

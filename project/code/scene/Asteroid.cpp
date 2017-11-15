@@ -5,6 +5,7 @@
 #include "../config.h"
 #include "../osg/ModelManager.h"
 #include "../osg/OsgEigenConversions.h"
+#include "../osg/visitors/BoundingBoxVisitor.h"
 
 using namespace pbs17;
 
@@ -18,7 +19,7 @@ using namespace pbs17;
 *      Center of the global-rotation.
 */
 Asteroid::Asteroid(std::string filename, Eigen::Vector3d center)
-	: SpaceObject(filename, center) {
+	: SpaceObject(filename) {
 }
 
 
@@ -41,7 +42,6 @@ Asteroid::~Asteroid() {}
 void Asteroid::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 	// Set the position to the space-object
 	_position = position;
-	_center = -position + _center;
 
 	// Load the model
 	std::string modelPath = DATA_PATH + "/" + _filename;
@@ -55,4 +55,8 @@ void Asteroid::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 	_model = new osg::MatrixTransform;
 	_model->setMatrix(osg::Matrix::translate(toOsg(position)));
 	_model->addChild(_rotation);
+
+	CalculateBoundingBox bbox;
+	_model->accept(bbox);
+	osg::BoundingBox boxExtents = bbox.getBoundBox();
 }

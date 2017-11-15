@@ -15,10 +15,8 @@ namespace pbs17 {
 		 * 
 		 * \param filename
 		 *      Relative location to the object-file. (Relative from the data-directory in the source).
-		 * \param center
-		 *      Center of the global-rotation.
 		 */
-		SpaceObject(std::string filename, Eigen::Vector3d center);
+		SpaceObject(std::string filename);
 
 
 		virtual ~SpaceObject();
@@ -69,12 +67,10 @@ namespace pbs17 {
 
 
 		/**
-		 * \brief Get the rotation-center of the space-object.
-		 * 
-		 * \return Position of the rotation-center.
+		 * \brief Get the AABB of the space-object.
 		 */
-		Eigen::Vector3d getCenter() const {
-			return _center;
+		osg::BoundingBox getAABB() const {
+			return _aabb;
 		}
 
 
@@ -137,8 +133,8 @@ namespace pbs17 {
 		Eigen::Vector3d _position;
 		//! Orientation
 		Eigen::Vector3d _orientation;
-		//! Rotation-center of the object
-		Eigen::Vector3d _center;
+		//! AABB of the object
+		osg::BoundingBox _aabb;
 
 		//! Mass: unit = kg
 		double _mass;

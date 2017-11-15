@@ -119,6 +119,12 @@ FILE(GLOB osg_HDRS "./osg/*.h")
 SOURCE_GROUP(Osg FILES ${osg_SRCS} ${osg_HDRS})
 LIST(APPEND SOURCES ${osg_SRCS} ${osg_HDRS})
 
+FILE(GLOB osg_visitors_SRCS "./osg/visitors/*.cpp")
+FILE(GLOB osg_visitors_HDRS "./osg/visitors/*.h")
+SOURCE_GROUP(Osg\\Visitors FILES ${osg_visitors_SRCS} ${osg_visitors_HDRS})
+LIST(APPEND SOURCES ${osg_visitors_SRCS} ${osg_visitors_HDRS})
+
+
 FILE(GLOB physics_SRCS "./physics/*.cpp")
 FILE(GLOB physics_HDRS "./physics/*.h")
 SOURCE_GROUP(Physics FILES ${physics_SRCS} ${physics_HDRS})
