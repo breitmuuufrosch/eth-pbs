@@ -6,6 +6,9 @@
 #include "../scene/SpaceObject.h"
 #include "../scene/Planet.h"
 #include "Collision.h"
+#include <Eigen/Core>
+#include <Eigen/LU>
+#include <Eigen/Dense>
 
 namespace pbs17 {
 
@@ -41,13 +44,16 @@ namespace pbs17 {
         void response(Planet *p1, Planet *p2);
         void pruneAndSweep(std::vector<SpaceObject*> &A, int dim, std::vector<std::pair<SpaceObject *, SpaceObject *>> &res);
 
+		Eigen::Matrix3d getOrthonormalBasis(Eigen::Vector3d v);
+
         std::vector<SpaceObject*> xList;
         std::vector<SpaceObject*> yList;
         std::vector<SpaceObject*> zList;
 
 		std::priority_queue<Collision, std::vector<Collision>, CollisionCompareLess> collisionQueue;
 
-		const double COEF_RESTITUTION = 0.3;
+		const double COEF_RESTITUTION = 1.;
+		const double COEF_FRICTION = 0.2;
     };
 
 }
