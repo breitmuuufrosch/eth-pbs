@@ -55,11 +55,9 @@ SpaceObject::~SpaceObject() {
  * \param torque
  *      Global torque: unit = vector with norm equals to N*m (newton metre)
  */
-void SpaceObject::initPhysics(double mass, double linearMomentum, double angularMomentum, Eigen::Vector3d linearVelocity, double angularVelocity, Eigen::Vector3d force, Eigen::Vector3d torque) {
+void SpaceObject::initPhysics(double mass,  Eigen::Vector3d linearVelocity, Eigen::Vector3d angularVelocity, Eigen::Vector3d force, Eigen::Vector3d torque) {
 	_mass = mass;
-	_linearMomentum = linearMomentum;
-	_angularMomentum = angularMomentum;
-	_linearVelcoity = linearVelocity;
+	_linearVelocity = linearVelocity;
 	_angularVelocity = angularVelocity;
 	_force = force;
 	_torque = torque;

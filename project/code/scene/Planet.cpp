@@ -28,6 +28,14 @@ Planet::Planet(double size, Eigen::Vector3d center, std::string textureName)
     : SpaceObject("", textureName), _size(size) {
 }
 
+void Planet::initPhysics(double mass, Eigen::Vector3d linearVelocity, Eigen::Vector3d angularVelocity, Eigen::Vector3d force, Eigen::Vector3d torque) {
+	SpaceObject::initPhysics(mass, linearVelocity, angularVelocity, force, torque);
+	_momentOfInertia = Eigen::Matrix3d();
+	_momentOfInertia.setIdentity();
+	_momentOfInertia *= mass;
+	_momentOfInertia *= 0.4 * getRadius() * getRadius();
+}
+
 
 /**
  * \brief Destructor of Planet.

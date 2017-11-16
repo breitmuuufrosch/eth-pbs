@@ -12,8 +12,8 @@ NBodyManager::NBodyManager() { }
 void NBodyManager::simulateStep(double dt, std::vector<SpaceObject *> _spaceObjects) {
 
     //CONST
-    double G = 6.67408 * pow(10.0, -11.0);
-    double EPS = 0.00000000000000000000001;
+    double G = 6.67408 * pow(10.0, -4.0);
+    double EPS = 0.000000001;
 
 
     int cntSpaceObj = _spaceObjects.size();
@@ -50,7 +50,7 @@ void NBodyManager::simulateStep(double dt, std::vector<SpaceObject *> _spaceObje
 
             // F is the force between the masses
             double f = (G * m * compareObject->getMass()) / (r + EPS);
-            forces[i] += f * d;
+            forces[i] += f * d.normalized();
         }
     }
 
@@ -65,8 +65,16 @@ void NBodyManager::simulateStep(double dt, std::vector<SpaceObject *> _spaceObje
         Vector3d p = spaceObject->getPosition() + dtv;
         spaceObject->setPosition(p);
 
+		Vector3d dto = dt * spaceObject->getAngularVelocity();
+		Vector3d o = spaceObject->getOrientation() + dto;
+		spaceObject->setOrientation(o);
+
         osg::Matrixd translate1 = osg::Matrixd::translate(toOsg(dtv));
+		osg::Matrixd rotate1 = osg::Matrixd::rotate(osg::Quat(dto[0],osg::Vec3d(1,0,0), dto[1],osg::Vec3d(0,1,0), dto[2], osg::Vec3d(0,0,1)));
         spaceObject->getModel()->setMatrix(translate1 * spaceObject->getModel()->getMatrix());
+		spaceObject->getRotation()->setMatrix(rotate1 * spaceObject->getRotation()->getMatrix());
+
+		
 
     }
     /*

@@ -1,9 +1,11 @@
 #pragma once
 
 #include <vector>
+#include <queue>
 
 #include "../scene/SpaceObject.h"
 #include "../scene/Planet.h"
+#include "Collision.h"
 
 namespace pbs17 {
 
@@ -33,6 +35,7 @@ namespace pbs17 {
         void broadPhase(std::vector<std::pair<SpaceObject *, SpaceObject *>> &res);
         void narrowPhase(std::vector<std::pair<SpaceObject *, SpaceObject *>> &collision);
         void insertionSort(std::vector<SpaceObject *> &A, int dim);
+		void respondToCollisions();
 
         bool checkIntersection(Planet *p1, Planet *p2);
         void response(Planet *p1, Planet *p2);
@@ -41,6 +44,10 @@ namespace pbs17 {
         std::vector<SpaceObject*> xList;
         std::vector<SpaceObject*> yList;
         std::vector<SpaceObject*> zList;
+
+		std::priority_queue<Collision, std::vector<Collision>, CollisionCompareLess> collisionQueue;
+
+		const double COEF_RESTITUTION = 0.3;
     };
 
 }

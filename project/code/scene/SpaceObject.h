@@ -56,7 +56,7 @@ namespace pbs17 {
 		 * \param torque
 		 *      Global torque: unit = vector with norm equals to N*m (newton metre)
 		 */
-        virtual void initPhysics(double mass, double linearMomentum, double angularMomentum, Eigen::Vector3d linearVelocity, double angularVelocity, Eigen::Vector3d force, Eigen::Vector3d torque);
+        virtual void initPhysics(double mass, Eigen::Vector3d linearVelocity, Eigen::Vector3d angularVelocity, Eigen::Vector3d force, Eigen::Vector3d torque);
 
 
 		/**
@@ -66,6 +66,14 @@ namespace pbs17 {
 		 */
 		osg::ref_ptr<osg::MatrixTransform> getModel() const {
 			return _model;
+		}
+
+		osg::ref_ptr<osg::MatrixTransform> getRotation() const{
+			return _rotation;
+		}
+
+		void setOrientation(Eigen::Vector3d o) {
+			_orientation = o;
 		}
 
 
@@ -105,7 +113,7 @@ namespace pbs17 {
         }
 
         Eigen::Vector3d getLinearVelocity() const {
-            return _linearVelcoity;
+            return _linearVelocity;
         }
 
         Eigen::Vector3d getPosition() const {
@@ -117,8 +125,24 @@ namespace pbs17 {
         }
 
         void setLinearVelocity(Eigen::Vector3d v) {
-            _linearVelcoity = v;
+            _linearVelocity = v;
         }
+
+		Eigen::Matrix3d getMomentOfInertia() const {
+			return _momentOfInertia;
+		}
+
+		Eigen::Matrix3d setMomentOfInertia(Eigen::Matrix3d m) {
+			_momentOfInertia = m;
+		}
+
+		Eigen::Vector3d getAngularVelocity() const {
+			return _angularVelocity;
+		}
+
+		Eigen::Vector3d getOrientation() const {
+			return _orientation;
+		}
 
 
 	protected:
@@ -147,13 +171,15 @@ namespace pbs17 {
 		//! Mass: unit = kg
 		double _mass;
 		//! Linear momentum : unit = kg*m / s
-		double _linearMomentum;
+		Eigen::Vector3d _linearMomentum;
 		//! Angular Momentum : unit = kg*m ^ 2 / s
-		double _angularMomentum;
+		Eigen::Vector3d _angularMomentum;
 		//! Linear velocity : unit = m / s
-        Eigen::Vector3d _linearVelcoity;
+        Eigen::Vector3d _linearVelocity;
 		//! Angular velocity : unit = rad / s
-		double _angularVelocity;
+		Eigen::Vector3d _angularVelocity;
+		//! Moment of inertia tensor (N.B. It is in the local coordinate system)
+		Eigen::Matrix3d _momentOfInertia;
 		//! Global force : unit = vector with norm equals to N
 		Eigen::Vector3d _force;
 		//! Global torque : unit = vector with norm equals to N*m(newton metre)

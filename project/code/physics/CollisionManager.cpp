@@ -5,18 +5,18 @@ using namespace pbs17;
 using namespace Eigen;
 
 CollisionManager::CollisionManager(std::vector<SpaceObject*> spaceObjects) {
-    for (std::vector<SpaceObject*>::iterator it = spaceObjects.begin(); it != spaceObjects.end(); ++it) {
-        SpaceObject* spaceObject = *it;
+	for (std::vector<SpaceObject*>::iterator it = spaceObjects.begin(); it != spaceObjects.end(); ++it) {
+		SpaceObject* spaceObject = *it;
 
-        xList.push_back(spaceObject);
-        yList.push_back(spaceObject);
-        zList.push_back(spaceObject);
-    }
+		xList.push_back(spaceObject);
+		yList.push_back(spaceObject);
+		zList.push_back(spaceObject);
+	}
 
-    // sort the lists
-    insertionSort(xList, 0);
-    insertionSort(yList, 1);
-    insertionSort(zList, 2);
+	// sort the lists
+	insertionSort(xList, 0);
+	insertionSort(yList, 1);
+	insertionSort(zList, 2);
 }
 /*
  *
@@ -24,21 +24,28 @@ CollisionManager::CollisionManager(std::vector<SpaceObject*> spaceObjects) {
  *
  */
 void CollisionManager::insertionSort(std::vector<SpaceObject*> &A, int dim) {
-    int i = 0;
-    while(i < A.size()) {
-        int j = 0;
-        while(j > 0 && A[j-1]->getAABB()._min[dim] > A[j]->getAABB()._min[dim]) {
-            std::swap(A[j]->getAABB()._min[dim], A[j-1]->getAABB()._min[dim]);
-            j--;
-        }
-        i++;
-    }
+	int i = 0;
+	while (i < A.size()) {
+		int j = 0;
+		while (j > 0 && A[j - 1]->getAABB()._min[dim] > A[j]->getAABB()._min[dim]) {
+			std::swap(A[j]->getAABB()._min[dim], A[j - 1]->getAABB()._min[dim]);
+			j--;
+		}
+		i++;
+	}
 }
 
 void CollisionManager::handleCollisions(double dt, std::vector<SpaceObject *> _spaceObjects) {
-    std::vector<std::pair<SpaceObject *, SpaceObject *>> collision;
+	std::vector<std::pair<SpaceObject *, SpaceObject *>> collision;
+
+	for (int i = 0; i < _spaceObjects.size(); i++) {
+		for (int j = 0; j < i; j++) {
+			collision.push_back(std::make_pair<>(_spaceObjects[i], _spaceObjects[j]));
+		}
+	}
     this->broadPhase(collision);
     this->narrowPhase(collision);
+	this->respondToCollisions();
 }
 
 
@@ -47,7 +54,7 @@ void CollisionManager::pruneAndSweep(std::vector<SpaceObject*> &A, int dim, std:
         double aabbMax = A[i]->getAABB()._max[dim];
         for (int j = i + 1; j < A.size(); ++j) {
             if(aabbMax > A[j]->getAABB()._min[dim]) {
-                // allways have the object with the smaller id first
+                // always have the object with the smaller id first
                 if(A[i]->getId() < A[j]->getId()) {
                     res.push_back(std::make_pair(A[i], A[j]));
                 } else {
@@ -73,9 +80,9 @@ void CollisionManager::broadPhase(std::vector<std::pair<SpaceObject *, SpaceObje
     pruneAndSweep(xList, 0, resX);
     pruneAndSweep(yList, 1, resY);
     pruneAndSweep(zList, 2, resZ);
-    std::cout << "resX = " << resX.size() << std::endl;
+    /*std::cout << "resX = " << resX.size() << std::endl;
     std::cout << "resY = " << resY.size() << std::endl;
-    std::cout << "resZ = " << resZ.size() << std::endl;
+    std::cout << "resZ = " << resZ.size() << std::endl;*/
 
     std::vector<std::pair<SpaceObject *, SpaceObject *>> resXY;
     // get only the instersections
@@ -88,6 +95,7 @@ void CollisionManager::broadPhase(std::vector<std::pair<SpaceObject *, SpaceObje
 
 bool CollisionManager::checkIntersection(Planet *p1, Planet *p2) {
     double d = (p1->getPosition() - p2->getPosition()).norm();
+	std::cout << d << " " << p1->getRadius() << " " << p2->getRadius() << std::endl;
     return (d - p1->getRadius() - p2->getRadius()) < 0.0;
 }
 
@@ -126,11 +134,45 @@ void CollisionManager::narrowPhase(std::vector<std::pair<SpaceObject *, SpaceObj
             // we have a possible collision between 2 spheres.
 
             if(checkIntersection(p1, p2)) {
-                response(p1, p2);
+				Collision sphereCollision;
+				sphereCollision.setFirstObject(p1);
+				sphereCollision.setSecondObject(p2);
+				sphereCollision.setUnitNormal((p1->getPosition() - p2->getPosition()).normalized());
+				sphereCollision.setFirstPOC(p1->getPosition() - p1->getRadius() * sphereCollision.getUnitNormal());
+				sphereCollision.setSecondPOC(p1->getPosition() + p1->getRadius() * sphereCollision.getUnitNormal());
+				sphereCollision.setIntersectionVector(sphereCollision.getUnitNormal() * (((p1->getPosition() - p2->getPosition()).norm()) - p1->getRadius() - p2->getRadius()));
+				collisionQueue.push(sphereCollision);
                 std::cout << "INTERSECTION DETECTED" << std::endl;
             }
         } else {
             std::cout << "TBD: impl narrow collision check between aribary space objects" << std::endl;
         }
     }
+}
+
+void CollisionManager::respondToCollisions() {
+	while (!collisionQueue.empty()) {
+		Collision currentCollision = collisionQueue.top();
+		collisionQueue.pop();
+
+		
+		Eigen::Vector3d velocityFirst = currentCollision.getFirstObject()->getLinearVelocity();
+		Eigen::Vector3d velocitySecond = currentCollision.getSecondObject()->getLinearVelocity();
+
+		double closingVelocity = (velocityFirst - velocitySecond).dot(currentCollision.getUnitNormal());
+		double finalVelocity = -COEF_RESTITUTION * closingVelocity;
+
+		double deltaVelocity = finalVelocity - closingVelocity;
+
+		double linearResponsePerUnitImpulse = 1. / currentCollision.getFirstObject()->getMass();
+		linearResponsePerUnitImpulse += 1. / currentCollision.getSecondObject()->getMass();
+
+		Eigen::Vector3d impulseResponse = (deltaVelocity / linearResponsePerUnitImpulse) * currentCollision.getUnitNormal();
+
+		currentCollision.getFirstObject()->setPosition(currentCollision.getFirstObject()->getPosition() + currentCollision.getIntersectionVector() / 2);
+		currentCollision.getFirstObject()->setPosition(currentCollision.getFirstObject()->getPosition() - currentCollision.getIntersectionVector() / 2);
+
+		currentCollision.getFirstObject()->setLinearVelocity(currentCollision.getFirstObject()->getLinearVelocity() + impulseResponse / currentCollision.getFirstObject()->getMass());
+		currentCollision.getSecondObject()->setLinearVelocity(currentCollision.getSecondObject()->getLinearVelocity() - impulseResponse / currentCollision.getSecondObject()->getMass());
+	}
 }

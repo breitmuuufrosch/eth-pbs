@@ -40,6 +40,7 @@ namespace pbs17 {
 		 */
 		void initOsg(Eigen::Vector3d position, double ratio, double scaling) override;
 
+		void initPhysics(double mass, Eigen::Vector3d linearVelocity, Eigen::Vector3d angularVelocity, Eigen::Vector3d force, Eigen::Vector3d torque);
 
         double getRadius() {
             return _size;

@@ -41,7 +41,7 @@ namespace pbs17 {
 		 * \param geode
 		 *      Current geode-child.
 		 */
-		void apply(osg::Geode &geode) override;
+		// apply(osg::Geode &geode) override;
 
 
 		/**
@@ -50,7 +50,7 @@ namespace pbs17 {
 		 * \param node
 		 *      Current matrix-transform-child.
 		 */
-		void apply(osg::MatrixTransform &node) override;
+		//void apply(osg::MatrixTransform &node) override;
 
 
 		/**
@@ -60,7 +60,7 @@ namespace pbs17 {
 		 * \param node
 		 *      Current billboard-child.
 		 */
-		void apply(osg::Billboard &node) override;
+		//void apply(osg::Billboard &node) override;
 
 
 		/**

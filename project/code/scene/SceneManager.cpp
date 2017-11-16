@@ -98,25 +98,25 @@ osg::ref_ptr<osg::Node> SceneManager::loadScene() {
 
         // SUN
         SpaceObject* planet1 = new Planet(5.0, Eigen::Vector3d(0.0, 0.0, 0.0), "sunmap.jpg");
-        planet1->initOsg(Eigen::Vector3d(-20.0 * sin(i * rad), -20.0 * cos(i * rad), 0.0), 1.0, 1.0);
-        planet1->initPhysics(1.989 * pow(10, 10), 0.0, 0.0, Eigen::Vector3d(0.0, 0.0, 0.0), 0.0, Eigen::Vector3d(0.0, 0.0, 0.0), Eigen::Vector3d(0.0, 0.0, 0.0));
+        planet1->initOsg(Eigen::Vector3d(0, 0, 0.0), 1.0, 1.0);
+        planet1->initPhysics(1989, Eigen::Vector3d(0.0, 0.0, 0.0), Eigen::Vector3d(0, 0.0, 1.0), Eigen::Vector3d(0.0, 0.0, 0.0), Eigen::Vector3d(0.0, 0.0, 0.0));
 		_spaceObjects.push_back(planet1);
 		planets->addChild(planet1->getModel());
 
 
         // EARTH
         SpaceObject* planet2 = new Planet(2.0, Eigen::Vector3d(10.0, 0.0, 0.0), "earthmap1k.jpg");
-        planet2->initOsg(Eigen::Vector3d(-10.0 * sin(i * rad) + 10.0, -10.0 * cos(i * rad), 0.0), 1.0, 1.0);
-        planet2->initPhysics(5.972 * pow(10, 7), 0.0, 0.0, Eigen::Vector3d(0.0, 0.0, 0.0), 0.0, Eigen::Vector3d(0.0, 0.0, 0.0), Eigen::Vector3d(0.0, 0.0, 0.0));
+        planet2->initOsg(Eigen::Vector3d(10.0, 0.0, 0.0), 1.0, 1.0);
+        planet2->initPhysics(5.972, Eigen::Vector3d(0.0, 0.0, 0.0), Eigen::Vector3d(0.0, 0.0, 1.0), Eigen::Vector3d(0.0, 0.0, 0.0), Eigen::Vector3d(0.0, 0.0, 0.0));
 		_spaceObjects.push_back(planet2);
 		planets->addChild(planet2->getModel());
 
         // MARS
-        SpaceObject* planet3 = new Planet(2.0, Eigen::Vector3d(10.0, 0.0, 0.0), "mars_1k_color.jpg");
+        /*SpaceObject* planet3 = new Planet(2.0, Eigen::Vector3d(10.0, 0.0, 0.0), "mars_1k_color.jpg");
         planet3->initOsg(Eigen::Vector3d(10.0, 10.0, 0.0), 1.0, 1.0);
-        planet3->initPhysics(6.39 * pow(10, 8), 0.0, 0.0, Eigen::Vector3d(0.0, 0.0, 0.0), 0.0, Eigen::Vector3d(0.0, 0.0, 0.0), Eigen::Vector3d(0.0, 0.0, 0.0));
+        planet3->initPhysics(63.9, Eigen::Vector3d(0.0, 0.0, 0.0), Eigen::Vector3d(0.0, 0.0, 0.0), Eigen::Vector3d(0.0, 0.0, 0.0), Eigen::Vector3d(0.0, 0.0, 0.0));
         _spaceObjects.push_back(planet3);
-        planets->addChild(planet3->getModel());
+        planets->addChild(planet3->getModel());*/
 
 	}
 
