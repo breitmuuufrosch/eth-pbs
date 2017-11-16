@@ -8,6 +8,7 @@
 #include "../config.h"
 #include "../osg/OsgEigenConversions.h"
 #include "../osg/visitors/BoundingBoxVisitor.h"
+#include "../osg/ImageManager.h"
 
 using namespace pbs17;
 
@@ -64,7 +65,7 @@ void Planet::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 
     if(_textureName != "") {
         std::string texturePath = DATA_PATH + "/texture/" + _textureName;
-        osg::ref_ptr<osg::Texture2D> myTex = new osg::Texture2D(osgDB::readImageFile(texturePath));
+        osg::ref_ptr<osg::Texture2D> myTex = ImageManager::Instance()->loadTexture(texturePath);
         model->getOrCreateStateSet()->setTextureAttributeAndModes(0, myTex.get());
     }
 
