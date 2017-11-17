@@ -1,6 +1,8 @@
 #pragma once
 
 #include <Eigen/Core>
+#include <Eigen/LU>
+#include <Eigen/Dense>
 #include <osg/MatrixTransform>
 #include <osg/BoundingBox>
 #include <osg/ShapeDrawable>
@@ -151,8 +153,8 @@ namespace pbs17 {
 			return _angularVelocity;
 		}
 
-		void setAngularVelocity(Eigen::Vector3d v) {
-			_angularVelocity = v;
+		void setAngularVelocity(Eigen::Vector3d av) {
+			_angularVelocity = av;
 		}
 
 		Eigen::Vector3d getOrientation() const {

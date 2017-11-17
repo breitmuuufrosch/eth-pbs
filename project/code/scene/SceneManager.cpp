@@ -85,15 +85,15 @@ osg::ref_ptr<osg::Node> SceneManager::loadScene() {
 	// SUN
 	SpaceObject* planetSun = new Planet(5.0, "sunmap.jpg");
 	planetSun->initOsg(Eigen::Vector3d(0, 0, 0.0), 1.0, 1.0);
-	planetSun->initPhysics(1989, Eigen::Vector3d(0.0, 0.0, 0.0), Eigen::Vector3d(0, 0.0, 1.0), Eigen::Vector3d(0.0, 0.0, 0.0), Eigen::Vector3d(0.0, 0.0, 0.0));
+	planetSun->initPhysics(10, Eigen::Vector3d(0.0, 0.0, 0.0), Eigen::Vector3d(0.0, 0.0, 0.0), Eigen::Vector3d(0.0, 0.0, 0.0), Eigen::Vector3d(0.0, 0.0, 0.0));
 	_spaceObjects.push_back(planetSun);
 	planets->addChild(planetSun->getModel());
 
 
 	// EARTH
 	SpaceObject* planetEarth = new Planet(2.0, "earthmap1k.jpg");
-	planetEarth->initOsg(Eigen::Vector3d(10.0, 0.0, 0.0), 1.0, 1.0);
-	planetEarth->initPhysics(5.972, Eigen::Vector3d(0.0, 0.0, 0.0), Eigen::Vector3d(0.0, 0.0, 1.0), Eigen::Vector3d(0.0, 0.0, 0.0), Eigen::Vector3d(0.0, 0.0, 0.0));
+	planetEarth->initOsg(Eigen::Vector3d(10.0, 0.0, 6.5), 1.0, 1.0);
+	planetEarth->initPhysics(1, Eigen::Vector3d(-4.0, 0.0, 0.0), Eigen::Vector3d(0.0, 0.0, 0.0), Eigen::Vector3d(0.0, 0.0, 0.0), Eigen::Vector3d(0.0, 0.0, 0.0));
 	_spaceObjects.push_back(planetEarth);
 	planets->addChild(planetEarth->getModel());
 
