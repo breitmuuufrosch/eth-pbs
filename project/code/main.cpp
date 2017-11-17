@@ -30,8 +30,9 @@ int main(int, char **) {
 		long frameNumber = viewer->getFrameStamp()->getFrameNumber();
 		double currentTime = viewer->elapsedTime();
 		double dt = currentTime - startTime;
-		// std::cout << "Frame: " << frameNumber << "\tdt: " << dt << "\tfps: " << 1.0 / dt << std::endl;
-		
+		 //std::cout << "Frame: " << frameNumber << "\tdt: " << dt << "\tfps: " << 1.0 / dt << std::endl;
+
+		 dt = 0.01;
 		simulationManager->simulate(dt);
 
 		startTime = currentTime;

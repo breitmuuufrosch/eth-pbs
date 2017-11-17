@@ -44,16 +44,6 @@ osg::ref_ptr<osg::Node> Loader::loadModel(std::string filePath, float ratio, flo
 
 	model->setName(filePath);
 
-	// Only simplify the node if desired.
-	if (ratio != 1.0) {
-		model = simplifyNode(model, ratio);
-	}
-
-	// Only scale the node if desired.
-	if (scaling != 1.0) {
-		model = scaleNode(model, scaling);
-	}
-
 	std::cout << "Loaded: OK!" << std::endl;
 
 	return model;

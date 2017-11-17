@@ -34,12 +34,12 @@ namespace pbs17 {
         //! All space-objects in the scene
         void broadPhase(std::vector<std::pair<SpaceObject *, SpaceObject *>> &res);
         void narrowPhase(std::vector<std::pair<SpaceObject *, SpaceObject *>> &collision);
-        void insertionSort(std::vector<SpaceObject *> &A, int dim);
+        void insertionSort(std::vector<SpaceObject *> &A, int dim) const;
 		void respondToCollisions();
 
         bool checkIntersection(Planet *p1, Planet *p2);
         void response(Planet *p1, Planet *p2);
-        void pruneAndSweep(std::vector<SpaceObject*> &A, int dim, std::vector<std::pair<SpaceObject *, SpaceObject *>> &res);
+	    static void pruneAndSweep(std::vector<SpaceObject*> &A, int dim, std::vector<std::pair<SpaceObject *, SpaceObject *>> &res);
 
         std::vector<SpaceObject*> xList;
         std::vector<SpaceObject*> yList;

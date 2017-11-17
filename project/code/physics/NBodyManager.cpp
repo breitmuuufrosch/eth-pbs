@@ -7,7 +7,10 @@
 using namespace pbs17;
 using namespace Eigen;
 using namespace std;
+
+
 NBodyManager::NBodyManager() { }
+
 
 void NBodyManager::simulateStep(double dt, std::vector<SpaceObject *> _spaceObjects) {
 
@@ -68,14 +71,6 @@ void NBodyManager::simulateStep(double dt, std::vector<SpaceObject *> _spaceObje
 		Vector3d dto = dt * spaceObject->getAngularVelocity();
 		Vector3d o = spaceObject->getOrientation() + dto;
 		spaceObject->setOrientation(o);
-
-        osg::Matrixd translate1 = osg::Matrixd::translate(toOsg(dtv));
-		osg::Matrixd rotate1 = osg::Matrixd::rotate(osg::Quat(dto[0],osg::Vec3d(1,0,0), dto[1],osg::Vec3d(0,1,0), dto[2], osg::Vec3d(0,0,1)));
-        spaceObject->getModel()->setMatrix(translate1 * spaceObject->getModel()->getMatrix());
-		spaceObject->getRotation()->setMatrix(rotate1 * spaceObject->getRotation()->getMatrix());
-
-		
-
     }
     /*
     for (std::vector<SpaceObject*>::iterator it = _spaceObjects.begin(); it != _spaceObjects.end(); ++it) {

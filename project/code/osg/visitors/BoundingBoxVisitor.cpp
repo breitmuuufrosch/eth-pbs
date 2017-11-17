@@ -9,6 +9,7 @@
 #include "BoundingBoxVisitor.h"
 
 #include <osg/MatrixTransform>
+#include <osg/Geometry>
 
 using namespace pbs17;
 
@@ -24,7 +25,15 @@ void CalculateBoundingBox::apply(osg::Geode& geode) {
 
 	// update bounding box for each drawable
 	for (unsigned int i = 0; i < geode.getNumDrawables(); ++i) {
-		bbox.expandBy(geode.getDrawable(i)->getBound());
+		osg::Geometry *curGeom = geode.getDrawable(i)->asGeometry();
+
+		// Only process if the drawable is geometry
+		//bbox.expandBy(geode.getDrawable(i)->getBoundingBox());
+		if (curGeom) {
+			bbox.expandBy(curGeom->getBoundingBox());
+		} else {
+			bbox.expandBy(geode.getDrawable(i)->getBoundingBox());
+		}
 	}
 
 	// transform corners by current matrix

@@ -54,5 +54,15 @@ osg::ref_ptr<osg::Node> ModelManager::loadModel(std::string filePath, float rati
 		retModel = _loaded[filePath];
 	}
 
+	// Only simplify the node if desired.
+	if (ratio != 1.0) {
+		retModel = Loader::simplifyNode(retModel, ratio);
+	}
+
+	// Only scale the node if desired.
+	if (scaling != 1.0) {
+		retModel = Loader::scaleNode(retModel, scaling);
+	}
+
 	return retModel;
 }
