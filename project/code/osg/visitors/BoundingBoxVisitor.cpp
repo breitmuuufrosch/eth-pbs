@@ -28,11 +28,11 @@ void CalculateBoundingBox::apply(osg::Geode& geode) {
 		osg::Geometry *curGeom = geode.getDrawable(i)->asGeometry();
 
 		// Only process if the drawable is geometry
-		//bbox.expandBy(geode.getDrawable(i)->getBoundingBox());
+		//bbox.expandBy(geode.getDrawable(i)->getBound());
 		if (curGeom) {
-			bbox.expandBy(curGeom->getBoundingBox());
+			bbox.expandBy(curGeom->getBound());
 		} else {
-			bbox.expandBy(geode.getDrawable(i)->getBoundingBox());
+			bbox.expandBy(geode.getDrawable(i)->getBound());
 		}
 	}
 
