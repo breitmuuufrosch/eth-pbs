@@ -151,7 +151,7 @@ osg::ref_ptr<osg::Node> SceneManager::loadScene() {
 osg::ref_ptr<osgViewer::Viewer> SceneManager::initViewer(osg::ref_ptr<osg::Node> scene) const {
 	osg::ref_ptr<osgViewer::Viewer> viewer = new osgViewer::Viewer;
     //viewer->setUpViewOnSingleScreen(0);
-    viewer->setUpViewInWindow(80, 80, 1000, 600, 1);
+    viewer->setUpViewInWindow(80, 80, 1000, 600, 0);
 
 	viewer->setSceneData(scene);
 
