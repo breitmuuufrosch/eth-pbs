@@ -15,8 +15,6 @@
 
 #include <osgUtil/Simplifier>
 
-#include "../config.h"
-
 using namespace pbs17;
 
 

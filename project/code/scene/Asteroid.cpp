@@ -5,8 +5,6 @@
 #include "../config.h"
 #include "../osg/ModelManager.h"
 #include "../osg/OsgEigenConversions.h"
-#include <osg/Texture2D>
-#include "../osg/ImageManager.h"
 
 using namespace pbs17;
 

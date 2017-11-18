@@ -5,19 +5,6 @@
 
 namespace pbs17 {
 	class Collision {
-	private:
-		//! Pointer to the first colliding object
-		SpaceObject* _firstObject;
-		//! Pointer to the second colliding object
-		SpaceObject* _secondObject;
-		//! Unit vector of the collision normal
-		Eigen::Vector3d _unitNormal;
-		//! Point of contact of the first object (in world coordinates)
-		Eigen::Vector3d _firstPOC;
-		//! Point of contact of the second object (in world coordinates)
-		Eigen::Vector3d _secondPOC;
-		//! Represents the displacement vector needed to annul collision
-		Eigen::Vector3d _intersectionVector;
 	public:
 		SpaceObject* getFirstObject() const {
 			return _firstObject;
@@ -66,6 +53,21 @@ namespace pbs17 {
 		void setIntersectionVector(Eigen::Vector3d iv) {
 			_intersectionVector = iv;
 		}
+
+
+	private:
+		//! Pointer to the first colliding object
+		SpaceObject* _firstObject;
+		//! Pointer to the second colliding object
+		SpaceObject* _secondObject;
+		//! Unit vector of the collision normal
+		Eigen::Vector3d _unitNormal;
+		//! Point of contact of the first object (in world coordinates)
+		Eigen::Vector3d _firstPOC;
+		//! Point of contact of the second object (in world coordinates)
+		Eigen::Vector3d _secondPOC;
+		//! Represents the displacement vector needed to annul collision
+		Eigen::Vector3d _intersectionVector;
 	};
 
 	struct CollisionCompareLess {

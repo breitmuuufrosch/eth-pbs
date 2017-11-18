@@ -1,12 +1,13 @@
 #pragma once
 
 #include <osg/Matrix>
+#include <osgDB/Input>
 
 /// Example for me,not yet used
 class GetWorldCoordOfNodeVisitor : public osg::NodeVisitor {
 public:
 	GetWorldCoordOfNodeVisitor() :
-		osg::NodeVisitor(NodeVisitor::TRAVERSE_PARENTS), done(false) {
+		osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_PARENTS), done(false) {
 		wcMatrix = new osg::Matrixd();
 	}
 

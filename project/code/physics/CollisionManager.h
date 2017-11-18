@@ -7,8 +7,6 @@
 #include "../scene/Planet.h"
 #include "Collision.h"
 #include <Eigen/Core>
-#include <Eigen/LU>
-#include <Eigen/Dense>
 
 namespace pbs17 {
 

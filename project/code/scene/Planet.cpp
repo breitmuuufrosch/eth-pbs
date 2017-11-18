@@ -1,6 +1,5 @@
 #include "Planet.h"
 
-#include <osg/ShapeDrawable>
 #include <osg/Texture2D>
 #include <osgDB/ReadFile>
 
@@ -60,8 +59,6 @@ void Planet::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 	// Load the model
 	std::string modelPath = DATA_PATH + "/sphere.obj";
 	osg::ref_ptr<osg::Node> modelFile = ModelManager::Instance()->loadModel(modelPath, ratio, _size);
-	//osg::ref_ptr<osg::ShapeDrawable> model = new osg::ShapeDrawable;
-	//model->setShape(new osg::Sphere(osg::Vec3d(0.0f, 0.0f, 0.0f), _size));
 
 	if (_textureName != "") {
 		std::string texturePath = DATA_PATH + "/texture/" + _textureName;
@@ -86,6 +83,20 @@ void Planet::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 }
 
 
+/**
+* \brief Initialize the space-object for physics.
+*
+* \param mass
+*      Mass: unit = kg
+* \param linearVelocity
+*      Linear velocity: unit = m/s
+* \param angularVelocity
+*      Angular velocity: unit = rad/s
+* \param force
+*      Global force: unit = vector with norm equals to N
+* \param torque
+*      Global torque: unit = vector with norm equals to N*m (newton metre)
+*/
 void Planet::initPhysics(double mass, Eigen::Vector3d linearVelocity, Eigen::Vector3d angularVelocity, Eigen::Vector3d force, Eigen::Vector3d torque) {
 	SpaceObject::initPhysics(mass, linearVelocity, angularVelocity, force, torque);
 

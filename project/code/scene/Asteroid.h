@@ -38,9 +38,6 @@ namespace pbs17 {
 
 
 		void setOrientation(Eigen::Vector3d o) override;
-
-	private:
-		
 	};
 
 }

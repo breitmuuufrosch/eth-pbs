@@ -37,7 +37,7 @@ SpaceObject::SpaceObject(std::string filename, std::string textureName)
 	_position = Eigen::Vector3d(0, 0, 0);
 	_orientation = Eigen::Vector3d(0, 0, 0);
 
-
+	// For visually debuggin => Make bounding-box visible
 	osg::ref_ptr<osg::Geode> geode = new osg::Geode;
 	_aabbShape = new osg::ShapeDrawable(new osg::Box(osg::Vec3(), 1.0f));
 	_aabbShape->setColor(osg::Vec4(1.0, 0, 0, 1.0));
@@ -104,7 +104,6 @@ void SpaceObject::calculateAABB() {
 	CalculateBoundingBox bbox;
 	_rotation->accept(bbox);
 	_aabbLocal = bbox.getBoundBox();
-	auto trans = osg::Matrix::translate(toOsg(_position));
 	_aabbRendering->setMatrix(osg::Matrix::scale(_aabbLocal._max - _aabbLocal._min) * osg::Matrix::translate(toOsg(_position)));
 }
 

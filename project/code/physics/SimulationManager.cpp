@@ -1,7 +1,5 @@
 #include "SimulationManager.h"
 
-#include "../osg/OsgEigenConversions.h"
-
 using namespace pbs17;
 
 /**

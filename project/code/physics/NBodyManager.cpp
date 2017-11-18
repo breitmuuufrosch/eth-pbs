@@ -1,8 +1,6 @@
-#include <iostream>
-#include <math.h>
-
-
 #include "NBodyManager.h"
+
+#include <math.h>
 
 using namespace pbs17;
 using namespace Eigen;
