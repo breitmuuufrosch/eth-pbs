@@ -10,12 +10,14 @@ Windows:
 * Download the libraries of OSG from here: http://objexx.com/OpenSceneGraph.html (debug and release if you want to build in both)
 * Extract to `<path_to_osg>/` (I pasted release and debug in the same, since they use a "d" as postfix for each files => no problems with overwritting etc)
 * Use Path-variable to `<path_to_osg>/bin`
+* install boost from here: http://www.boost.org/doc/libs/1_65_1/more/getting_started/index.html
 
 Ubuntu:
 * Install the libraries with "sudo apt-get install openscenegraph
  libopenscenegraph-dev libopenscenegraph100v5"
 * For the examples one can use "sudo apt-get install openscenegraph-examples". These can then simply called by the command "osgteapot" for example.
 * Includes should be at "/usr/include" and libraries at `/usr/lib/x86_64-linux-gnu` (at least for me.. ;-) )
+* install boost from here: http://www.boost.org/doc/libs/1_65_1/more/getting_started/index.html
 
 ### Project-setup
 I suggest to use the cmake-gui, since it most likely does not find the variables autoamtically, so it might be easier to set them correctly.

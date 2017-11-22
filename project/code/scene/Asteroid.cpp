@@ -15,8 +15,40 @@ using namespace pbs17;
 * \param filename
 *      Relative location to the object-file. (Relative from the data-directory in the source).
 */
-Asteroid::Asteroid(std::string filename)
-	: SpaceObject(filename) {}
+Asteroid::Asteroid()
+    : SpaceObject("A2.obj", 0) {
+
+}
+
+Asteroid::Asteroid(json j) :
+    SpaceObject(j){
+
+    Eigen::Vector3d pos(
+        j["position"]["x"].get<double>(),
+        j["position"]["y"].get<double>(),
+        j["position"]["z"].get<double>());
+    initOsg(pos, j["ratio"].get<double>(), j["scaling"].get<double>());
+
+    Eigen::Vector3d linearVelocity(
+        j["linearVelocity"]["x"].get<double>(),
+        j["linearVelocity"]["y"].get<double>(),
+        j["linearVelocity"]["z"].get<double>());
+    Eigen::Vector3d angularVelocity(
+        j["angularVelocity"]["x"].get<double>(),
+        j["angularVelocity"]["y"].get<double>(),
+        j["angularVelocity"]["z"].get<double>());
+    Eigen::Vector3d force(
+        j["force"]["x"].get<double>(),
+        j["force"]["y"].get<double>(),
+        j["force"]["z"].get<double>());
+    Eigen::Vector3d torque(
+        j["torque"]["x"].get<double>(),
+        j["torque"]["y"].get<double>(),
+        j["torque"]["z"].get<double>());
+
+
+    initPhysics(j["mass"].get<double>(),linearVelocity,angularVelocity,force, torque);
+}
 
 
 /**

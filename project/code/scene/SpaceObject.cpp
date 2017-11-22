@@ -17,8 +17,35 @@ long SpaceObject::RunningId = 0;
 * \param filename
 *      Relative location to the object-file. (Relative from the data-directory in the source).
 */
-SpaceObject::SpaceObject(std::string filename)
-	: SpaceObject(filename, "") {}
+SpaceObject::SpaceObject(std::string filename, int i)
+    : SpaceObject(filename, "") {
+    std::cout << "should not be called" << std::endl;
+}
+
+SpaceObject::SpaceObject(json j) {
+    _textureName = j["texture"].is_string()? j["texture"].get<std::string>(): "";
+    std::cout << "_textureName = "<< _textureName << std::endl;
+    _filename = j["obj"].is_string()? j["obj"].get<std::string>(): "";
+    _id = RunningId;
+    ++RunningId;
+
+    _position = Eigen::Vector3d(0, 0, 0);
+    _orientation = Eigen::Vector3d(0, 0, 0);
+
+    // For visually debuggin => Make bounding-box visible
+    osg::ref_ptr<osg::Geode> geode = new osg::Geode;
+    _aabbShape = new osg::ShapeDrawable(new osg::Box(osg::Vec3(), 1.0f));
+    _aabbShape->setColor(osg::Vec4(1.0, 0, 0, 1.0));
+    geode->addDrawable(_aabbShape);
+
+    _aabbRendering = new osg::MatrixTransform;
+    _aabbRendering->setNodeMask(0x1);
+    _aabbRendering->addChild(geode.get());
+    osg::StateSet* ss = _aabbRendering->getOrCreateStateSet();
+    ss->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+    ss->setAttributeAndModes(new osg::PolygonMode(
+        osg::PolygonMode::FRONT_AND_BACK, osg::PolygonMode::LINE));
+}
 
 
 /**
