@@ -1,5 +1,6 @@
-#include <iostream>
 #include "CollisionManager.h"
+
+#include <iostream>
 
 
 using namespace pbs17;
@@ -199,7 +200,7 @@ Matrix3d CollisionManager::getOrthonormalBasis(Vector3d v) {
 	Vector3d firstTangent;
 	Vector3d secondTangent;
 
-	if (abs(v[0]) > abs(v[1])) {
+	if (fabs(v[0]) > fabs(v[1])) {
 		firstTangent[0] = v[2];
 		firstTangent[1] = 0;
 		firstTangent[2] = -v[0];
