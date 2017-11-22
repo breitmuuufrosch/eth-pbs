@@ -1,19 +1,20 @@
-#include <iostream>
-#include <math.h>
-
-
 #include "NBodyManager.h"
+
+#include <math.h>
 
 using namespace pbs17;
 using namespace Eigen;
 using namespace std;
+
+
 NBodyManager::NBodyManager() { }
+
 
 void NBodyManager::simulateStep(double dt, std::vector<SpaceObject *> _spaceObjects) {
 
     //CONST
-    double G = 6.67408 * pow(10.0, -11.0);
-    double EPS = 0.00000000000000000000001;
+    double G = 6.67408 * pow(10.0, -4.0);
+    double EPS = 0.000000001;
 
 
     int cntSpaceObj = _spaceObjects.size();
@@ -47,11 +48,10 @@ void NBodyManager::simulateStep(double dt, std::vector<SpaceObject *> _spaceObje
             // compute the square distance
             double r = (compareCenter - curCenter).norm();
             r *= r;
-            cout << "r= " << r << endl;
 
             // F is the force between the masses
             double f = (G * m * compareObject->getMass()) / (r + EPS);
-            forces[i] += f * d;
+            forces[i] += f * d.normalized();
         }
     }
 
@@ -60,18 +60,15 @@ void NBodyManager::simulateStep(double dt, std::vector<SpaceObject *> _spaceObje
         SpaceObject* spaceObject = _spaceObjects[i];
         Vector3d a = forces[i] / spaceObject->getMass();
         Vector3d v = spaceObject->getLinearVelocity() + (dt * a);
-        cout << "a= " << a << endl;
-        cout << "v= " << v << endl;
         spaceObject->setLinearVelocity(v);
 
         Vector3d dtv = dt * v;
         Vector3d p = spaceObject->getPosition() + dtv;
         spaceObject->setPosition(p);
 
-        cout << "p= " << p << endl;
-        osg::Matrixd translate1 = osg::Matrixd::translate(toOsg(dtv));
-        spaceObject->getModel()->setMatrix(translate1 * spaceObject->getModel()->getMatrix());
-
+		Vector3d dto = dt * spaceObject->getAngularVelocity();
+		Vector3d o = spaceObject->getOrientation() + dto;
+		spaceObject->setOrientation(o);
     }
     /*
     for (std::vector<SpaceObject*>::iterator it = _spaceObjects.begin(); it != _spaceObjects.end(); ++it) {

@@ -5,7 +5,6 @@
 #include "../config.h"
 #include "../osg/ModelManager.h"
 #include "../osg/OsgEigenConversions.h"
-#include "../osg/visitors/BoundingBoxVisitor.h"
 
 using namespace pbs17;
 
@@ -15,12 +14,9 @@ using namespace pbs17;
 *
 * \param filename
 *      Relative location to the object-file. (Relative from the data-directory in the source).
-* \param center
-*      Center of the global-rotation.
 */
-Asteroid::Asteroid(std::string filename, Eigen::Vector3d center)
-	: SpaceObject(filename) {
-}
+Asteroid::Asteroid(std::string filename)
+	: SpaceObject(filename) {}
 
 
 /**
@@ -42,6 +38,7 @@ Asteroid::~Asteroid() {}
 void Asteroid::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 	// Set the position to the space-object
 	_position = position;
+	_scaling = scaling;
 
 	// Load the model
 	std::string modelPath = DATA_PATH + "/" + _filename;
@@ -52,11 +49,20 @@ void Asteroid::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 	_rotation->addChild(modelFile);
 
 	// Second transformation-node for global rotations and translations
-	_model = new osg::MatrixTransform;
-	_model->setMatrix(osg::Matrix::translate(toOsg(position)));
-	_model->addChild(_rotation);
+	_translation = new osg::MatrixTransform;
+	_translation->setMatrix(osg::Matrix::translate(toOsg(position)));
+	_translation->addChild(_rotation);
 
-	CalculateBoundingBox bbox;
-	_model->accept(bbox);
-	osg::BoundingBox boxExtents = bbox.getBoundBox();
+	calculateAABB();
+
+	_model = new osg::Group;
+	_model->addChild(_aabbRendering);
+	_model->addChild(_translation);
+}
+
+
+void Asteroid::setOrientation(Eigen::Vector3d o) {
+	SpaceObject::setOrientation(o);
+
+	calculateAABB();
 }

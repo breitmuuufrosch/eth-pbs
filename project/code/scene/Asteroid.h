@@ -1,8 +1,5 @@
 #pragma once
 
-#include <osg/Node>
-#include <osg/MatrixTransform>
-
 #include "SpaceObject.h"
 
 namespace pbs17 {
@@ -17,10 +14,8 @@ namespace pbs17 {
 		 * 
 		 * \param filename
 		 *      Relative location to the object-file. (Relative from the data-directory in the source).
-		 * \param center
-		 *      Center of the global-rotation.
 		 */
-		Asteroid(std::string filename, Eigen::Vector3d center);
+		Asteroid(std::string filename);
 
 
 		/**
@@ -41,8 +36,8 @@ namespace pbs17 {
 		 */
 		void initOsg(Eigen::Vector3d position, double ratio, double scaling) override;
 
-	private:
-		
+
+		void setOrientation(Eigen::Vector3d o) override;
 	};
 
 }

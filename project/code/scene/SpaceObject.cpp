@@ -1,6 +1,8 @@
 #include "SpaceObject.h"
 
 #include <osgDB/ReadFile>
+#include <osg/PolygonMode>
+#include <osg/ShapeDrawable>
 
 using namespace pbs17;
 
@@ -16,9 +18,38 @@ long SpaceObject::RunningId = 0;
 *      Relative location to the object-file. (Relative from the data-directory in the source).
 */
 SpaceObject::SpaceObject(std::string filename)
-	: _filename(filename) {
+	: SpaceObject(filename, "") {}
+
+
+/**
+* \brief Constructor of SpaceObject.
+*
+* \param filename
+*      Relative location to the object-file. (Relative from the data-directory in the source).
+* \param textureName
+*      Relative location to the texture-file. (Relative from the data-directory in the source).
+*/
+SpaceObject::SpaceObject(std::string filename, std::string textureName)
+	: _filename(filename), _textureName(textureName) {
 	_id = RunningId;
 	++RunningId;
+
+	_position = Eigen::Vector3d(0, 0, 0);
+	_orientation = Eigen::Vector3d(0, 0, 0);
+
+	// For visually debuggin => Make bounding-box visible
+	osg::ref_ptr<osg::Geode> geode = new osg::Geode;
+	_aabbShape = new osg::ShapeDrawable(new osg::Box(osg::Vec3(), 1.0f));
+	_aabbShape->setColor(osg::Vec4(1.0, 0, 0, 1.0));
+	geode->addDrawable(_aabbShape);
+	
+	_aabbRendering = new osg::MatrixTransform;
+	_aabbRendering->setNodeMask(0x1);
+	_aabbRendering->addChild(geode.get());
+	osg::StateSet* ss = _aabbRendering->getOrCreateStateSet();
+	ss->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+	ss->setAttributeAndModes(new osg::PolygonMode(
+		osg::PolygonMode::FRONT_AND_BACK, osg::PolygonMode::LINE));
 }
 
 
@@ -37,10 +68,6 @@ SpaceObject::~SpaceObject() {
  *
  * \param mass
  *      Mass: unit = kg
- * \param linearMomentum
- *      Linear momentum: unit = kg*m/s
- * \param angularMomentum
- *      Angular Momentum: unit = kg*m^2/s
  * \param linearVelocity
  *      Linear velocity: unit = m/s
  * \param angularVelocity
@@ -50,11 +77,9 @@ SpaceObject::~SpaceObject() {
  * \param torque
  *      Global torque: unit = vector with norm equals to N*m (newton metre)
  */
-void SpaceObject::initPhysics(double mass, double linearMomentum, double angularMomentum, Eigen::Vector3d linearVelocity, double angularVelocity, Eigen::Vector3d force, Eigen::Vector3d torque) {
+void SpaceObject::initPhysics(double mass, Eigen::Vector3d linearVelocity, Eigen::Vector3d angularVelocity, Eigen::Vector3d force, Eigen::Vector3d torque) {
 	_mass = mass;
-	_linearMomentum = linearMomentum;
-	_angularMomentum = angularMomentum;
-	_linearVelcoity = linearVelocity;
+	_linearVelocity = linearVelocity;
 	_angularVelocity = angularVelocity;
 	_force = force;
 	_torque = torque;
@@ -72,4 +97,22 @@ void SpaceObject::initPhysics(double mass, double linearMomentum, double angular
 void SpaceObject::setLocalRotation(double angle, osg::Vec3d axis) const {
 	osg::Matrix rotationMatrix = osg::Matrix::rotate(angle, axis);
 	_rotation->setMatrix(rotationMatrix * _rotation->getMatrix());
+}
+
+
+void SpaceObject::calculateAABB() {
+	CalculateBoundingBox bbox;
+	_rotation->accept(bbox);
+	_aabbLocal = bbox.getBoundBox();
+	_aabbRendering->setMatrix(osg::Matrix::scale(_aabbLocal._max - _aabbLocal._min) * osg::Matrix::translate(toOsg(_position)));
+}
+
+
+void SpaceObject::repositionAABB() {
+	osg::BoundingBox global;
+	auto trans = osg::Matrix::translate(toOsg(_position));
+	global.expandBy(_aabbLocal._min * trans);
+	global.expandBy(_aabbLocal._max * trans);
+	_aabbGlobal = global;
+	_aabbRendering->setMatrix(osg::Matrix::scale(_aabbLocal._max - _aabbLocal._min) * osg::Matrix::translate(toOsg(_position)));
 }

@@ -11,13 +11,22 @@ namespace pbs17 {
 	public:
 		/**
 		 * \brief Constructor of Planet.
-		 * 
+		 *
 		 * \param size
 		 *      Size of the planet.
-		 * \param center
-		 *      Center of the global-rotation.
 		 */
-		Planet(double size, Eigen::Vector3d center);
+		Planet(double size);
+
+
+		/**
+		 * \brief Constructor of Planet.
+		 *
+		 * \param size
+		 *      Size of the planet.
+		 * \param textureName
+		 *      Relative location to the texture-file. (Relative from the data-directory in the source).
+		 */
+		Planet(double size, std::string textureName);
 
 
 		/**
@@ -28,7 +37,7 @@ namespace pbs17 {
 
 		/**
 		 * \brief Initialize the space-object for OSG.
-		 * 
+		 *
 		 * \param position
 		 *      Initial translation of the object.
 		 * \param ratio
@@ -38,6 +47,26 @@ namespace pbs17 {
 		 */
 		void initOsg(Eigen::Vector3d position, double ratio, double scaling) override;
 
+
+		/**
+		* \brief Initialize the space-object for physics.
+		*
+		* \param mass
+		*      Mass: unit = kg
+		* \param linearVelocity
+		*      Linear velocity: unit = m/s
+		* \param angularVelocity
+		*      Angular velocity: unit = rad/s
+		* \param force
+		*      Global force: unit = vector with norm equals to N
+		* \param torque
+		*      Global torque: unit = vector with norm equals to N*m (newton metre)
+		*/
+		void initPhysics(double mass, Eigen::Vector3d linearVelocity, Eigen::Vector3d angularVelocity, Eigen::Vector3d force, Eigen::Vector3d torque) override;
+
+		double getRadius() const {
+			return _size;
+		}
 
 	private:
 		//! Size of the planet

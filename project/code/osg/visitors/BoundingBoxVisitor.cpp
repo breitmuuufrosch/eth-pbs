@@ -9,6 +9,8 @@
 #include "BoundingBoxVisitor.h"
 
 #include <osg/MatrixTransform>
+#include <osg/Geometry>
+#include <iostream>
 
 using namespace pbs17;
 
@@ -24,19 +26,29 @@ void CalculateBoundingBox::apply(osg::Geode& geode) {
 
 	// update bounding box for each drawable
 	for (unsigned int i = 0; i < geode.getNumDrawables(); ++i) {
-		bbox.expandBy(geode.getDrawable(i)->getBound());
-	}
+		osg::Geometry *curGeom = geode.getDrawable(i)->asGeometry();
 
-	// transform corners by current matrix
-	osg::BoundingBox bboxTrans;
+		// Only process if the drawable is geometry
+		if (curGeom) {
+			osg::Vec3Array* vertices = dynamic_cast<osg::Vec3Array*>(curGeom->getVertexArray());
 
-	for (unsigned int i = 0; i < 8; ++i) {
-		osg::Vec3 xvec = bbox.corner(i) * m_transformMatrix;
-		bboxTrans.expandBy(xvec);
+			if (vertices) {
+				for (unsigned int j = 0; j < vertices->size(); ++j) {
+					osg::Vec3 vertex_at_j = (*vertices)[j] * m_transformMatrix;
+					bbox.expandBy(vertex_at_j);
+				}
+			}
+		} else {
+			std::cout << "Consider using OBJ-files instead of shapes.";
+			//osg::ShapeDrawable* drawable = dynamic_cast<osg::ShapeDrawable*>(geode.getDrawable(i));
+			//curGeom = drawable->asGeometry();
+			//bbox.expandBy(geode.getDrawable(i)->getBound());
+			//bbox.expandBy(geode.getDrawable(i)->getBoundingBox());
+		}
 	}
 
 	// update the overall bounding box size
-	m_boundingBox.expandBy(bboxTrans);
+	m_boundingBox.expandBy(bbox);
 
 	// continue traversing through the graph
 	traverse(geode);

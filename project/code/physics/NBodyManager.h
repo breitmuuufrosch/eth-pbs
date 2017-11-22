@@ -3,7 +3,6 @@
 #include <vector>
 
 #include "../scene/SpaceObject.h"
-#include "../osg/OsgEigenConversions.h"
 
 namespace pbs17 {
 
@@ -28,8 +27,6 @@ namespace pbs17 {
         */
         void simulateStep(double dt, std::vector<SpaceObject*> _spaceObjects);
 
-    private:
-        //! All space-objects in the scene
     };
 
 }
