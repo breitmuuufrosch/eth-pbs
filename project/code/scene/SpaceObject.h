@@ -1,8 +1,6 @@
 #pragma once
 
 #include <Eigen/Core>
-#include <Eigen/LU>
-#include <Eigen/Dense>
 #include <osg/MatrixTransform>
 #include <osg/BoundingBox>
 #include <osg/ShapeDrawable>
@@ -215,6 +213,8 @@ namespace pbs17 {
 		//! AABB of the object
 		osg::BoundingBox _aabbLocal;
 		osg::BoundingBox _aabbGlobal;
+		//! ConvexHull of the object
+		osg::ref_ptr<osg::Geometry> _convexHull;
 
 		//! Mass: unit = kg
 		double _mass;
@@ -231,7 +231,9 @@ namespace pbs17 {
 
 		int _collisionState;
 
+
 	private:
+
 		//! Running Id for uniquely identifying the objects.
 		static long RunningId;
 	};

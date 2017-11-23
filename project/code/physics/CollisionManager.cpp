@@ -1,6 +1,9 @@
 #include "CollisionManager.h"
 
 #include <iostream>
+#include <Eigen/Core>
+#include <Eigen/LU>
+#include <Eigen/Dense>
 
 
 using namespace pbs17;
@@ -246,7 +249,7 @@ void CollisionManager::respondToCollisions() {
 
 		foOrientationX << 1., 0.,                   0.,
 			              0., cos(orientation1[0]), -sin(orientation1[0]),
-			              0., sin(orientation1[0]), cos(orientation1[0]);
+			              0., sin(orientation1[0]),  cos(orientation1[0]);
 
 		foOrientationY << cos(orientation1[1]), 0, sin(orientation1[1]),
 			              0,                    1, 0,
@@ -256,17 +259,17 @@ void CollisionManager::respondToCollisions() {
 			              sin(orientation1[2]),  cos(orientation1[2]), 0,
 			              0,                     0,                    1;
 
-		soOrientationX << 1., 0., 0.,
-			0., cos(orientation2[0]), -sin(orientation2[0]),
-			0., sin(orientation2[0]), cos(orientation2[0]);
+		soOrientationX << 1., 0.,                   0.,
+			              0., cos(orientation2[0]), -sin(orientation2[0]),
+			              0., sin(orientation2[0]), cos(orientation2[0]);
 
 		soOrientationY << cos(orientation2[1]), 0, sin(orientation2[1]),
 			              0, 1, 0,
 			             -sin(orientation2[1]), 0, cos(orientation2[1]);
 
 		soOrientationZ << cos(orientation2[2]), -sin(orientation2[2]), 0,
-			              sin(orientation2[2]), cos(orientation2[2]), 0,
-			              0, 0, 1;
+			              sin(orientation2[2]),  cos(orientation2[2]), 0,
+			              0,                     0,                    1;
 		
 		Eigen::Matrix3d foRotationMatrix = foOrientationZ * foOrientationY * foOrientationX;
 		Eigen::Matrix3d soRotationMatrix = soOrientationZ * soOrientationY * soOrientationX;

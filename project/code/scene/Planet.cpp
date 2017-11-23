@@ -7,6 +7,7 @@
 #include "../osg/OsgEigenConversions.h"
 #include "../osg/ImageManager.h"
 #include "../osg/ModelManager.h"
+#include "../osg/visitors/ConvexHullVisitor.h"
 
 using namespace pbs17;
 
@@ -60,6 +61,14 @@ void Planet::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 	std::string modelPath = DATA_PATH + "/sphere.obj";
 	osg::ref_ptr<osg::Node> modelFile = ModelManager::Instance()->loadModel(modelPath, ratio, _size);
 
+	// Compute convex hull
+	// TODO: Save convex hull as we need it => cgal/eigen/osg? :-)
+	ConvexHullVisitor convexHull;
+	modelFile->accept(convexHull);
+
+	osg::Geode* geodeConvexHull = new osg::Geode;
+	geodeConvexHull->addDrawable(convexHull.getConvexHull());
+
 	if (_textureName != "") {
 		std::string texturePath = DATA_PATH + "/texture/" + _textureName;
 		osg::ref_ptr<osg::Texture2D> myTex = ImageManager::Instance()->loadTexture(texturePath);
@@ -69,6 +78,7 @@ void Planet::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 	// First transformation-node to handle locale-rotations easier
 	_rotation = new osg::MatrixTransform;
 	_rotation->addChild(modelFile);
+	//_rotation->addChild(geodeConvexHull);
 
 	// Second transformation-node for global rotations and translations
 	_translation = new osg::MatrixTransform;
