@@ -155,20 +155,69 @@ osg::ref_ptr<osg::Node> SceneManager::loadScene(json j) {
     return _scene;
 }
 
+std::vector<Eigen::Vector2d> SceneManager::getSamples(int pointCount, bool random) {
+    std::vector<Eigen::Vector2d> res;
+    int sqrtVal = (int) (std::sqrt((float) pointCount) + 0.5f);
+    double invSqrtVal = 1.f / sqrtVal;
+    pointCount = sqrtVal*sqrtVal;
+
+    for (int i = 0; i < pointCount; ++i) {
+        if(random) {
+            double x = ((double) rand()) / (double) RAND_MAX;
+            double y = ((double) rand()) / (double) RAND_MAX;
+            res.push_back(Eigen::Vector2d(x, y));
+        } else {
+            int y = i / sqrtVal, x = i % sqrtVal;
+            res.push_back(Eigen::Vector2d((x + 0.5) * invSqrtVal, (y + 0.5) * invSqrtVal));
+        }
+    }
+    return res;
+}
+
+std::vector<Eigen::Vector3d> SceneManager::getSamples3(int pointCount, bool random) {
+    std::vector<Eigen::Vector3d> res;
+    int sqrtVal = (int) (std::cbrt((float) pointCount) + 0.5f);
+    double invSqrtVal = 1.f / sqrtVal;
+    pointCount = sqrtVal*sqrtVal*sqrtVal;
+    if(random) {
+        for (int i = 0; i < pointCount; ++i) {
+            double x = ((double) rand()) / (double) RAND_MAX;
+            double y = ((double) rand()) / (double) RAND_MAX;
+            double z = ((double) rand()) / (double) RAND_MAX;
+            res.push_back(Eigen::Vector3d(x, y, z));
+        }
+    } else {
+        for (int x = 0; x < sqrtVal; ++x) {
+            for (int y = 0; y < sqrtVal; ++y) {
+                for (int z = 0; z < sqrtVal; ++z) {
+                     res.push_back(Eigen::Vector3d((x + 0.5) * invSqrtVal, (y + 0.5) * invSqrtVal, (z + 0.5) * invSqrtVal));
+                }
+            }
+        }
+    }
+    return res;
+}
+
+
 void SceneManager::sphereEmitter(int spheres, int asteroids, bool random) {
-    double rad = 2.0 * osg::PI / spheres;
+    double radius = 15.0;
     osg::ref_ptr<osg::Group> planets = new osg::Group;
     _scene->addChild(planets);
 
+    std::vector<Eigen::Vector2d> samples = getSamples(spheres, random);
+    // for spheres
     for (int i = 0; i < spheres; ++i) {
         SpaceObject* planet2 = new Planet(2.0);
-        if(random) {
-            float random = ((float) rand()) / (float) RAND_MAX;
-            random *= spheres;
-            planet2->initOsg(Eigen::Vector3d(-15.0 * sin(random * rad), -10.0 * cos(random * rad), 0.0), 1.0, 1.0);
-        } else {
-            planet2->initOsg(Eigen::Vector3d(-15.0 * sin(i * rad), -10.0 * cos(i * rad), 0.0), 1.0, 1.0);
-        }
+        //  Point2f(2.0f * hightStop * sample(1) + hightStart, 2.0F * M_PI  * sample(0));
+        Eigen::Vector2d cylSample = Eigen::Vector2d(2.0 * samples[i].y() - 1.0, 2.0 * osg::PI * samples[i].x());
+        double omegaZ = cylSample(0);
+        double r = sqrt(1.0 -  omegaZ * omegaZ);
+        double phi = cylSample(1);
+        double omegaX = r * cos(phi);
+        double omegaY = r * sin(phi);
+
+        planet2->initOsg(Eigen::Vector3d(radius * omegaX, radius * omegaY, radius * omegaZ), 1.0, 1.0);
+
         planet2->initPhysics(DEFAULT_MASS,
             Eigen::Vector3d(0.0, 0.0, 0.0),
             Eigen::Vector3d(0.0, 0.0, 1.0),
@@ -179,17 +228,20 @@ void SceneManager::sphereEmitter(int spheres, int asteroids, bool random) {
     }
 
     // ASTEROIDS
-    rad = 2.0 * osg::PI / asteroids;
+    samples = getSamples(asteroids, random);
+
     for (int i = 0; i < asteroids; ++i) {
         SpaceObject* asteroid1 = new Asteroid();
 
-        if(random) {
-            float random = ((float) rand()) / (float) RAND_MAX;
-            random *= asteroids;
-            asteroid1->initOsg(Eigen::Vector3d(-15.0 * sin(random * rad), -10.0 * cos(random * rad), 0.0), 1.0, 1.0);
-        } else {
-            asteroid1->initOsg(Eigen::Vector3d(-15.0 * sin(i * rad), -10.0 * cos(i * rad), 0.0), 1.0, 1.0);
-        }
+        Eigen::Vector2d cylSample = Eigen::Vector2d(2.0 * samples[i].y() - 1.0, 2.0 * osg::PI * samples[i].x());
+        double omegaZ = cylSample(0);
+        double r = sqrt(1.0 -  omegaZ * omegaZ);
+        double phi = cylSample(1);
+        double omegaX = r * cos(phi);
+        double omegaY = r * sin(phi);
+
+        asteroid1->initOsg(Eigen::Vector3d(radius * omegaX, radius * omegaY, radius * omegaZ), 1.0, 1.0);
+
         asteroid1->initPhysics(DEFAULT_MASS,
             Eigen::Vector3d(0.0, 0.0, 0.0),
             Eigen::Vector3d(0.0, 0.0, 1.0),
@@ -204,20 +256,15 @@ void SceneManager::cubeEmitter(int spheres, int asteroids, bool random) {
     osg::ref_ptr<osg::Group> planets = new osg::Group;
     _scene->addChild(planets);
 
-    int size = spheres / 2;
-    int j = 0;
+    double sideLength = 15.0;
+
+    std::vector<Eigen::Vector3d> samples = getSamples3(spheres, random);
+
 
     for (int i = 0; i < spheres; ++i) {
         SpaceObject* planet2 = new Planet(2.0);
-        if(random) {
-            float random = ((float) rand()) / (float) RAND_MAX;
-            planet2->initOsg(Eigen::Vector3d(15.0 * random, 10.0 * random , 0.0), 1.0, 1.0);
-        } else {
-            planet2->initOsg(Eigen::Vector3d(15.0 * (i % size), 10.0 * (j % size), 0.0), 1.0, 1.0);
-            if(i == size) {
-                j++;
-            }
-        }
+
+        planet2->initOsg(samples[i] * sideLength, 1.0, 1.0);
         planet2->initPhysics(DEFAULT_MASS,
             Eigen::Vector3d(0.0, 0.0, 0.0),
             Eigen::Vector3d(0.0, 0.0, 1.0),
@@ -228,20 +275,12 @@ void SceneManager::cubeEmitter(int spheres, int asteroids, bool random) {
     }
 
     // ASTEROIDS
-    size = asteroids / 2;
-    j = 0;
+    samples = getSamples3(asteroids, random);
 
     for (int i = 0; i < asteroids; ++i) {
         SpaceObject* asteroid1 = new Asteroid("A2.obj");
-        if(random) {
-            float random = ((float) rand()) / (float) RAND_MAX;
-            asteroid1->initOsg(Eigen::Vector3d(15.0 * random, 10.0 * random , 0.0), 1.0, 1.0);
-        } else {
-            asteroid1->initOsg(Eigen::Vector3d(15.0 * (i % size), 10.0 * (j % size), 0.0), 1.0, 1.0);
-            if(i == size) {
-                j++;
-            }
-        }
+        asteroid1->initOsg(samples[i] * sideLength, 1.0, 1.0);
+
         asteroid1->initPhysics(DEFAULT_MASS,
             Eigen::Vector3d(0.0, 0.0, 0.0),
             Eigen::Vector3d(0.0, 0.0, 1.0),

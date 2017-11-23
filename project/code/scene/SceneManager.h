@@ -45,6 +45,9 @@ namespace pbs17
         osg::ref_ptr<osg::Node> loadScene(variables_map vm);
         osg::ref_ptr<osg::Node> loadScene(json j);
 
+        std::vector<Eigen::Vector2d> getSamples(int pointCount, bool random);
+        std::vector<Eigen::Vector3d> getSamples3(int pointCount, bool random);
+
 
 		/**
 		 * \brief Init the viewer for the rendering window and set up the camera.
