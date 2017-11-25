@@ -1,6 +1,7 @@
 #include "Asteroid.h"
 
 #include <osgDB/ReadFile>
+#include <osg/Switch>
 
 #include "../config.h"
 #include "../osg/ModelManager.h"
@@ -43,20 +44,24 @@ void Asteroid::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 
 	// Load the model
 	std::string modelPath = DATA_PATH + "/" + _filename;
-	osg::ref_ptr<osg::Node> modelFile = ModelManager::Instance()->loadModel(modelPath, ratio, scaling);
+	_modelFile = ModelManager::Instance()->loadModel(modelPath, ratio, scaling);
 
 	// Compute convex hull
-	// TODO: Save convex hull as we need it => cgal/eigen/osg? :-)
 	ConvexHullVisitor convexHull;
-	modelFile->accept(convexHull);
+	_modelFile->accept(convexHull);
+	_convexHull = convexHull.getConvexHull();
 	
 	osg::Geode* geodeConvexHull = new osg::Geode;
-	geodeConvexHull->addDrawable(convexHull.getConvexHull());
+	geodeConvexHull->addDrawable(_convexHull->getOsgModel());
+
+	// Switch to decide if the convex hull or the model has to be rendered.
+	_convexRenderSwitch = new osg::Switch;
+	_convexRenderSwitch->addChild(_modelFile, false);
+	_convexRenderSwitch->addChild(geodeConvexHull, true);
 
 	// First transformation-node to handle locale-rotations easier
 	_rotation = new osg::MatrixTransform;
-	_rotation->addChild(modelFile);
-	_rotation->addChild(geodeConvexHull);
+	_rotation->addChild(_convexRenderSwitch);
 
 	// Second transformation-node for global rotations and translations
 	_translation = new osg::MatrixTransform;
@@ -65,14 +70,7 @@ void Asteroid::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 
 	calculateAABB();
 
-	_model = new osg::Group;
-	_model->addChild(_aabbRendering);
-	_model->addChild(_translation);
-}
-
-
-void Asteroid::setOrientation(Eigen::Vector3d o) {
-	SpaceObject::setOrientation(o);
-
-	calculateAABB();
+	_modelRoot = new osg::Switch;
+	_modelRoot->addChild(_translation, true);
+	_modelRoot->addChild(_aabbRendering, true);
 }

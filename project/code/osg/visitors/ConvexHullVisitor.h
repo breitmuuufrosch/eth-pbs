@@ -11,6 +11,7 @@
 #include <osg/NodeVisitor>
 #include <osg/Billboard>
 #include <osg/Geometry>
+#include "../../graphics/ConvexHull3D.h"
 
 namespace pbs17 {
 
@@ -66,7 +67,7 @@ namespace pbs17 {
 		void apply(osg::Billboard &node) override;
 		
 
-		osg::ref_ptr<osg::Geometry> getConvexHull();
+		ConvexHull3D* getConvexHull();
 
 
 	protected:
@@ -78,7 +79,7 @@ namespace pbs17 {
 		osg::Matrix _transformMatrix;
 
 		//! The convex hull.
-		osg::Geometry* _convexHull;
+		ConvexHull3D* _convexHull;
 
 		bool _isCalculated;
 	

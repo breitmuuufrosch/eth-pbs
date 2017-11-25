@@ -22,8 +22,6 @@ using namespace pbs17;
 *      Current geode-child.
 */
 void CalculateBoundingBox::apply(osg::Geode& geode) {
-	osg::BoundingBox bbox;
-
 	// update bounding box for each drawable
 	for (unsigned int i = 0; i < geode.getNumDrawables(); ++i) {
 		osg::Geometry *curGeom = geode.getDrawable(i)->asGeometry();
@@ -34,8 +32,8 @@ void CalculateBoundingBox::apply(osg::Geode& geode) {
 
 			if (vertices) {
 				for (unsigned int j = 0; j < vertices->size(); ++j) {
-					osg::Vec3 vertex_at_j = (*vertices)[j] * m_transformMatrix;
-					bbox.expandBy(vertex_at_j);
+					_localBoundingBox.expandBy((*vertices)[j] * _localTransform);
+					_globalBoundingBox.expandBy((*vertices)[j] * _globalTransform);
 				}
 			}
 		} else {
@@ -46,9 +44,6 @@ void CalculateBoundingBox::apply(osg::Geode& geode) {
 			//bbox.expandBy(geode.getDrawable(i)->getBoundingBox());
 		}
 	}
-
-	// update the overall bounding box size
-	m_boundingBox.expandBy(bbox);
 
 	// continue traversing through the graph
 	traverse(geode);
@@ -62,8 +57,6 @@ void CalculateBoundingBox::apply(osg::Geode& geode) {
 *      Current matrix-transform-child.
 */
 void CalculateBoundingBox::apply(osg::MatrixTransform& node) {
-	m_transformMatrix *= node.getMatrix();
-
 	// continue traversing through the graph
 	traverse(node);
 }

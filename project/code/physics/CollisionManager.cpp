@@ -4,6 +4,7 @@
 #include <Eigen/Core>
 #include <Eigen/LU>
 #include <Eigen/Dense>
+#include "../graphics/MinkowskiSum.h"
 
 
 using namespace pbs17;
@@ -116,9 +117,9 @@ void CollisionManager::broadPhase(std::vector<std::pair<SpaceObject *, SpaceObje
 	std::sort(resX.begin(), resX.end());
 	std::sort(resY.begin(), resY.end());
 	std::sort(resZ.begin(), resZ.end());
-	/*std::cout << "resX = " << resX.size() << std::endl;
-	std::cout << "resY = " << resY.size() << std::endl;
-	std::cout << "resZ = " << resZ.size() << std::endl;*/
+	std::cout << "Collisions: " << resX.size()
+		<< ", " << resY.size()
+		<< ", " << resZ.size() << std::endl;
 
 	std::vector<std::pair<SpaceObject *, SpaceObject *>> resXY;
 
@@ -192,9 +193,17 @@ void CollisionManager::narrowPhase(std::vector<std::pair<SpaceObject *, SpaceObj
 				p2->setCollisionState(1);
 			}
 		} else {
-			//std::cout << "TBD: impl narrow collision check between aribary space objects" << std::endl;
-			collision[i].first->setCollisionState(1);
-			collision[i].second->setCollisionState(1);
+			Nef_Polyhedron_3 convexHullP1 = collision[i].first->getConvexHull()->getCgalNefModel();
+			Nef_Polyhedron_3 convexHullP2 = collision[i].second->getConvexHull()->getCgalNefModel();
+
+			if (MinkowskiSum::doIntersect(convexHullP1, convexHullP2)) {
+				collision[i].first->setCollisionState(2);
+				collision[i].second->setCollisionState(2);
+			} else {
+				//std::cout << "TBD: impl narrow collision check between aribary space objects" << std::endl;
+				collision[i].first->setCollisionState(1);
+				collision[i].second->setCollisionState(1);
+			}
 		}
 	}
 }

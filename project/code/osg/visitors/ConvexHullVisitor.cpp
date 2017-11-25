@@ -14,24 +14,7 @@
 #include <osg/MatrixTransform>
 #include <osg/Geometry>
 
-#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
-#include <CGAL/point_generators_3.h>
-#include <CGAL/Polyhedron_3.h>
-#include <CGAL/Polyhedron_items_with_id_3.h>
-#include <CGAL/convex_hull_3.h>
-
 using namespace pbs17;
-
-typedef CGAL::Exact_predicates_inexact_constructions_kernel  K;
-//typedef CGAL::
-typedef CGAL::Polyhedron_3<K, CGAL::Polyhedron_items_with_id_3>                     Polyhedron_3;
-typedef K::Segment_3                              Segment_3;
-// define point creator
-typedef K::Point_3                                Point_3;
-typedef Polyhedron_3::Vertex_iterator             Vertex_iterator;
-typedef Polyhedron_3::Facet_iterator              Facet_iterator;
-typedef Polyhedron_3::Halfedge_around_facet_circulator Halfedge_around_facet_circulator;
-
 
 /**
 * \brief Calculate the bounding-box for the type osg::Geode.
@@ -92,43 +75,9 @@ void ConvexHullVisitor::apply(osg::Billboard& node) {
 }
 
 
-osg::ref_ptr<osg::Geometry> ConvexHullVisitor::getConvexHull() {
+ConvexHull3D* ConvexHullVisitor::getConvexHull() {
 	if (!_isCalculated) {
-		std::vector<Point_3> points(_vertices->size());
-
-		// Transform the osg-vertices into cgal-points
-		for (unsigned int i = 0; i < _vertices->size(); ++i) {
-			osg::Vec3 vertex_at_j = (*_vertices)[i];
-			points[i] = Point_3(vertex_at_j[0], vertex_at_j[1], vertex_at_j[2]);
-		}
-
-		// Define polyhedron to hold convex hull and compute convex hull of non-collinear points
-		Polyhedron_3 poly;
-		CGAL::convex_hull_3(points.begin(), points.end(), poly);
-
-		// Vectors to store the vertices and faces of the convex-hull
-		osg::ref_ptr<osg::Vec3Array> convexVertices = new osg::Vec3Array;
-		osg::ref_ptr < osg::DrawElementsUInt> convexFaces = new osg::DrawElementsUInt(GL_TRIANGLES);
-
-		// Set the index of each vertex and add it to the convex-hull-vertices (osg)
-		unsigned int index = 0;
-		for (Vertex_iterator v = poly.vertices_begin(); v != poly.vertices_end(); ++v, ++index) {
-			v->id() = index;
-			convexVertices->push_back(osg::Vec3(v->point()[0], v->point()[1], v->point()[2]));
-		}
-
-		// Store each face of the convex-hull
-		for (Facet_iterator pFacet = poly.facets_begin(); pFacet != poly.facets_end(); ++pFacet) {
-			Halfedge_around_facet_circulator pHalfedge = pFacet->facet_begin();
-			do {
-				convexFaces->push_back(pHalfedge->vertex()->id());
-			} while (++pHalfedge != pFacet->facet_begin());
-		}
-
-		// Create the osg-entity which represents the convex-hull
-		_convexHull = new osg::Geometry;
-		_convexHull->setVertexArray(convexVertices);
-		_convexHull->addPrimitiveSet(convexFaces);
+		_convexHull = new ConvexHull3D(_vertices);
 		_isCalculated = true;
 	}
 

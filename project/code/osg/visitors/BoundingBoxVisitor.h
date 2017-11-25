@@ -24,8 +24,12 @@ namespace pbs17 {
 		/**
 		 * \brief Constructor. Initialize the visitor to traverse all children.
 		 */
-		CalculateBoundingBox() : NodeVisitor(TRAVERSE_ALL_CHILDREN) {
-			m_transformMatrix.makeIdentity();
+		CalculateBoundingBox(osg::Matrix globalTransform, osg::Matrix localTransform) : NodeVisitor(TRAVERSE_ALL_CHILDREN) {
+			_globalTransform = globalTransform;
+			_localTransform = localTransform;
+
+			_localBoundingBox = osg::BoundingBox();
+			_globalBoundingBox = osg::BoundingBox();
 		}
 
 
@@ -68,16 +72,21 @@ namespace pbs17 {
 		 *
 		 * \return Calculated bounding-box.
 		 */
-		osg::BoundingBox &getBoundBox() {
-			return m_boundingBox;
+		osg::BoundingBox &getLocalBoundBox() {
+			return _localBoundingBox;
+		}
+		osg::BoundingBox &getGlobalBoundBox() {
+			return _globalBoundingBox;
 		}
 
 	protected:
 
 		//! The overall resultant bounding box.
-		osg::BoundingBox m_boundingBox;
+		osg::BoundingBox _localBoundingBox;
+		osg::BoundingBox _globalBoundingBox;
 
 		//! The current transform matrix.
-		osg::Matrix m_transformMatrix;
+		osg::Matrix _localTransform;
+		osg::Matrix _globalTransform;
 	};
 }

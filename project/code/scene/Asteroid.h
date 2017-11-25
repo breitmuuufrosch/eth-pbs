@@ -36,8 +36,6 @@ namespace pbs17 {
 		 */
 		void initOsg(Eigen::Vector3d position, double ratio, double scaling) override;
 
-
-		void setOrientation(Eigen::Vector3d o) override;
 	};
 
 }

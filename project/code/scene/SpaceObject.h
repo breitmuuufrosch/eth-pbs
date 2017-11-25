@@ -1,11 +1,13 @@
 #pragma once
 
 #include <Eigen/Core>
+#include <osg/Switch>
 #include <osg/MatrixTransform>
 #include <osg/BoundingBox>
 #include <osg/ShapeDrawable>
-#include "../osg/visitors/BoundingBoxVisitor.h"
 #include "../osg/OsgEigenConversions.h"
+#include "../graphics/ConvexHull3D.h"
+#include "../graphics/MinkowskiSum.h"
 
 namespace pbs17 {
 
@@ -75,8 +77,12 @@ namespace pbs17 {
 		 *
 		 * \return OSG-node of the space-object.
 		 */
-		osg::ref_ptr<osg::Group> getModel() const {
-			return _model;
+		osg::ref_ptr<osg::Switch> getModel() const {
+			return _modelRoot;
+		}
+
+		osg::ref_ptr<osg::Switch> getConvexSwitch() const {
+			return _convexRenderSwitch;
 		}
 
 		osg::ref_ptr<osg::MatrixTransform> getTranslation() const
@@ -95,17 +101,6 @@ namespace pbs17 {
 		osg::BoundingBox getAABB() const {
 			return _aabbGlobal;
 		}
-
-
-		/**
-		 * \brief Set the local rotation of the model. (Around it's local axis).
-		 *
-		 * \param angle
-		 *      Angle of the rotation.
-		 * \param axis
-		 *      Axis of the rotation.
-		 */
-		virtual void setLocalRotation(double angle, osg::Vec3d axis) const;
 
 
 		/**
@@ -128,7 +123,7 @@ namespace pbs17 {
 		void setPosition(Eigen::Vector3d p) {
 			_position = p;
 			_translation->setMatrix(osg::Matrix::translate(toOsg(p)));
-			repositionAABB();
+			calculateAABB();
 		}
 
 		Eigen::Vector3d getLinearVelocity() const {
@@ -159,35 +154,27 @@ namespace pbs17 {
 			return _orientation;
 		}
 
-		virtual void setOrientation(Eigen::Vector3d o) {
+		void setOrientation(Eigen::Vector3d o) {
 			_orientation = o;
 			_rotation->setMatrix(osg::Matrixd::rotate(osg::Quat(o[0], osg::X_AXIS, o[1], osg::Y_AXIS, o[2], osg::Z_AXIS)));
+			calculateAABB();
 		}
+
+		void updatePositionOrientation(Eigen::Vector3d p, Eigen::Vector3d dtv, Eigen::Vector3d o, Eigen::Vector3d dto);
 
 		void calculateAABB();
-		void repositionAABB();
 
-		void resetCollisionState()
-		{
-			if (_collisionState == 0){
-				//ColorVisitor colorVisitor(osg::Vec4(1, 1, 1, 1));
-				//_aabbRendering->accept(colorVisitor);
-				_aabbShape->setColor(osg::Vec4(1, 1, 1, 1));
-			}
+		void resetCollisionState();
 
-			_collisionState = 0;
-		}
-		void setCollisionState(int c)
-		{
-			_collisionState = std::max(_collisionState, c);
+		void setCollisionState(int c);
 
-			//ColorVisitor colorVisitor(c == 1 ? osg::Vec4(0, 1, 0, 1) : osg::Vec4(1, 0, 0, 1));
-			_aabbShape->setColor(c == 1 ? osg::Vec4(0, 1, 0, 1) : osg::Vec4(1, 0, 0, 1));
-			//_aabbRendering->accept(colorVisitor);
+		const ConvexHull3D* getConvexHull() const {
+			return _convexHull;
 		}
 
 
 	protected:
+
 		//! Filename of the loaded object
 		std::string _filename;
 		//! Filename of the loaded texture
@@ -197,7 +184,9 @@ namespace pbs17 {
 
 
 		//! Root of the model which is used for the scene
-		osg::ref_ptr<osg::Group> _model;
+		osg::ref_ptr<osg::Switch> _modelRoot;
+		osg::ref_ptr<osg::Switch> _convexRenderSwitch;
+		osg::ref_ptr<osg::Node> _modelFile;
 		osg::ref_ptr<osg::MatrixTransform> _aabbRendering;
 		osg::ref_ptr<osg::ShapeDrawable> _aabbShape;
 		//! Local-rotation-node for the object
@@ -214,7 +203,7 @@ namespace pbs17 {
 		osg::BoundingBox _aabbLocal;
 		osg::BoundingBox _aabbGlobal;
 		//! ConvexHull of the object
-		osg::ref_ptr<osg::Geometry> _convexHull;
+		ConvexHull3D* _convexHull;
 
 		//! Mass: unit = kg
 		double _mass;

@@ -1,6 +1,7 @@
 #include "Planet.h"
 
 #include <osg/Texture2D>
+#include <osg/Switch>
 #include <osgDB/ReadFile>
 
 #include "../config.h"
@@ -59,26 +60,30 @@ void Planet::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 
 	// Load the model
 	std::string modelPath = DATA_PATH + "/sphere.obj";
-	osg::ref_ptr<osg::Node> modelFile = ModelManager::Instance()->loadModel(modelPath, ratio, _size);
-
-	// Compute convex hull
-	// TODO: Save convex hull as we need it => cgal/eigen/osg? :-)
-	ConvexHullVisitor convexHull;
-	modelFile->accept(convexHull);
-
-	osg::Geode* geodeConvexHull = new osg::Geode;
-	geodeConvexHull->addDrawable(convexHull.getConvexHull());
+	_modelFile = ModelManager::Instance()->loadModel(modelPath, ratio, _size);
 
 	if (_textureName != "") {
 		std::string texturePath = DATA_PATH + "/texture/" + _textureName;
 		osg::ref_ptr<osg::Texture2D> myTex = ImageManager::Instance()->loadTexture(texturePath);
-		modelFile->getOrCreateStateSet()->setTextureAttributeAndModes(0, myTex.get());
+		_modelFile->getOrCreateStateSet()->setTextureAttributeAndModes(0, myTex.get());
 	}
+
+	// Compute convex hull
+	ConvexHullVisitor convexHull;
+	_modelFile->accept(convexHull);
+	_convexHull = convexHull.getConvexHull();
+
+	osg::Geode* geodeConvexHull = new osg::Geode;
+	geodeConvexHull->addDrawable(_convexHull->getOsgModel());
+
+	// Switch to decide if the convex hull or the model has to be rendered.
+	_convexRenderSwitch = new osg::Switch;
+	_convexRenderSwitch->addChild(_modelFile, true);
+	_convexRenderSwitch->addChild(geodeConvexHull, false);
 
 	// First transformation-node to handle locale-rotations easier
 	_rotation = new osg::MatrixTransform;
-	_rotation->addChild(modelFile);
-	//_rotation->addChild(geodeConvexHull);
+	_rotation->addChild(_convexRenderSwitch);
 
 	// Second transformation-node for global rotations and translations
 	_translation = new osg::MatrixTransform;
@@ -87,9 +92,9 @@ void Planet::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 
 	calculateAABB();
 
-	_model = new osg::Group;
-	_model->addChild(_aabbRendering);
-	_model->addChild(_translation);
+	_modelRoot = new osg::Switch;
+	_modelRoot->addChild(_translation, true);
+	_modelRoot->addChild(_aabbRendering, true);
 }
 
 

@@ -64,11 +64,11 @@ void NBodyManager::simulateStep(double dt, std::vector<SpaceObject *> _spaceObje
 
         Vector3d dtv = dt * v;
         Vector3d p = spaceObject->getPosition() + dtv;
-        spaceObject->setPosition(p);
 
 		Vector3d dto = dt * spaceObject->getAngularVelocity();
 		Vector3d o = spaceObject->getOrientation() + dto;
-		spaceObject->setOrientation(o);
+
+		spaceObject->updatePositionOrientation(p, dtv, o, dto);
     }
     /*
     for (std::vector<SpaceObject*>::iterator it = _spaceObjects.begin(); it != _spaceObjects.end(); ++it) {

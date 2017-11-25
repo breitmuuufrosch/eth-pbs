@@ -3,6 +3,7 @@
 #include <osgDB/ReadFile>
 #include <osg/PolygonMode>
 #include <osg/ShapeDrawable>
+#include "../osg/visitors/BoundingBoxVisitor.h"
 
 using namespace pbs17;
 
@@ -42,7 +43,7 @@ SpaceObject::SpaceObject(std::string filename, std::string textureName)
 	_aabbShape = new osg::ShapeDrawable(new osg::Box(osg::Vec3(), 1.0f));
 	_aabbShape->setColor(osg::Vec4(1.0, 0, 0, 1.0));
 	geode->addDrawable(_aabbShape);
-	
+
 	_aabbRendering = new osg::MatrixTransform;
 	_aabbRendering->setNodeMask(0x1);
 	_aabbRendering->addChild(geode.get());
@@ -57,8 +58,8 @@ SpaceObject::SpaceObject(std::string filename, std::string textureName)
  * \brief Destructor of SpaceObject.
  */
 SpaceObject::~SpaceObject() {
-	if (_model) {
-		_model = nullptr;
+	if (_modelRoot) {
+		_modelRoot = nullptr;
 	}
 }
 
@@ -86,33 +87,55 @@ void SpaceObject::initPhysics(double mass, Eigen::Vector3d linearVelocity, Eigen
 }
 
 
-/**
- * \brief Set the local rotation of the model. (Around it's local axis).
- *
- * \param angle
- *      Angle of the rotation.
- * \param axis
- *      Axis of the rotation.
- */
-void SpaceObject::setLocalRotation(double angle, osg::Vec3d axis) const {
-	osg::Matrix rotationMatrix = osg::Matrix::rotate(angle, axis);
-	_rotation->setMatrix(rotationMatrix * _rotation->getMatrix());
+void SpaceObject::updatePositionOrientation(Eigen::Vector3d p, Eigen::Vector3d dtv, Eigen::Vector3d o, Eigen::Vector3d dto) {
+	_position = p;
+	_orientation = o;
+
+	_translation->setMatrix(osg::Matrix::translate(toOsg(p)));
+	_rotation->setMatrix(osg::Matrixd::rotate(osg::Quat(o[0], osg::X_AXIS, o[1], osg::Y_AXIS, o[2], osg::Z_AXIS)));
+
+	auto rotation = fromOsg(osg::Matrixd::rotate(osg::Quat(dto[0], osg::X_AXIS, dto[1], osg::Y_AXIS, dto[2], osg::Z_AXIS)));
+
+	// Then obtain the property map for P
+	Aff_transformation_3 trans1(
+		rotation(0, 0), rotation(0, 1), rotation(0, 2), dtv(0),
+		rotation(1, 0), rotation(1, 1), rotation(1, 2), dtv(1),
+		rotation(2, 0), rotation(2, 1), rotation(2, 2), dtv(2),
+		1);
+	_convexHull->transform(trans1);
+
+	calculateAABB();
 }
 
 
 void SpaceObject::calculateAABB() {
-	CalculateBoundingBox bbox;
-	_rotation->accept(bbox);
-	_aabbLocal = bbox.getBoundBox();
-	_aabbRendering->setMatrix(osg::Matrix::scale(_aabbLocal._max - _aabbLocal._min) * osg::Matrix::translate(toOsg(_position)));
+	osg::Matrix scaling = osg::Matrix::scale(_scaling, _scaling, _scaling);
+	osg::Matrix translation = osg::Matrix::translate(toOsg(_position));
+	osg::Matrix rotation = osg::Matrixd::rotate(osg::Quat(_orientation[0], osg::X_AXIS, _orientation[1], osg::Y_AXIS, _orientation[2], osg::Z_AXIS));
+
+	CalculateBoundingBox bbox(scaling * rotation * translation, scaling * rotation);
+	_modelFile->accept(bbox);
+	_aabbLocal = bbox.getLocalBoundBox();
+	_aabbGlobal = bbox.getGlobalBoundBox();
+
+	_aabbRendering->setMatrix(osg::Matrix::scale(_aabbGlobal._max - _aabbGlobal._min) * osg::Matrix::translate(toOsg(_position)));
 }
 
 
-void SpaceObject::repositionAABB() {
-	osg::BoundingBox global;
-	auto trans = osg::Matrix::translate(toOsg(_position));
-	global.expandBy(_aabbLocal._min * trans);
-	global.expandBy(_aabbLocal._max * trans);
-	_aabbGlobal = global;
-	_aabbRendering->setMatrix(osg::Matrix::scale(_aabbLocal._max - _aabbLocal._min) * osg::Matrix::translate(toOsg(_position)));
+void SpaceObject::resetCollisionState() {
+	if (_collisionState == 0) {
+		//ColorVisitor colorVisitor(osg::Vec4(1, 1, 1, 1));
+		//_aabbRendering->accept(colorVisitor);
+		_aabbShape->setColor(osg::Vec4(1, 1, 1, 1));
+	}
+
+	_collisionState = 0;
+}
+
+void SpaceObject::setCollisionState(int c) {
+	_collisionState = std::max(_collisionState, c);
+
+	//ColorVisitor colorVisitor(c == 1 ? osg::Vec4(0, 1, 0, 1) : osg::Vec4(1, 0, 0, 1));
+	_aabbShape->setColor(c == 1 ? osg::Vec4(0, 1, 0, 1) : osg::Vec4(1, 0, 0, 1));
+	//_aabbRendering->accept(colorVisitor);
 }
