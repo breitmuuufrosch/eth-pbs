@@ -31,7 +31,7 @@ namespace pbs17 {
         * \param spaceObjects
         *      All space-objects in the scene.
         */
-        void handleCollisions(double dt, std::vector<SpaceObject*> spaceObjects);
+        void handleCollisions(double dt, std::vector<SpaceObject*> &spaceObjects);
 
     private:
         //! All space-objects in the scene

@@ -24,8 +24,10 @@ namespace pbs17 {
         *
         * \param dt
         *      Time difference since between the last frames.
+		* \param spaceObjects
+		*      All space-objects in the scene.
         */
-        void simulateStep(double dt, std::vector<SpaceObject*> _spaceObjects);
+        void simulateStep(double dt, std::vector<SpaceObject*> &spaceObjects);
 
     };
 

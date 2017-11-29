@@ -35,7 +35,7 @@ CollisionManager::CollisionManager(std::vector<SpaceObject*> spaceObjects) {
  *	    Current axis for which the sort-criteria is checked.
  */
 void CollisionManager::insertionSort(std::vector<SpaceObject*> &A, int dim) const {
-	for (int i = 1; i < A.size(); ++i) {
+	for (unsigned int i = 1; i < A.size(); ++i) {
 		SpaceObject* tmp = A[i];
 		int j = i - 1;
 
@@ -52,10 +52,10 @@ void CollisionManager::insertionSort(std::vector<SpaceObject*> &A, int dim) cons
 /**
  * 
  */
-void CollisionManager::handleCollisions(double dt, std::vector<SpaceObject *> spaceObjects) {
+void CollisionManager::handleCollisions(double dt, std::vector<SpaceObject *> &spaceObjects) {
 	std::vector<std::pair<SpaceObject *, SpaceObject *>> collision;
 
-	for (int i = 0; i < spaceObjects.size(); ++i) {
+	for (unsigned int i = 0; i < spaceObjects.size(); ++i) {
 		spaceObjects[i]->resetCollisionState();
 	}
 
@@ -78,10 +78,10 @@ void CollisionManager::handleCollisions(double dt, std::vector<SpaceObject *> sp
  *	                      By convention, on the first position the object with the smaller id is stored (key.first.Id < key.second.Id)
  */
 void CollisionManager::pruneAndSweep(std::vector<SpaceObject*> &A, int dim, std::vector<std::pair<SpaceObject *, SpaceObject *>> &res) {
-	for (int i = 0; i < A.size() - 1; ++i) {
+	for (unsigned int i = 0; i < A.size() - 1; ++i) {
 		double aabbMax = A[i]->getAABB()._max[dim];
 
-		for (int j = i + 1; j < A.size(); ++j) {
+		for (unsigned int j = i + 1; j < A.size(); ++j) {
 			// If the left edge of the neighbor is smaller than the right edge of the current, a possible collision exists.
 			if (aabbMax >= A[j]->getAABB()._min[dim]) {
 				// always have the object with the smaller id first
@@ -168,7 +168,7 @@ void CollisionManager::response(Planet *p1, Planet *p2) {
 }
 
 void CollisionManager::narrowPhase(std::vector<std::pair<SpaceObject *, SpaceObject *>> &collision) {
-	for (int i = 0; i < collision.size(); ++i) {
+	for (unsigned int i = 0; i < collision.size(); ++i) {
 		Planet* p1 = dynamic_cast<Planet*>(collision[i].first);
 		Planet* p2 = dynamic_cast<Planet*>(collision[i].second);
 
