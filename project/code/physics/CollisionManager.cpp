@@ -4,7 +4,6 @@
 #include <Eigen/Core>
 #include <Eigen/LU>
 #include <Eigen/Dense>
-#include "../graphics/MinkowskiSum.h"
 
 
 using namespace pbs17;
@@ -196,7 +195,7 @@ void CollisionManager::narrowPhase(std::vector<std::pair<SpaceObject *, SpaceObj
 			Nef_Polyhedron_3 convexHullP1 = collision[i].first->getConvexHull()->getCgalNefModel();
 			Nef_Polyhedron_3 convexHullP2 = collision[i].second->getConvexHull()->getCgalNefModel();
 
-			if (MinkowskiSum::doIntersect(convexHullP1, convexHullP2)) {
+			if (false) {
 				collision[i].first->setCollisionState(2);
 				collision[i].second->setCollisionState(2);
 			} else {

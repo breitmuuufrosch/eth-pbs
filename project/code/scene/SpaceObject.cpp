@@ -121,17 +121,6 @@ void SpaceObject::updatePositionOrientation(Eigen::Vector3d p, Eigen::Vector3d d
 	_translation->setMatrix(osg::Matrix::translate(toOsg(p)));
 	_rotation->setMatrix(osg::Matrixd::rotate(osg::Quat(o[0], osg::X_AXIS, o[1], osg::Y_AXIS, o[2], osg::Z_AXIS)));
 
-	// TODO: For minkowski sum, transformation has to be propagated to the Ppolyhedron.
-	//auto rotation = fromOsg(osg::Matrixd::rotate(osg::Quat(dto[0], osg::X_AXIS, dto[1], osg::Y_AXIS, dto[2], osg::Z_AXIS)));
-
-	//// Then obtain the property map for P
-	//Aff_transformation_3 trans1(
-	//	rotation(0, 0), rotation(0, 1), rotation(0, 2), dtv(0),
-	//	rotation(1, 0), rotation(1, 1), rotation(1, 2), dtv(1),
-	//	rotation(2, 0), rotation(2, 1), rotation(2, 2), dtv(2),
-	//	1);
-	//_convexHull->transform(trans1);
-
 	calculateAABB();
 }
 

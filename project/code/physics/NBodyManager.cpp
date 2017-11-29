@@ -13,7 +13,7 @@ NBodyManager::NBodyManager() { }
 void NBodyManager::simulateStep(double dt, std::vector<SpaceObject *> &spaceObjects) {
 
     //CONST
-    double G = 6.67408 * pow(10.0, -4.0);
+	double G = 1.0; // 6.67408 * pow(10.0, -4.0);
     double EPS = 0.000000001;
 
 

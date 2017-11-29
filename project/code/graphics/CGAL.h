@@ -10,10 +10,6 @@
 #include <CGAL/AABB_face_graph_triangle_primitive.h>
 #include <CGAL/Side_of_triangle_mesh.h>
 
-#include <CGAL/Polytope_distance_d.h>
-#include <CGAL/Polytope_distance_d_traits_3.h>
-
-
 typedef CGAL::Exact_predicates_exact_constructions_kernel              K;
 typedef CGAL::Polyhedron_3<K, CGAL::Polyhedron_items_with_id_3>        Polyhedron_3;
 typedef CGAL::Polyhedron_3<K>                                          Polyhedron_No_Id_3;
@@ -33,6 +29,3 @@ typedef CGAL::AABB_face_graph_triangle_primitive<Polyhedron_No_Id_3>   Primitive
 typedef CGAL::AABB_traits<K, Primitive>                                Traits;
 typedef CGAL::AABB_tree<Traits>                                        Tree;
 typedef CGAL::Side_of_triangle_mesh<Polyhedron_No_Id_3, K>             Point_inside;
-
-typedef CGAL::Polytope_distance_d_traits_3<K>                          Distance_Traits;
-typedef CGAL::Polytope_distance_d<Distance_Traits>                     Polytope_distance;

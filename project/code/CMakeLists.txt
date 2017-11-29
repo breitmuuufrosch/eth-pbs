@@ -127,6 +127,7 @@ SET(EXAMPLE_NAME asteroid_field)
 SET(SOURCES "")
 
 SET(DATA_MODEL_PATH ${CMAKE_CURRENT_LIST_DIR}/data)
+SET(SCENES_PATH ${CMAKE_CURRENT_LIST_DIR}/demoScenes)
 CONFIGURE_FILE(precompile/config.h.in ${CMAKE_CURRENT_LIST_DIR}/config.h)
 
 FILE(GLOB main_SRCS "./*.cpp")

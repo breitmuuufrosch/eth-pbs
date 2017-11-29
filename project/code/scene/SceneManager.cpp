@@ -336,7 +336,7 @@ osg::ref_ptr<osgViewer::Viewer> SceneManager::initViewer(osg::ref_ptr<osg::Node>
 	viewer->setCameraManipulator(manipulator);
 
 	osg::Matrix rotation = osg::Matrix::rotate(-osg::PI / .6, osg::X_AXIS);
-	osg::Matrix translation = osg::Matrix::translate(0.0f, 0.0f, 75.0f);
+	osg::Matrix translation = osg::Matrix::translate(0.0f, 0.0f, 15.0f);
 
 	//manipulator->setByMatrix(translation * rotation);
 	manipulator->setByMatrix(translation);

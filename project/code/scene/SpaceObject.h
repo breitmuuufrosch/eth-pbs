@@ -11,7 +11,6 @@
 #include "../osg/visitors/BoundingBoxVisitor.h"
 #include "../osg/OsgEigenConversions.h"
 #include "../graphics/ConvexHull3D.h"
-#include "../graphics/MinkowskiSum.h"
 
 using json = nlohmann::json;
 

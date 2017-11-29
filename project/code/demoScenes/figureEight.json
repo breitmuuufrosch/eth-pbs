@@ -3,20 +3,20 @@
     "id": "someID",
     "objects": [
         {
-            "id": "1",
-            "size": 1,
+            "id": "0",
+            "size": 0.05,
             "type": "planet",
             "mass": 1.0,
             "position": {
-                "x": 10.0,
+                "x": -1.0,
                 "y": 0.0,
-                "z": 5.0
+                "z": 0.0
             },
             "ratio": 1.0,
             "scaling": 1.0,
             "linearVelocity": {
-                "x": -4.0,
-                "y": 0.0,
+                "x": 0.347111,
+                "y": 0.532728,
                 "z": 0.0
             },
             "angularVelocity": {
@@ -38,19 +38,19 @@
         },
         {
             "id": "1",
-            "size": 1,
+            "size": 0.05,
             "type": "planet",
             "mass": 1.0,
             "position": {
-                "x": 10.0,
+                "x": 1.0,
                 "y": 0.0,
-                "z": -5.0
+                "z": 0.0
             },
             "ratio": 1.0,
             "scaling": 1.0,
             "linearVelocity": {
-                "x": -4.0,
-                "y": 0.0,
+                "x": 0.347111,
+                "y": 0.532728,
                 "z": 0.0
             },
             "angularVelocity": {
@@ -72,9 +72,9 @@
         },
         {
             "id": "2",
-            "size": 5.0,
+            "size": 0.05,
             "type": "planet",
-            "mass": 1000.0,
+            "mass": 1.0,
             "position": {
                 "x": 0.0,
                 "y": 0.0,
@@ -83,8 +83,8 @@
             "ratio": 1.0,
             "scaling": 1.0,
             "linearVelocity": {
-                "x": 0.0,
-                "y": 0.0,
+                "x": -0.694222,
+                "y": -1.065456,
                 "z": 0.0
             },
             "angularVelocity": {

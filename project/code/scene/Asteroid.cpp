@@ -28,7 +28,7 @@ Asteroid::Asteroid()
  *      JSON-configuration for the asteroid.
  */
 Asteroid::Asteroid(json j) :
-    SpaceObject(j){
+    SpaceObject(j) {
 
     Eigen::Vector3d pos = fromJson(j["position"]);
     initOsg(pos, j["ratio"].get<double>(), j["scaling"].get<double>());
