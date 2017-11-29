@@ -2,9 +2,14 @@
 
 #include <osg/Group>
 #include <osgViewer/Viewer>
+#include <boost/program_options.hpp>
+#include <string>
+#include <json.hpp>
 
 #include "SpaceObject.h"
 
+using namespace boost::program_options;
+using json = nlohmann::json;
 namespace pbs17
 {
 	/**
@@ -37,6 +42,13 @@ namespace pbs17
 		osg::ref_ptr<osg::Node> loadScene();
 
 
+        osg::ref_ptr<osg::Node> loadScene(variables_map vm);
+        osg::ref_ptr<osg::Node> loadScene(json j);
+
+        std::vector<Eigen::Vector2d> getSamples(int pointCount, bool random);
+        std::vector<Eigen::Vector3d> getSamples3(int pointCount, bool random);
+
+
 		/**
 		 * \brief Init the viewer for the rendering window and set up the camera.
 		 * IMPORTANT: Camera can be animated in a later step! Or it can follow also some objects (not yet tested)
@@ -60,10 +72,17 @@ namespace pbs17
 
 	private:
 
+        void addSkybox();
+
+        void sphereEmitter(int spheres, int asteroids, bool random);
+        void cubeEmitter(int spheres, int asteroids, bool random);
+
 		//! Root-node of OSG which contains the whole scene (used for rendering)
 		osg::ref_ptr<osg::Group> _scene;
 
 		//! All space-objects in the scene (used for calcualtions)
 		std::vector<SpaceObject*> _spaceObjects;
+
+        const double DEFAULT_MASS = 500000;
 	};
 }

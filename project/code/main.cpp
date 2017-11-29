@@ -8,16 +8,77 @@
 #include <osg/Node>
 #include <osgDB/ReadFile>
 #include <osgViewer/Viewer>
+#include <boost/program_options.hpp>
+#include <string>
 
 #include <iomanip>
 #include "scene/SceneManager.h"
 #include "physics/SimulationManager.h"
+#include <json.hpp>
 
-int main(int, char **) {
+using namespace boost::program_options;
+// for convenience
+using json = nlohmann::json;
+
+int main(int argc, const char *argv[]) {
+    pbs17::SceneManager* sceneManager = new pbs17::SceneManager;
+    osg::ref_ptr<osg::Node> scene = NULL;
+
 	std::cout << std::fixed << std::setprecision(6);
+    variables_map vm;
 
-	pbs17::SceneManager* sceneManager = new pbs17::SceneManager;
-	osg::ref_ptr<osg::Node> scene = sceneManager->loadScene();
+    try
+      {
+        options_description desc{"Options"};
+        desc.add_options()
+          ("help,h", "Help screen")
+          ("spheres,s", value<int>()->default_value(10), "Spheres")
+          ("asteroids,a", value<int>()->default_value(0), "Asteroids")
+          ("emitter,e", value<std::string>()->default_value("sphere"), "Emitter")
+          ("rand,r", value<bool>()->default_value(true), "Random")
+          ("sceneJson,j", value<std::string>(), "Json file containing the scene");
+
+
+        store(parse_command_line(argc, argv, desc), vm);
+        notify(vm);
+
+        if (vm.count("help")) {
+          std::cout << desc << '\n';
+          return 0;
+        } else if(vm.count("sceneJson")) {
+            const std::string jsonFilePath = vm["sceneJson"].as<std::string>();
+
+            // check if file exists
+            std::ifstream stream(jsonFilePath);
+            if (!stream) {
+                std::cout << "File " + jsonFilePath + " doesnt exists!" << std::endl;
+                return 0;
+            }
+
+            // read json files
+            json j;
+            stream >> j;
+
+            // load scene with json file
+            std::cout << "load scene with json: " << jsonFilePath << '\n';
+            scene = sceneManager->loadScene(j);
+        } else {
+            // load scene with parameters
+            std::cout << "load scene with parameters" << '\n';
+            scene = sceneManager->loadScene(vm);
+        }
+      }
+      catch (const error &ex)
+      {
+        std::cerr << ex.what() << '\n';
+      }
+
+
+
+
+
+
+    //osg::ref_ptr<osg::Node> scene = sceneManager->loadScene();
 	osg::ref_ptr<osgViewer::Viewer> viewer = sceneManager->initViewer(scene);
 
 	pbs17::SimulationManager* simulationManager = new pbs17::SimulationManager(sceneManager->getSpaceObjects());

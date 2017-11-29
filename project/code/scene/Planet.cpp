@@ -18,7 +18,37 @@ using namespace pbs17;
  *      Size of the planet.
  */
 Planet::Planet(double size)
-	: SpaceObject(""), _size(size) {
+    : SpaceObject("", 0), _size(size) {
+}
+
+Planet::Planet(json j) : SpaceObject(j){
+    std::cout << "json=" << j << std::endl;
+    _size = j["size"].get<double>();
+    Eigen::Vector3d pos(
+        j["position"]["x"].get<double>(),
+        j["position"]["y"].get<double>(),
+        j["position"]["z"].get<double>());
+    initOsg(pos, j["ratio"].get<double>(), j["scaling"].get<double>());
+
+    Eigen::Vector3d linearVelocity(
+        j["linearVelocity"]["x"].get<double>(),
+        j["linearVelocity"]["y"].get<double>(),
+        j["linearVelocity"]["z"].get<double>());
+    Eigen::Vector3d angularVelocity(
+        j["angularVelocity"]["x"].get<double>(),
+        j["angularVelocity"]["y"].get<double>(),
+        j["angularVelocity"]["z"].get<double>());
+    Eigen::Vector3d force(
+        j["force"]["x"].get<double>(),
+        j["force"]["y"].get<double>(),
+        j["force"]["z"].get<double>());
+    Eigen::Vector3d torque(
+        j["torque"]["x"].get<double>(),
+        j["torque"]["y"].get<double>(),
+        j["torque"]["z"].get<double>());
+
+
+    initPhysics(j["mass"].get<double>(),linearVelocity,angularVelocity,force, torque);
 }
 
 
@@ -62,6 +92,7 @@ void Planet::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 
 	if (_textureName != "") {
 		std::string texturePath = DATA_PATH + "/texture/" + _textureName;
+        std::cout << texturePath << std::endl;
 		osg::ref_ptr<osg::Texture2D> myTex = ImageManager::Instance()->loadTexture(texturePath);
 		modelFile->getOrCreateStateSet()->setTextureAttributeAndModes(0, myTex.get());
 	}

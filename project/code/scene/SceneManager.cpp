@@ -53,26 +53,8 @@ SceneManager::~SceneManager() {
 osg::ref_ptr<osg::Node> SceneManager::loadScene() {
 	_scene = new osg::Group();
 
-	// -------------------------------------------------------------------------
-	// Sky-box
-	// -------------------------------------------------------------------------
-
-	osg::ref_ptr<osg::Drawable> skyDrawable = new osg::ShapeDrawable;
-	skyDrawable->setShape(new osg::Sphere(osg::Vec3(), 10));
-
-	osg::ref_ptr<osg::Geode> geode = new osg::Geode;
-	geode->addDrawable(skyDrawable);
-
-	osg::ref_ptr<SkyBox> skybox = new SkyBox;
-	skybox->getOrCreateStateSet()->setTextureAttributeAndModes(0, new osg::TexGen);
-	skybox->init(0, DATA_PATH + "/skyBox/2");
-	skybox->addChild(geode);
-
-	osg::ref_ptr<osg::MatrixTransform> skyTransform = new osg::MatrixTransform;
-	skyTransform->setMatrix(osg::Matrix::rotate(osg::PI / 2.0, osg::Z_AXIS) * osg::Matrix::rotate(- osg::PI / 5.0, osg::X_AXIS));
-	skyTransform->addChild(skybox);
-
-	_scene->addChild(skyTransform);
+    // add the skybox
+    addSkybox();
 
 
 	// -------------------------------------------------------------------------
@@ -107,23 +89,12 @@ osg::ref_ptr<osg::Node> SceneManager::loadScene() {
     int numObjects = 5;
 	double rad = 2.0 * osg::PI / numObjects;
 	
-	for (int i = 0; i < numObjects; ++i) {
-        SpaceObject* asteroid1 = new Asteroid("A2.obj");
+    for (int i = 0; i < numObjects; ++i) {
+        SpaceObject* asteroid1 = new Asteroid();
 		asteroid1->initOsg(Eigen::Vector3d(-10.0 * sin(i * rad), -10.0 * cos(i * rad), 0.0), 1.0, (i+1.0) / (numObjects));
 		asteroid1->initPhysics(5.972, Eigen::Vector3d(0.0, 0.0, 0.0), Eigen::Vector3d(0.0, 0.0, 1.0), Eigen::Vector3d(0.0, 0.0, 0.0), Eigen::Vector3d(0.0, 0.0, 0.0));
 		_spaceObjects.push_back(asteroid1);
-		planets->addChild(asteroid1->getModel());
-
-		//SpaceObject* asteroid2 = new Asteroid("asteroid OBJ.obj");
-		//asteroid2->initOsg(Eigen::Vector3d(-10.0 * sin(i * rad) + 10.0, -10.0 * cos(i * rad), 0.0), 1.0, 0.1);
-		//_spaceObjects.push_back(asteroid2);
-		//planets->addChild(asteroid2->getModel());
-
-		//SpaceObject* planet1 = new Planet(2.0);
-		//planet1->initOsg(Eigen::Vector3d(-10.0 * sin(i * rad), -10.0 * cos(i * rad), 0.0), 1.0, 1.0);
-		//planet1->initPhysics(5.972, Eigen::Vector3d(0.0, 0.0, 0.0), Eigen::Vector3d(0.0, 0.0, 1.0), Eigen::Vector3d(0.0, 0.0, 0.0), Eigen::Vector3d(0.0, 0.0, 0.0));
-		//_spaceObjects.push_back(planet1);
-		//planets->addChild(planet1->getModel());
+        planets->addChild(asteroid1->getModel());
 
 		SpaceObject* planet2 = new Planet(2.0);
 		planet2->initOsg(Eigen::Vector3d(-15.0 * sin((i+0.5) * rad), -10.0 * cos((i+0.5) * rad), 0.0), 1.0, 1.0);
@@ -132,12 +103,217 @@ osg::ref_ptr<osg::Node> SceneManager::loadScene() {
 		planets->addChild(planet2->getModel());
 	}
 
-	//osgUtil::Optimizer optimizer;
-	//optimizer.optimize(_scene.get());
-
 	return _scene;
 }
 
+
+osg::ref_ptr<osg::Node> SceneManager::loadScene(variables_map vm) {
+    _scene = new osg::Group();
+    // add the skybox
+    addSkybox();
+
+    // check values and with emitter
+    bool useSphereEmitter = vm["emitter"].as<std::string>() == "sphere";
+    bool random = vm["rand"].as<bool>();
+    int spheres = vm["spheres"].as<int>();
+    int asteroids = vm["asteroids"].as<int>();
+
+    if(useSphereEmitter) {
+        sphereEmitter(spheres, asteroids, random);
+    } else {
+        cubeEmitter(spheres, asteroids, random);
+    }
+
+
+    return _scene;
+}
+
+osg::ref_ptr<osg::Node> SceneManager::loadScene(json j) {
+    _scene = new osg::Group();
+    osg::ref_ptr<osg::Group> planets = new osg::Group;
+    _scene->addChild(planets);
+    // add the skybox
+    addSkybox();
+
+    std::cout << "Loading scene " + j["name"].get<std::string>() << " ";
+
+    std::vector<json> objects = j["objects"].get<std::vector<json>>();
+    std::cout << "with " << objects.size() << " objects."  << std::endl;
+    for(json d: objects) {
+        SpaceObject* so;
+        if(d["type"].get<std::string>() == "planet") {
+            so = new Planet(d);
+        } else if(d["type"].get<std::string>() == "asteroid") {
+            so = new Asteroid(d);
+        } else {
+            std::cout << "Type (" + d["type"].get<std::string>() + ") not supported!" << std::endl;
+        }
+        _spaceObjects.push_back(so);
+        planets->addChild(so->getModel());
+    }
+
+    return _scene;
+}
+
+std::vector<Eigen::Vector2d> SceneManager::getSamples(int pointCount, bool random) {
+    std::vector<Eigen::Vector2d> res;
+    int sqrtVal = (int) (std::sqrt((float) pointCount) + 0.5f);
+    double invSqrtVal = 1.f / sqrtVal;
+    pointCount = sqrtVal*sqrtVal;
+
+    for (int i = 0; i < pointCount; ++i) {
+        if(random) {
+            double x = ((double) rand()) / (double) RAND_MAX;
+            double y = ((double) rand()) / (double) RAND_MAX;
+            res.push_back(Eigen::Vector2d(x, y));
+        } else {
+            int y = i / sqrtVal, x = i % sqrtVal;
+            res.push_back(Eigen::Vector2d((x + 0.5) * invSqrtVal, (y + 0.5) * invSqrtVal));
+        }
+    }
+    return res;
+}
+
+std::vector<Eigen::Vector3d> SceneManager::getSamples3(int pointCount, bool random) {
+    std::vector<Eigen::Vector3d> res;
+    int sqrtVal = (int) (std::cbrt((float) pointCount) + 0.5f);
+    double invSqrtVal = 1.f / sqrtVal;
+    pointCount = sqrtVal*sqrtVal*sqrtVal;
+    if(random) {
+        for (int i = 0; i < pointCount; ++i) {
+            double x = ((double) rand()) / (double) RAND_MAX;
+            double y = ((double) rand()) / (double) RAND_MAX;
+            double z = ((double) rand()) / (double) RAND_MAX;
+            res.push_back(Eigen::Vector3d(x, y, z));
+        }
+    } else {
+        for (int x = 0; x < sqrtVal; ++x) {
+            for (int y = 0; y < sqrtVal; ++y) {
+                for (int z = 0; z < sqrtVal; ++z) {
+                     res.push_back(Eigen::Vector3d((x + 0.5) * invSqrtVal, (y + 0.5) * invSqrtVal, (z + 0.5) * invSqrtVal));
+                }
+            }
+        }
+    }
+    return res;
+}
+
+
+void SceneManager::sphereEmitter(int spheres, int asteroids, bool random) {
+    double radius = 15.0;
+    osg::ref_ptr<osg::Group> planets = new osg::Group;
+    _scene->addChild(planets);
+
+    std::vector<Eigen::Vector2d> samples = getSamples(spheres, random);
+    // for spheres
+    for (int i = 0; i < spheres; ++i) {
+        SpaceObject* planet2 = new Planet(2.0);
+        //  Point2f(2.0f * hightStop * sample(1) + hightStart, 2.0F * M_PI  * sample(0));
+        Eigen::Vector2d cylSample = Eigen::Vector2d(2.0 * samples[i].y() - 1.0, 2.0 * osg::PI * samples[i].x());
+        double omegaZ = cylSample(0);
+        double r = sqrt(1.0 -  omegaZ * omegaZ);
+        double phi = cylSample(1);
+        double omegaX = r * cos(phi);
+        double omegaY = r * sin(phi);
+
+        planet2->initOsg(Eigen::Vector3d(radius * omegaX, radius * omegaY, radius * omegaZ), 1.0, 1.0);
+
+        planet2->initPhysics(DEFAULT_MASS,
+            Eigen::Vector3d(0.0, 0.0, 0.0),
+            Eigen::Vector3d(0.0, 0.0, 1.0),
+            Eigen::Vector3d(0.0, 0.0, 0.0),
+            Eigen::Vector3d(0.0, 0.0, 0.0));
+        _spaceObjects.push_back(planet2);
+        planets->addChild(planet2->getModel());
+    }
+
+    // ASTEROIDS
+    samples = getSamples(asteroids, random);
+
+    for (int i = 0; i < asteroids; ++i) {
+        SpaceObject* asteroid1 = new Asteroid();
+
+        Eigen::Vector2d cylSample = Eigen::Vector2d(2.0 * samples[i].y() - 1.0, 2.0 * osg::PI * samples[i].x());
+        double omegaZ = cylSample(0);
+        double r = sqrt(1.0 -  omegaZ * omegaZ);
+        double phi = cylSample(1);
+        double omegaX = r * cos(phi);
+        double omegaY = r * sin(phi);
+
+        asteroid1->initOsg(Eigen::Vector3d(radius * omegaX, radius * omegaY, radius * omegaZ), 1.0, 1.0);
+
+        asteroid1->initPhysics(DEFAULT_MASS,
+            Eigen::Vector3d(0.0, 0.0, 0.0),
+            Eigen::Vector3d(0.0, 0.0, 1.0),
+            Eigen::Vector3d(0.0, 0.0, 0.0),
+            Eigen::Vector3d(0.0, 0.0, 0.0));
+        _spaceObjects.push_back(asteroid1);
+        planets->addChild(asteroid1->getModel());
+    }
+}
+
+void SceneManager::cubeEmitter(int spheres, int asteroids, bool random) {
+    osg::ref_ptr<osg::Group> planets = new osg::Group;
+    _scene->addChild(planets);
+
+    double sideLength = 15.0;
+
+    std::vector<Eigen::Vector3d> samples = getSamples3(spheres, random);
+
+
+    for (int i = 0; i < spheres; ++i) {
+        SpaceObject* planet2 = new Planet(2.0);
+
+        planet2->initOsg(samples[i] * sideLength, 1.0, 1.0);
+        planet2->initPhysics(DEFAULT_MASS,
+            Eigen::Vector3d(0.0, 0.0, 0.0),
+            Eigen::Vector3d(0.0, 0.0, 1.0),
+            Eigen::Vector3d(0.0, 0.0, 0.0),
+            Eigen::Vector3d(0.0, 0.0, 0.0));
+        _spaceObjects.push_back(planet2);
+        planets->addChild(planet2->getModel());
+    }
+
+    // ASTEROIDS
+    samples = getSamples3(asteroids, random);
+
+    for (int i = 0; i < asteroids; ++i) {
+        SpaceObject* asteroid1 = new Asteroid("A2.obj");
+        asteroid1->initOsg(samples[i] * sideLength, 1.0, 1.0);
+
+        asteroid1->initPhysics(DEFAULT_MASS,
+            Eigen::Vector3d(0.0, 0.0, 0.0),
+            Eigen::Vector3d(0.0, 0.0, 1.0),
+            Eigen::Vector3d(0.0, 0.0, 0.0),
+            Eigen::Vector3d(0.0, 0.0, 0.0));
+        _spaceObjects.push_back(asteroid1);
+        planets->addChild(asteroid1->getModel());
+    }
+}
+
+
+void SceneManager::addSkybox() {
+    // -------------------------------------------------------------------------
+    // Sky-box
+    // -------------------------------------------------------------------------
+
+    osg::ref_ptr<osg::Drawable> skyDrawable = new osg::ShapeDrawable;
+    skyDrawable->setShape(new osg::Sphere(osg::Vec3(), 10));
+
+    osg::ref_ptr<osg::Geode> geode = new osg::Geode;
+    geode->addDrawable(skyDrawable);
+
+    osg::ref_ptr<SkyBox> skybox = new SkyBox;
+    skybox->getOrCreateStateSet()->setTextureAttributeAndModes(0, new osg::TexGen);
+    skybox->init(0, DATA_PATH + "/skyBox/2");
+    skybox->addChild(geode);
+
+    osg::ref_ptr<osg::MatrixTransform> skyTransform = new osg::MatrixTransform;
+    skyTransform->setMatrix(osg::Matrix::rotate(osg::PI / 2.0, osg::Z_AXIS) * osg::Matrix::rotate(- osg::PI / 5.0, osg::X_AXIS));
+    skyTransform->addChild(skybox);
+
+    _scene->addChild(skyTransform);
+}
 
 /**
  * \brief Init the viewer for the rendering window and set up the camera.

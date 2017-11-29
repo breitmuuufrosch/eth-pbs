@@ -2,6 +2,7 @@
 
 #include "SpaceObject.h"
 
+using json = nlohmann::json;
 namespace pbs17 {
 
 	/**
@@ -16,6 +17,7 @@ namespace pbs17 {
 		 *      Size of the planet.
 		 */
 		Planet(double size);
+        Planet(json j);
 
 
 		/**
