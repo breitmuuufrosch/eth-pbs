@@ -11,14 +11,14 @@ using namespace pbs17;
 using namespace Eigen;
 
 CollisionManager::CollisionManager(std::vector<SpaceObject*> spaceObjects) {
-	xList = std::vector<SpaceObject*>(spaceObjects);
-	yList = std::vector<SpaceObject*>(spaceObjects);
-	zList = std::vector<SpaceObject*>(spaceObjects);
+	_xList = std::vector<SpaceObject*>(spaceObjects);
+	_yList = std::vector<SpaceObject*>(spaceObjects);
+	_zList = std::vector<SpaceObject*>(spaceObjects);
 	
 	// sort the lists
-	insertionSort(xList, 0);
-	insertionSort(yList, 1);
-	insertionSort(zList, 2);
+	insertionSort(_xList, 0);
+	insertionSort(_yList, 1);
+	insertionSort(_zList, 2);
 }
 
 
@@ -52,11 +52,11 @@ void CollisionManager::insertionSort(std::vector<SpaceObject*> &A, int dim) cons
 /**
  * 
  */
-void CollisionManager::handleCollisions(double dt, std::vector<SpaceObject *> _spaceObjects) {
+void CollisionManager::handleCollisions(double dt, std::vector<SpaceObject *> spaceObjects) {
 	std::vector<std::pair<SpaceObject *, SpaceObject *>> collision;
 
-	for (int i = 0; i < _spaceObjects.size(); ++i) {
-		_spaceObjects[i]->resetCollisionState();
+	for (int i = 0; i < spaceObjects.size(); ++i) {
+		spaceObjects[i]->resetCollisionState();
 	}
 
 	this->broadPhase(collision);
@@ -101,18 +101,18 @@ void CollisionManager::pruneAndSweep(std::vector<SpaceObject*> &A, int dim, std:
 
 void CollisionManager::broadPhase(std::vector<std::pair<SpaceObject *, SpaceObject *>> &res) {
 	// Resort the list
-	insertionSort(xList, 0);
-	insertionSort(yList, 1);
-	insertionSort(zList, 2);
+	insertionSort(_xList, 0);
+	insertionSort(_yList, 1);
+	insertionSort(_zList, 2);
 
 	// Vectors which contains the possible collisions per axis
 	std::vector<std::pair<SpaceObject *, SpaceObject *>> resX;
 	std::vector<std::pair<SpaceObject *, SpaceObject *>> resY;
 	std::vector<std::pair<SpaceObject *, SpaceObject *>> resZ;
 
-	pruneAndSweep(xList, 0, resX);
-	pruneAndSweep(yList, 1, resY);
-	pruneAndSweep(zList, 2, resZ);
+	pruneAndSweep(_xList, 0, resX);
+	pruneAndSweep(_yList, 1, resY);
+	pruneAndSweep(_zList, 2, resZ);
 
 	std::sort(resX.begin(), resX.end());
 	std::sort(resY.begin(), resY.end());
@@ -183,7 +183,7 @@ void CollisionManager::narrowPhase(std::vector<std::pair<SpaceObject *, SpaceObj
 				sphereCollision.setFirstPOC(p1->getPosition() - p1->getRadius() * sphereCollision.getUnitNormal());
 				sphereCollision.setSecondPOC(p2->getPosition() + p2->getRadius() * sphereCollision.getUnitNormal());
 				sphereCollision.setIntersectionVector(sphereCollision.getUnitNormal() * (((p1->getPosition() - p2->getPosition()).norm()) - p1->getRadius() - p2->getRadius()));
-				collisionQueue.push(sphereCollision);
+				_collisionQueue.push(sphereCollision);
 				//std::cout << "INTERSECTION DETECTED" << std::endl;
 
 				p1->setCollisionState(2);
@@ -244,9 +244,9 @@ Matrix3d CollisionManager::getOrthonormalBasis(Vector3d v) {
 }
 
 void CollisionManager::respondToCollisions() {
-	while (!collisionQueue.empty()) {
-		Collision currentCollision = collisionQueue.top();
-		collisionQueue.pop();
+	while (!_collisionQueue.empty()) {
+		Collision currentCollision = _collisionQueue.top();
+		_collisionQueue.pop();
 
 		Matrix3d contactBasis = getOrthonormalBasis(currentCollision.getUnitNormal());
 

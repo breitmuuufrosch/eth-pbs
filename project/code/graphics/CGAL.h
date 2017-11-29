@@ -7,9 +7,11 @@
 
 #include <CGAL/AABB_tree.h>
 #include <CGAL/AABB_traits.h>
-#include <CGAL/Polyhedron_3.h>
 #include <CGAL/AABB_face_graph_triangle_primitive.h>
 #include <CGAL/Side_of_triangle_mesh.h>
+
+#include <CGAL/Polytope_distance_d.h>
+#include <CGAL/Polytope_distance_d_traits_3.h>
 
 
 typedef CGAL::Exact_predicates_exact_constructions_kernel              K;
@@ -18,12 +20,12 @@ typedef CGAL::Polyhedron_3<K>                                          Polyhedro
 typedef CGAL::Nef_polyhedron_3<K>                                      Nef_Polyhedron_3;
 typedef K::Segment_3                                                   Segment_3;
 typedef K::Point_3                                                     Point_3;
+
 typedef Polyhedron_3::Vertex_iterator                                  Vertex_iterator;
 typedef Polyhedron_3::Facet_iterator                                   Facet_iterator;
 typedef Polyhedron_3::Halfedge_around_facet_circulator                 Halfedge_around_facet_circulator;
-
-
 typedef Polyhedron_3::HalfedgeDS                                       HalfedgeDS;
+typedef Nef_Polyhedron_3::Vertex_iterator                              Nef_Vertex_iterator;
 typedef Nef_Polyhedron_3::Vector_3                                     Vector_3;
 typedef Nef_Polyhedron_3::Aff_transformation_3                         Aff_transformation_3;
 
@@ -31,3 +33,6 @@ typedef CGAL::AABB_face_graph_triangle_primitive<Polyhedron_No_Id_3>   Primitive
 typedef CGAL::AABB_traits<K, Primitive>                                Traits;
 typedef CGAL::AABB_tree<Traits>                                        Tree;
 typedef CGAL::Side_of_triangle_mesh<Polyhedron_No_Id_3, K>             Point_inside;
+
+typedef CGAL::Polytope_distance_d_traits_3<K>                          Distance_Traits;
+typedef CGAL::Polytope_distance_d<Distance_Traits>                     Polytope_distance;

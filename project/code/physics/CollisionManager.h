@@ -28,8 +28,10 @@ namespace pbs17 {
         *
         * \param dt
         *      Time difference since between the last frames.
+        * \param spaceObjects
+        *      All space-objects in the scene.
         */
-        void handleCollisions(double dt, std::vector<SpaceObject*> _spaceObjects);
+        void handleCollisions(double dt, std::vector<SpaceObject*> spaceObjects);
 
     private:
         //! All space-objects in the scene
@@ -44,11 +46,11 @@ namespace pbs17 {
 
 		Eigen::Matrix3d getOrthonormalBasis(Eigen::Vector3d v);
 
-        std::vector<SpaceObject*> xList;
-        std::vector<SpaceObject*> yList;
-        std::vector<SpaceObject*> zList;
+        std::vector<SpaceObject*> _xList;
+        std::vector<SpaceObject*> _yList;
+        std::vector<SpaceObject*> _zList;
 
-		std::priority_queue<Collision, std::vector<Collision>, CollisionCompareLess> collisionQueue;
+		std::priority_queue<Collision, std::vector<Collision>, CollisionCompareLess> _collisionQueue;
 
 		const double COEF_RESTITUTION = 1.;
 		const double COEF_FRICTION = 0.2;

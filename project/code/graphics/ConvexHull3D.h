@@ -4,7 +4,6 @@
 #include <osg/Geometry>
 
 #include "CGAL.h"
-#include <ctime>
 
 namespace pbs17 {
 
