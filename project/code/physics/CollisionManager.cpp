@@ -4,6 +4,7 @@
 #include <Eigen/Core>
 #include <Eigen/LU>
 #include <Eigen/Dense>
+#include "../graphics/GjkAlgorithm.h"
 
 
 using namespace pbs17;
@@ -192,10 +193,10 @@ void CollisionManager::narrowPhase(std::vector<std::pair<SpaceObject *, SpaceObj
 				p2->setCollisionState(1);
 			}
 		} else {
-			Nef_Polyhedron_3 convexHullP1 = collision[i].first->getConvexHull()->getCgalNefModel();
-			Nef_Polyhedron_3 convexHullP2 = collision[i].second->getConvexHull()->getCgalNefModel();
+			std::vector<Eigen::Vector3d> convexHullP1 = collision[i].first->getConvexHull();
+			std::vector<Eigen::Vector3d> convexHullP2 = collision[i].second->getConvexHull();
 
-			if (false) {
+			if (GjkAlgorithm::intersect(convexHullP1, convexHullP2)) {
 				collision[i].first->setCollisionState(2);
 				collision[i].second->setCollisionState(2);
 			} else {

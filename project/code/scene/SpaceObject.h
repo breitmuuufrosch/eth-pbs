@@ -175,9 +175,25 @@ namespace pbs17 {
 
 		void setCollisionState(int c);
 
-		const ConvexHull3D* getConvexHull() const {
-			return _convexHull;
+		const std::vector<Eigen::Vector3d> getConvexHull() const
+		{
+			// Todo: use Eigen-transformations instead
+			osg::Matrix translation = osg::Matrix::translate(toOsg(_position));
+			osg::Matrix rotation = osg::Matrixd::rotate(osg::Quat(_orientation[0], osg::X_AXIS, _orientation[1], osg::Y_AXIS, _orientation[2], osg::Z_AXIS));
+
+			std::vector<Eigen::Vector3d> transformed;
+			std::vector<Eigen::Vector3d> current= _convexHull->getVertices();
+
+			for (int i = 0; i < current.size(); ++i) {
+				transformed.push_back(fromOsg(toOsg(current[i]) * rotation * translation));
+			}
+
+			return transformed;
 		}
+
+		//const ConvexHull3D* getConvexHull() const {
+		//	return _convexHull;
+		//}
 
 
 	protected:

@@ -68,7 +68,8 @@ void Asteroid::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 	_modelFile = ModelManager::Instance()->loadModel(modelPath, ratio, scaling);
 
 	// Compute convex hull
-	ConvexHullVisitor convexHull;
+	osg::Matrix scalingMatrix = osg::Matrix::scale(_scaling, _scaling, _scaling);
+	ConvexHullVisitor convexHull(scalingMatrix);
 	_modelFile->accept(convexHull);
 	_convexHull = convexHull.getConvexHull();
 	

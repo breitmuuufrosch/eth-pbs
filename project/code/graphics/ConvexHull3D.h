@@ -36,7 +36,7 @@ namespace pbs17 {
 		 * 
 		 * \return (#V x 3)-matrix of vertices.
 		 */
-		const Eigen::MatrixXd& getVertices() const {
+		const std::vector<Eigen::Vector3d>& getVertices() const {
 			return _vertices;
 		}
 
@@ -99,7 +99,8 @@ namespace pbs17 {
 	private:
 
 		//! Vertices which belongs on the convex-hull => (#V x 3)-matrix.
-		Eigen::MatrixXd _vertices;
+		std::vector<Eigen::Vector3d> _vertices;
+		
 		//! Faced which belongs on the convex-hull => (#F x 3)-matrix. (based on _vertices)
 		Eigen::MatrixXi _faces;
 

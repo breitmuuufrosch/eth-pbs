@@ -43,7 +43,7 @@ void ConvexHull3D::init(osg::Vec3Array* vertices) {
 	std::cout << "\nStart...\n"
 		<< (_cgalModel.size_of_halfedges() / 2) << " final edges.\n";
 	
-	SMS::Count_stop_predicate<Polyhedron_3> stop(20);
+	SMS::Count_stop_predicate<Polyhedron_3> stop(100);
 	int r = SMS::edge_collapse (_cgalModel
 		, stop
 		, CGAL::parameters::vertex_index_map(get(CGAL::vertex_external_index, _cgalModel))
@@ -59,7 +59,6 @@ void ConvexHull3D::init(osg::Vec3Array* vertices) {
 	// Vectors to store the vertices and faces of the convex-hull
 	osg::ref_ptr<osg::Vec3Array> convexVertices = new osg::Vec3Array;
 	osg::ref_ptr<osg::DrawElementsUInt> convexFaces = new osg::DrawElementsUInt(GL_TRIANGLES);
-	_vertices.resize(_cgalModel.size_of_vertices(), 3);
 	_faces.resize(_cgalModel.size_of_facets(), 3);
 
 	// Set the index of each vertex and add it to the convex-hull-vertices (osg)
@@ -68,10 +67,7 @@ void ConvexHull3D::init(osg::Vec3Array* vertices) {
 		v->id() = index;
 		Point_3 vertex = v->point();
 		convexVertices->push_back(osg::Vec3(CGAL::to_double(vertex[0]), CGAL::to_double(vertex[1]), CGAL::to_double(vertex[2])));
-
-		_vertices(index, 0) = CGAL::to_double(vertex[0]);
-		_vertices(index, 1) = CGAL::to_double(vertex[1]);
-		_vertices(index, 2) = CGAL::to_double(vertex[2]);
+		_vertices.push_back(Eigen::Vector3d(CGAL::to_double(vertex[0]), CGAL::to_double(vertex[1]), CGAL::to_double(vertex[2])));
 	}
 
 	// Store each face of the convex-hull

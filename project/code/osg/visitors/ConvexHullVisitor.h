@@ -25,10 +25,11 @@ namespace pbs17 {
 		/**
 		 * \brief Constructor. Initialize the visitor to traverse all children.
 		 */
-		ConvexHullVisitor() : NodeVisitor(TRAVERSE_ALL_CHILDREN) {
+		ConvexHullVisitor(osg::Matrix globalTransform) : NodeVisitor(TRAVERSE_ALL_CHILDREN) {
+			_globalTransform = globalTransform;
+
 			_vertices = new osg::Vec3Array;
-			_convexHull = NULL;
-			_transformMatrix.makeIdentity();
+			_convexHull = NULL;;
 			_isCalculated = false;
 		}
 
@@ -47,16 +48,7 @@ namespace pbs17 {
 		 */
 		void apply(osg::Geode &geode) override;
 
-
-		/**
-		 * \brief Calculate the bounding-box for the type osg::MatrixTransform.
-		 *
-		 * \param node
-		 *      Current matrix-transform-child.
-		 */
-		void apply(osg::MatrixTransform &node) override;
-
-
+		
 		/**
 		 * \brief Calculate the bounding-box for the type osg::Billboard.
 		 * important to handle billboard so that its size will not affect the geode size continue traversing the graph
@@ -76,7 +68,7 @@ namespace pbs17 {
 		osg::Vec3Array* _vertices;
 
 		//! The current transform matrix.
-		osg::Matrix _transformMatrix;
+		osg::Matrix _globalTransform;
 
 		//! The convex hull.
 		ConvexHull3D* _convexHull;

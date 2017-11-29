@@ -11,7 +11,6 @@
 #include <iostream>
 #include <vector>
 
-#include <osg/MatrixTransform>
 #include <osg/Geometry>
 
 using namespace pbs17;
@@ -35,7 +34,7 @@ void ConvexHullVisitor::apply(osg::Geode& geode) {
 			if (vertices) {
 				// Store all vertices of the subtree
 				for (unsigned int j = 0; j < vertices->size(); ++j) {
-					osg::Vec3 vertex_at_j = (*vertices)[j] * _transformMatrix;
+					osg::Vec3 vertex_at_j = (*vertices)[j] * _globalTransform;
 					_vertices->push_back(vertex_at_j);
 				}
 			}
@@ -46,20 +45,6 @@ void ConvexHullVisitor::apply(osg::Geode& geode) {
 
 	// continue traversing through the graph
 	traverse(geode);
-}
-
-
-/**
-* \brief Calculate the bounding-box for the type osg::MatrixTransform.
-*
-* \param node
-*      Current matrix-transform-child.
-*/
-void ConvexHullVisitor::apply(osg::MatrixTransform& node) {
-	_transformMatrix *= node.getMatrix();
-
-	// continue traversing through the graph
-	traverse(node);
 }
 
 
