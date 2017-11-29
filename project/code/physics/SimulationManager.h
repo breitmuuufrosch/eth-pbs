@@ -34,8 +34,8 @@ namespace pbs17 {
 	private:
 		//! All space-objects in the scene
 		std::vector<SpaceObject*> _spaceObjects;
-        CollisionManager* cManager;
-        NBodyManager* nManager;
+        CollisionManager* _cManager;
+        NBodyManager* _nManager;
 	};
 
 }

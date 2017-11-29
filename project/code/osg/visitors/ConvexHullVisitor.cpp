@@ -3,17 +3,18 @@
 * The code is copied from http://www.vis-sim.com/osg/code/osgcode_bbox1.htm and adapted to our use.
 *
 * \Author: Alexander Lelidis (14-907-562), Andreas Emch (08-631-384), Uroš Tešić (17-950-346)
-* \Date:   2017-11-11
+* \Date:   2017-11-23
 */
 
-#include "BoundingBoxVisitor.h"
+#include "ConvexHullVisitor.h"
+
+#include <iostream>
+#include <vector>
 
 #include <osg/MatrixTransform>
 #include <osg/Geometry>
-#include <iostream>
 
 using namespace pbs17;
-
 
 /**
 * \brief Calculate the bounding-box for the type osg::Geode.
@@ -21,7 +22,8 @@ using namespace pbs17;
 * \param geode
 *      Current geode-child.
 */
-void CalculateBoundingBox::apply(osg::Geode& geode) {
+void ConvexHullVisitor::apply(osg::Geode& geode) {
+
 	// update bounding box for each drawable
 	for (unsigned int i = 0; i < geode.getNumDrawables(); ++i) {
 		osg::Geometry *curGeom = geode.getDrawable(i)->asGeometry();
@@ -31,17 +33,14 @@ void CalculateBoundingBox::apply(osg::Geode& geode) {
 			osg::Vec3Array* vertices = dynamic_cast<osg::Vec3Array*>(curGeom->getVertexArray());
 
 			if (vertices) {
+				// Store all vertices of the subtree
 				for (unsigned int j = 0; j < vertices->size(); ++j) {
-					_localBoundingBox.expandBy((*vertices)[j] * _localTransform);
-					_globalBoundingBox.expandBy((*vertices)[j] * _globalTransform);
+					osg::Vec3 vertex_at_j = (*vertices)[j] * _transformMatrix;
+					_vertices->push_back(vertex_at_j);
 				}
 			}
 		} else {
 			std::cout << "Consider using OBJ-files instead of shapes.";
-			//osg::ShapeDrawable* drawable = dynamic_cast<osg::ShapeDrawable*>(geode.getDrawable(i));
-			//curGeom = drawable->asGeometry();
-			//bbox.expandBy(geode.getDrawable(i)->getBound());
-			//bbox.expandBy(geode.getDrawable(i)->getBoundingBox());
 		}
 	}
 
@@ -56,7 +55,9 @@ void CalculateBoundingBox::apply(osg::Geode& geode) {
 * \param node
 *      Current matrix-transform-child.
 */
-void CalculateBoundingBox::apply(osg::MatrixTransform& node) {
+void ConvexHullVisitor::apply(osg::MatrixTransform& node) {
+	_transformMatrix *= node.getMatrix();
+
 	// continue traversing through the graph
 	traverse(node);
 }
@@ -69,6 +70,16 @@ void CalculateBoundingBox::apply(osg::MatrixTransform& node) {
 * \param node
 *      Current billboard-child.
 */
-void CalculateBoundingBox::apply(osg::Billboard& node) {
+void ConvexHullVisitor::apply(osg::Billboard& node) {
 	traverse(node);
+}
+
+
+ConvexHull3D* ConvexHullVisitor::getConvexHull() {
+	if (!_isCalculated) {
+		_convexHull = new ConvexHull3D(_vertices);
+		_isCalculated = true;
+	}
+
+	return _convexHull;
 }

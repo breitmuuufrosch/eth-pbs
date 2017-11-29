@@ -10,14 +10,14 @@ using namespace std;
 NBodyManager::NBodyManager() { }
 
 
-void NBodyManager::simulateStep(double dt, std::vector<SpaceObject *> _spaceObjects) {
+void NBodyManager::simulateStep(double dt, std::vector<SpaceObject *> &spaceObjects) {
 
     //CONST
-    double G = 6.67408 * pow(10.0, -4.0);
+	double G = 1.0; // 6.67408 * pow(10.0, -4.0);
     double EPS = 0.000000001;
 
 
-    int cntSpaceObj = _spaceObjects.size();
+    int cntSpaceObj = spaceObjects.size();
 
 
     // initialize the forces
@@ -28,7 +28,7 @@ void NBodyManager::simulateStep(double dt, std::vector<SpaceObject *> _spaceObje
 
 
     for (int i = 0; i < cntSpaceObj; ++i) {
-        SpaceObject* curObject = _spaceObjects[i];
+        SpaceObject* curObject = spaceObjects[i];
         // Calculate a rotation around the rotation-center of the object
         Vector3d curCenter = curObject->getPosition();
         double m = curObject->getMass();
@@ -39,7 +39,7 @@ void NBodyManager::simulateStep(double dt, std::vector<SpaceObject *> _spaceObje
             if (i == j) continue; // do not compare the object with it self
 
             // compare the objects based on the center of mass
-            SpaceObject* compareObject = _spaceObjects[j];
+            SpaceObject* compareObject = spaceObjects[j];
             Vector3d compareCenter = compareObject->getPosition();
 
             // get the distance
@@ -57,18 +57,18 @@ void NBodyManager::simulateStep(double dt, std::vector<SpaceObject *> _spaceObje
 
     // update positions
     for (int i = 0; i < cntSpaceObj; ++i) {
-        SpaceObject* spaceObject = _spaceObjects[i];
+        SpaceObject* spaceObject = spaceObjects[i];
         Vector3d a = forces[i] / spaceObject->getMass();
         Vector3d v = spaceObject->getLinearVelocity() + (dt * a);
         spaceObject->setLinearVelocity(v);
 
         Vector3d dtv = dt * v;
         Vector3d p = spaceObject->getPosition() + dtv;
-        spaceObject->setPosition(p);
 
 		Vector3d dto = dt * spaceObject->getAngularVelocity();
 		Vector3d o = spaceObject->getOrientation() + dto;
-		spaceObject->setOrientation(o);
+
+		spaceObject->updatePositionOrientation(p, dtv, o, dto);
     }
     /*
     for (std::vector<SpaceObject*>::iterator it = _spaceObjects.begin(); it != _spaceObjects.end(); ++it) {

@@ -12,5 +12,6 @@
 #define NUMBER  ${NUMBER}
 
 const std::string DATA_PATH = "${DATA_MODEL_PATH}";
+const std::string SCENES_PATH = "${SCENES_PATH}";
 
 #endif /* EXAMPLE_H */

@@ -1,51 +1,42 @@
 #include "Asteroid.h"
 
 #include <osgDB/ReadFile>
+#include <osg/Switch>
 
 #include "../config.h"
 #include "../osg/ModelManager.h"
 #include "../osg/OsgEigenConversions.h"
+#include "../osg/JsonEigenConversions.h"
+#include "../osg/visitors/ConvexHullVisitor.h"
 
 using namespace pbs17;
 
 
 /**
 * \brief Constructor of Asteroid.
-*
-* \param filename
-*      Relative location to the object-file. (Relative from the data-directory in the source).
 */
 Asteroid::Asteroid()
     : SpaceObject("A2.obj", 0) {
 
 }
 
-Asteroid::Asteroid(json j) :
-    SpaceObject(j){
 
-    Eigen::Vector3d pos(
-        j["position"]["x"].get<double>(),
-        j["position"]["y"].get<double>(),
-        j["position"]["z"].get<double>());
+/**
+ * \brief Constructor of Asteroid with JSON-configuration.
+ * 
+ * \param j
+ *      JSON-configuration for the asteroid.
+ */
+Asteroid::Asteroid(json j) :
+    SpaceObject(j) {
+
+    Eigen::Vector3d pos = fromJson(j["position"]);
     initOsg(pos, j["ratio"].get<double>(), j["scaling"].get<double>());
 
-    Eigen::Vector3d linearVelocity(
-        j["linearVelocity"]["x"].get<double>(),
-        j["linearVelocity"]["y"].get<double>(),
-        j["linearVelocity"]["z"].get<double>());
-    Eigen::Vector3d angularVelocity(
-        j["angularVelocity"]["x"].get<double>(),
-        j["angularVelocity"]["y"].get<double>(),
-        j["angularVelocity"]["z"].get<double>());
-    Eigen::Vector3d force(
-        j["force"]["x"].get<double>(),
-        j["force"]["y"].get<double>(),
-        j["force"]["z"].get<double>());
-    Eigen::Vector3d torque(
-        j["torque"]["x"].get<double>(),
-        j["torque"]["y"].get<double>(),
-        j["torque"]["z"].get<double>());
-
+	Eigen::Vector3d linearVelocity = fromJson(j["linearVelocity"]);
+    Eigen::Vector3d angularVelocity = fromJson(j["angularVelocity"]);
+    Eigen::Vector3d force = fromJson(j["force"]);
+    Eigen::Vector3d torque = fromJson(j["torque"]);
 
     initPhysics(j["mass"].get<double>(),linearVelocity,angularVelocity,force, torque);
 }
@@ -74,11 +65,24 @@ void Asteroid::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 
 	// Load the model
 	std::string modelPath = DATA_PATH + "/" + _filename;
-	osg::ref_ptr<osg::Node> modelFile = ModelManager::Instance()->loadModel(modelPath, ratio, scaling);
+	_modelFile = ModelManager::Instance()->loadModel(modelPath, ratio, scaling);
+
+	// Compute convex hull
+	ConvexHullVisitor convexHull;
+	_modelFile->accept(convexHull);
+	_convexHull = convexHull.getConvexHull();
+	
+	osg::Geode* geodeConvexHull = new osg::Geode;
+	geodeConvexHull->addDrawable(_convexHull->getOsgModel());
+
+	// Switch to decide if the convex hull or the model has to be rendered.
+	_convexRenderSwitch = new osg::Switch;
+	_convexRenderSwitch->addChild(_modelFile, false);
+	_convexRenderSwitch->addChild(geodeConvexHull, true);
 
 	// First transformation-node to handle locale-rotations easier
 	_rotation = new osg::MatrixTransform;
-	_rotation->addChild(modelFile);
+	_rotation->addChild(_convexRenderSwitch);
 
 	// Second transformation-node for global rotations and translations
 	_translation = new osg::MatrixTransform;
@@ -87,14 +91,7 @@ void Asteroid::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 
 	calculateAABB();
 
-	_model = new osg::Group;
-	_model->addChild(_aabbRendering);
-	_model->addChild(_translation);
-}
-
-
-void Asteroid::setOrientation(Eigen::Vector3d o) {
-	SpaceObject::setOrientation(o);
-
-	calculateAABB();
+	_modelRoot = new osg::Switch;
+	_modelRoot->addChild(_translation, true);
+	_modelRoot->addChild(_aabbRendering, true);
 }

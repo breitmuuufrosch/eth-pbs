@@ -1,20 +1,23 @@
 #include "CollisionManager.h"
 
 #include <iostream>
+#include <Eigen/Core>
+#include <Eigen/LU>
+#include <Eigen/Dense>
 
 
 using namespace pbs17;
 using namespace Eigen;
 
 CollisionManager::CollisionManager(std::vector<SpaceObject*> spaceObjects) {
-	xList = std::vector<SpaceObject*>(spaceObjects);
-	yList = std::vector<SpaceObject*>(spaceObjects);
-	zList = std::vector<SpaceObject*>(spaceObjects);
+	_xList = std::vector<SpaceObject*>(spaceObjects);
+	_yList = std::vector<SpaceObject*>(spaceObjects);
+	_zList = std::vector<SpaceObject*>(spaceObjects);
 	
 	// sort the lists
-	insertionSort(xList, 0);
-	insertionSort(yList, 1);
-	insertionSort(zList, 2);
+	insertionSort(_xList, 0);
+	insertionSort(_yList, 1);
+	insertionSort(_zList, 2);
 }
 
 
@@ -31,7 +34,7 @@ CollisionManager::CollisionManager(std::vector<SpaceObject*> spaceObjects) {
  *	    Current axis for which the sort-criteria is checked.
  */
 void CollisionManager::insertionSort(std::vector<SpaceObject*> &A, int dim) const {
-	for (int i = 1; i < A.size(); ++i) {
+	for (unsigned int i = 1; i < A.size(); ++i) {
 		SpaceObject* tmp = A[i];
 		int j = i - 1;
 
@@ -48,11 +51,11 @@ void CollisionManager::insertionSort(std::vector<SpaceObject*> &A, int dim) cons
 /**
  * 
  */
-void CollisionManager::handleCollisions(double dt, std::vector<SpaceObject *> _spaceObjects) {
+void CollisionManager::handleCollisions(double dt, std::vector<SpaceObject *> &spaceObjects) {
 	std::vector<std::pair<SpaceObject *, SpaceObject *>> collision;
 
-	for (int i = 0; i < _spaceObjects.size(); ++i) {
-		_spaceObjects[i]->resetCollisionState();
+	for (unsigned int i = 0; i < spaceObjects.size(); ++i) {
+		spaceObjects[i]->resetCollisionState();
 	}
 
 	this->broadPhase(collision);
@@ -74,10 +77,10 @@ void CollisionManager::handleCollisions(double dt, std::vector<SpaceObject *> _s
  *	                      By convention, on the first position the object with the smaller id is stored (key.first.Id < key.second.Id)
  */
 void CollisionManager::pruneAndSweep(std::vector<SpaceObject*> &A, int dim, std::vector<std::pair<SpaceObject *, SpaceObject *>> &res) {
-	for (int i = 0; i < A.size() - 1; ++i) {
+	for (unsigned int i = 0; i < A.size() - 1; ++i) {
 		double aabbMax = A[i]->getAABB()._max[dim];
 
-		for (int j = i + 1; j < A.size(); ++j) {
+		for (unsigned int j = i + 1; j < A.size(); ++j) {
 			// If the left edge of the neighbor is smaller than the right edge of the current, a possible collision exists.
 			if (aabbMax >= A[j]->getAABB()._min[dim]) {
 				// always have the object with the smaller id first
@@ -97,25 +100,25 @@ void CollisionManager::pruneAndSweep(std::vector<SpaceObject*> &A, int dim, std:
 
 void CollisionManager::broadPhase(std::vector<std::pair<SpaceObject *, SpaceObject *>> &res) {
 	// Resort the list
-	insertionSort(xList, 0);
-	insertionSort(yList, 1);
-	insertionSort(zList, 2);
+	insertionSort(_xList, 0);
+	insertionSort(_yList, 1);
+	insertionSort(_zList, 2);
 
 	// Vectors which contains the possible collisions per axis
 	std::vector<std::pair<SpaceObject *, SpaceObject *>> resX;
 	std::vector<std::pair<SpaceObject *, SpaceObject *>> resY;
 	std::vector<std::pair<SpaceObject *, SpaceObject *>> resZ;
 
-	pruneAndSweep(xList, 0, resX);
-	pruneAndSweep(yList, 1, resY);
-	pruneAndSweep(zList, 2, resZ);
+	pruneAndSweep(_xList, 0, resX);
+	pruneAndSweep(_yList, 1, resY);
+	pruneAndSweep(_zList, 2, resZ);
 
 	std::sort(resX.begin(), resX.end());
 	std::sort(resY.begin(), resY.end());
 	std::sort(resZ.begin(), resZ.end());
-	/*std::cout << "resX = " << resX.size() << std::endl;
-	std::cout << "resY = " << resY.size() << std::endl;
-	std::cout << "resZ = " << resZ.size() << std::endl;*/
+	std::cout << "Collisions: " << resX.size()
+		<< ", " << resY.size()
+		<< ", " << resZ.size() << std::endl;
 
 	std::vector<std::pair<SpaceObject *, SpaceObject *>> resXY;
 
@@ -164,7 +167,7 @@ void CollisionManager::response(Planet *p1, Planet *p2) {
 }
 
 void CollisionManager::narrowPhase(std::vector<std::pair<SpaceObject *, SpaceObject *>> &collision) {
-	for (int i = 0; i < collision.size(); ++i) {
+	for (unsigned int i = 0; i < collision.size(); ++i) {
 		Planet* p1 = dynamic_cast<Planet*>(collision[i].first);
 		Planet* p2 = dynamic_cast<Planet*>(collision[i].second);
 
@@ -179,7 +182,7 @@ void CollisionManager::narrowPhase(std::vector<std::pair<SpaceObject *, SpaceObj
 				sphereCollision.setFirstPOC(p1->getPosition() - p1->getRadius() * sphereCollision.getUnitNormal());
 				sphereCollision.setSecondPOC(p2->getPosition() + p2->getRadius() * sphereCollision.getUnitNormal());
 				sphereCollision.setIntersectionVector(sphereCollision.getUnitNormal() * (((p1->getPosition() - p2->getPosition()).norm()) - p1->getRadius() - p2->getRadius()));
-				collisionQueue.push(sphereCollision);
+				_collisionQueue.push(sphereCollision);
 				//std::cout << "INTERSECTION DETECTED" << std::endl;
 
 				p1->setCollisionState(2);
@@ -189,9 +192,17 @@ void CollisionManager::narrowPhase(std::vector<std::pair<SpaceObject *, SpaceObj
 				p2->setCollisionState(1);
 			}
 		} else {
-			//std::cout << "TBD: impl narrow collision check between aribary space objects" << std::endl;
-			collision[i].first->setCollisionState(1);
-			collision[i].second->setCollisionState(1);
+			Nef_Polyhedron_3 convexHullP1 = collision[i].first->getConvexHull()->getCgalNefModel();
+			Nef_Polyhedron_3 convexHullP2 = collision[i].second->getConvexHull()->getCgalNefModel();
+
+			if (false) {
+				collision[i].first->setCollisionState(2);
+				collision[i].second->setCollisionState(2);
+			} else {
+				//std::cout << "TBD: impl narrow collision check between aribary space objects" << std::endl;
+				collision[i].first->setCollisionState(1);
+				collision[i].second->setCollisionState(1);
+			}
 		}
 	}
 }
@@ -232,9 +243,9 @@ Matrix3d CollisionManager::getOrthonormalBasis(Vector3d v) {
 }
 
 void CollisionManager::respondToCollisions() {
-	while (!collisionQueue.empty()) {
-		Collision currentCollision = collisionQueue.top();
-		collisionQueue.pop();
+	while (!_collisionQueue.empty()) {
+		Collision currentCollision = _collisionQueue.top();
+		_collisionQueue.pop();
 
 		Matrix3d contactBasis = getOrthonormalBasis(currentCollision.getUnitNormal());
 
@@ -246,7 +257,7 @@ void CollisionManager::respondToCollisions() {
 
 		foOrientationX << 1., 0.,                   0.,
 			              0., cos(orientation1[0]), -sin(orientation1[0]),
-			              0., sin(orientation1[0]), cos(orientation1[0]);
+			              0., sin(orientation1[0]),  cos(orientation1[0]);
 
 		foOrientationY << cos(orientation1[1]), 0, sin(orientation1[1]),
 			              0,                    1, 0,
@@ -256,17 +267,17 @@ void CollisionManager::respondToCollisions() {
 			              sin(orientation1[2]),  cos(orientation1[2]), 0,
 			              0,                     0,                    1;
 
-		soOrientationX << 1., 0., 0.,
-			0., cos(orientation2[0]), -sin(orientation2[0]),
-			0., sin(orientation2[0]), cos(orientation2[0]);
+		soOrientationX << 1., 0.,                   0.,
+			              0., cos(orientation2[0]), -sin(orientation2[0]),
+			              0., sin(orientation2[0]), cos(orientation2[0]);
 
 		soOrientationY << cos(orientation2[1]), 0, sin(orientation2[1]),
 			              0, 1, 0,
 			             -sin(orientation2[1]), 0, cos(orientation2[1]);
 
 		soOrientationZ << cos(orientation2[2]), -sin(orientation2[2]), 0,
-			              sin(orientation2[2]), cos(orientation2[2]), 0,
-			              0, 0, 1;
+			              sin(orientation2[2]),  cos(orientation2[2]), 0,
+			              0,                     0,                    1;
 		
 		Eigen::Matrix3d foRotationMatrix = foOrientationZ * foOrientationY * foOrientationX;
 		Eigen::Matrix3d soRotationMatrix = soOrientationZ * soOrientationY * soOrientationX;

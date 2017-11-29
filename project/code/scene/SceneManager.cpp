@@ -12,6 +12,7 @@
 #include "Planet.h"
 #include "../osg/SkyBox.h"
 #include "../config.h"
+#include "../osg/KeyboardHandler.h"
 
 using namespace pbs17;
 
@@ -86,7 +87,7 @@ osg::ref_ptr<osg::Node> SceneManager::loadScene() {
 	_spaceObjects.push_back(planet3);
 	planets->addChild(planet3->getModel());*/
 
-    int numObjects = 5;
+    int numObjects = 1;
 	double rad = 2.0 * osg::PI / numObjects;
 	
     for (int i = 0; i < numObjects; ++i) {
@@ -328,14 +329,14 @@ osg::ref_ptr<osgViewer::Viewer> SceneManager::initViewer(osg::ref_ptr<osg::Node>
 	osg::ref_ptr<osgViewer::Viewer> viewer = new osgViewer::Viewer;
     //viewer->setUpViewOnSingleScreen(0);
     viewer->setUpViewInWindow(80, 80, 1000, 600, 0);
-
 	viewer->setSceneData(scene);
+	viewer->addEventHandler(new KeyHandler(_spaceObjects));
 
 	osg::ref_ptr<osgGA::TrackballManipulator> manipulator = new osgGA::TrackballManipulator;
 	viewer->setCameraManipulator(manipulator);
 
 	osg::Matrix rotation = osg::Matrix::rotate(-osg::PI / .6, osg::X_AXIS);
-	osg::Matrix translation = osg::Matrix::translate(0.0f, 0.0f, 75.0f);
+	osg::Matrix translation = osg::Matrix::translate(0.0f, 0.0f, 15.0f);
 
 	//manipulator->setByMatrix(translation * rotation);
 	manipulator->setByMatrix(translation);

@@ -6,18 +6,41 @@
 
 ### Prerequisites
 
+#### Open Scene Graph (OSG)
 Windows:
 * Download the libraries of OSG from here: http://objexx.com/OpenSceneGraph.html (debug and release if you want to build in both)
 * Extract to `<path_to_osg>/` (I pasted release and debug in the same, since they use a "d" as postfix for each files => no problems with overwritting etc)
-* Use Path-variable to `<path_to_osg>/bin`
-* install boost from here: http://www.boost.org/doc/libs/1_65_1/more/getting_started/index.html
+* Add path `<path_to_osg>/bin` to the PATH-environment-variable
 
 Ubuntu:
 * Install the libraries with "sudo apt-get install openscenegraph
  libopenscenegraph-dev libopenscenegraph100v5"
 * For the examples one can use "sudo apt-get install openscenegraph-examples". These can then simply called by the command "osgteapot" for example.
 * Includes should be at "/usr/include" and libraries at `/usr/lib/x86_64-linux-gnu` (at least for me.. ;-) )
-* install boost from here: http://www.boost.org/doc/libs/1_65_1/more/getting_started/index.html
+
+### Boost
+Windows:
+* Instructions: http://www.boost.org/doc/libs/1_65_1/more/getting_started/windows.html
+* Set environment-variable `BOOST_ROOT` to `<path_to_boost>`
+
+Ubuntu:
+* Instructions: http://www.boost.org/doc/libs/1_65_1/more/getting_started/unix-variants.html
+* Install the libraries with "sudo apt-get install libboost*" (except you know which you really need ;-) )
+
+#### CGAL
+Windows:
+* Instructions: https://www.cgal.org/download/windows.html
+* Download the installer `CGAL-4.11-Setup.exe` from here: https://github.com/CGAL/cgal/releases
+* Install it to `<path_to_cgal>`
+* Set environment-variable `CGAL_DIR` to `<path_to_cgal>`
+* Add `<path_to_cgal>\auxiliary\gmp\lib` to the PATH-environment-variable 
+
+Ubuntu:
+* Instructions: https://www.cgal.org/download/linux.html
+* Install the libraries with "sudo apt-get install libcgal*"
+* If this works, fine, otherwise:
+    * Download the source from git to `<path_to_cgal>`
+    * Build it with make install in `<path_to_cgal>/build`
 
 ### Project-setup
 I suggest to use the cmake-gui, since it most likely does not find the variables autoamtically, so it might be easier to set them correctly.
@@ -31,6 +54,12 @@ I suggest to use the cmake-gui, since it most likely does not find the variables
     * OPENSCENEGRAPH_LIB_DIR:
         * Windows: `<path_to_osg>/lib`
         * Ubuntu: `/usr/lib/x86_64-linux-gnu` (for me)
+    * BOOST_INCLUDE_DIR: (acvanced, when found => `Boost version: 1.65.1 Boost_FOUND=true.` is written in the output of cmake)
+        * Windows: `<path_to_boost>`
+        * Ubunutu: `/usr/include`
+    * CGAL_DIR:
+        * Windows: `<path_to_cgal>/build`
+        * Ubuntu: `<path_to_cgal>/build`
 * Generate
 
 Open the project, build and run it and enjoy :-)
@@ -41,9 +70,11 @@ I added two asteroid (3d obj models) and two planets (simple spheres). Both impl
 
 The structure is meant to be like this:
 * Core: main loop, path config, ...
+* Graphics: All graphics calculations (convex-hull, minkowski-sum, ...)
+* OSG: Using and setup of OSG. All rendering-relevant parts are included here as well classes to work with OSG.
+* OSG/Visitors: All visitors which are used for OSG to traverse the graph to make calculations/changes on the nodes
 * Physics: All physics calculations (Collision-handling, NBody-handling, ...)
-* Scene: Used for all rendering things as well the objects which holds the information about the space-objects. Scene-manager to make load the scene (later with parameters or scene-file) and keep track of objects.
-* Visitors: not yet used. Basically for OSG visitors are a cool concept to spread calculations among the tree.
+* Scene: Used to build and manage the scene and the objects which are currently on the scene.
 
 
 <img src="version_1.png">

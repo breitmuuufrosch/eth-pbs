@@ -9,34 +9,34 @@
 #pragma once
 
 #include <osg/NodeVisitor>
-#include <osg/BoundingBox>
 #include <osg/Billboard>
+#include <osg/Geometry>
+#include "../../graphics/ConvexHull3D.h"
 
 namespace pbs17 {
 
 	/**
 	 * \brief Calculate the bounding-box of anode
 	 */
-	class  CalculateBoundingBox : public osg::NodeVisitor {
+	class  ConvexHullVisitor : public osg::NodeVisitor {
 
 	public:
 
 		/**
 		 * \brief Constructor. Initialize the visitor to traverse all children.
 		 */
-		CalculateBoundingBox(osg::Matrix globalTransform, osg::Matrix localTransform) : NodeVisitor(TRAVERSE_ALL_CHILDREN) {
-			_globalTransform = globalTransform;
-			_localTransform = localTransform;
-
-			_localBoundingBox = osg::BoundingBox();
-			_globalBoundingBox = osg::BoundingBox();
+		ConvexHullVisitor() : NodeVisitor(TRAVERSE_ALL_CHILDREN) {
+			_vertices = new osg::Vec3Array;
+			_convexHull = NULL;
+			_transformMatrix.makeIdentity();
+			_isCalculated = false;
 		}
 
 
 		/**
 		 * \brief Destructor.
 		 */
-		virtual ~CalculateBoundingBox() {}
+		virtual ~ConvexHullVisitor() {}
 
 
 		/**
@@ -65,28 +65,23 @@ namespace pbs17 {
 		 *      Current billboard-child.
 		 */
 		void apply(osg::Billboard &node) override;
+		
 
+		ConvexHull3D* getConvexHull();
 
-		/**
-		 * \brief Return the calculated bounding-box.
-		 *
-		 * \return Calculated bounding-box.
-		 */
-		osg::BoundingBox &getLocalBoundBox() {
-			return _localBoundingBox;
-		}
-		osg::BoundingBox &getGlobalBoundBox() {
-			return _globalBoundingBox;
-		}
 
 	protected:
 
-		//! The overall resultant bounding box.
-		osg::BoundingBox _localBoundingBox;
-		osg::BoundingBox _globalBoundingBox;
+		//! All the vertices found of the subtree
+		osg::Vec3Array* _vertices;
 
 		//! The current transform matrix.
-		osg::Matrix _localTransform;
-		osg::Matrix _globalTransform;
+		osg::Matrix _transformMatrix;
+
+		//! The convex hull.
+		ConvexHull3D* _convexHull;
+
+		bool _isCalculated;
+	
 	};
 }

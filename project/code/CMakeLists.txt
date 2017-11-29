@@ -2,6 +2,7 @@ PROJECT(PBS17_group11_project)
 
 CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
 SET(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "add a postfix for Debug mode, usually d on windows")
+SET(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/modules;${CMAKE_MODULE_PATH}")
 
 # check c++11 compiler-flags
 INCLUDE(CheckCXXCompilerFlag)
@@ -65,17 +66,31 @@ FIND_PATH(OPENSCENEGRAPH_LIB_DIR libso.so osg.lib
 	/usr/lib/x86_64-linux-gnu
 )
 
-# find boost_1_65_1
-FIND_PACKAGE( Boost COMPONENTS program_options REQUIRED )
-if(Boost_FOUND)
-    MESSAGE(STATUS "Boost_FOUND=true.")
-    INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIRS} )
-    LINK_DIRECTORIES( ${Boost_LIBRARY_DIRS} )
-endif()
-
 # apply them to following projects
 INCLUDE_DIRECTORIES(${OPENSCENEGRAPH_INCLUDE_DIR})
 LINK_DIRECTORIES(${OPENSCENEGRAPH_LIB_DIR})
+
+# find boost_1_65_1
+FIND_PACKAGE(Boost COMPONENTS program_options REQUIRED)
+IF (Boost_FOUND)
+    MESSAGE(STATUS "Boost_FOUND=true.")
+    INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIRS} )
+    LINK_DIRECTORIES( ${Boost_LIBRARY_DIRS} )
+ENDIF()
+
+# CGAL
+FIND_PACKAGE(CGAL QUIET COMPONENTS Core)
+
+IF (CGAL_FOUND)
+	MESSAGE(STATUS "CGAL_FOUND=true.")
+  INCLUDE(${CGAL_USE_FILE})
+  INCLUDE(CGAL_CreateSingleSourceCGALProgram)
+ELSE()  
+    MESSAGE(STATUS "This program requires the CGAL library, and will not be compiled.")
+ENDIF()
+
+INCLUDE_DIRECTORIES(${CGAL_INCLUDE_DIR})
+LINK_DIRECTORIES(${CGAL_INCLUDE_DIR})
 
 MACRO(START_PROJECT)
 
@@ -111,8 +126,9 @@ ENDMACRO(START_PROJECT)
 SET(EXAMPLE_NAME asteroid_field)
 SET(SOURCES "")
 
-set(DATA_MODEL_PATH ${CMAKE_CURRENT_LIST_DIR}/data)
-configure_file(precompile/config.h.in ${CMAKE_CURRENT_LIST_DIR}/config.h)
+SET(DATA_MODEL_PATH ${CMAKE_CURRENT_LIST_DIR}/data)
+SET(SCENES_PATH ${CMAKE_CURRENT_LIST_DIR}/demoScenes)
+CONFIGURE_FILE(precompile/config.h.in ${CMAKE_CURRENT_LIST_DIR}/config.h)
 
 FILE(GLOB main_SRCS "./*.cpp")
 FILE(GLOB main_HDRS "./*.h")
@@ -134,10 +150,14 @@ FILE(GLOB osg_visitors_HDRS "./osg/visitors/*.h")
 SOURCE_GROUP(Osg\\Visitors FILES ${osg_visitors_SRCS} ${osg_visitors_HDRS})
 LIST(APPEND SOURCES ${osg_visitors_SRCS} ${osg_visitors_HDRS})
 
-
 FILE(GLOB physics_SRCS "./physics/*.cpp")
 FILE(GLOB physics_HDRS "./physics/*.h")
 SOURCE_GROUP(Physics FILES ${physics_SRCS} ${physics_HDRS})
 LIST(APPEND SOURCES ${physics_SRCS} ${physics_HDRS})
+
+FILE(GLOB graphics_SRCS "./graphics/*.cpp")
+FILE(GLOB graphics_HDRS "./graphics/*.h")
+SOURCE_GROUP(Graphics FILES ${graphics_SRCS} ${graphics_HDRS})
+LIST(APPEND SOURCES ${graphics_SRCS} ${graphics_HDRS})
 
 START_PROJECT()

@@ -15,6 +15,7 @@
 #include "scene/SceneManager.h"
 #include "physics/SimulationManager.h"
 #include <json.hpp>
+#include "config.h"
 
 using namespace boost::program_options;
 // for convenience
@@ -27,51 +28,53 @@ int main(int argc, const char *argv[]) {
 	std::cout << std::fixed << std::setprecision(6);
     variables_map vm;
 
-    try
-      {
-        options_description desc{"Options"};
-        desc.add_options()
-          ("help,h", "Help screen")
-          ("spheres,s", value<int>()->default_value(10), "Spheres")
-          ("asteroids,a", value<int>()->default_value(0), "Asteroids")
-          ("emitter,e", value<std::string>()->default_value("sphere"), "Emitter")
-          ("rand,r", value<bool>()->default_value(true), "Random")
-          ("sceneJson,j", value<std::string>(), "Json file containing the scene");
+	try {
+		options_description desc{ "Options" };
+		desc.add_options()
+			("help,h", "Help screen")
+			("spheres,s", value<int>()->default_value(10), "Spheres")
+			("asteroids,a", value<int>()->default_value(0), "Asteroids")
+			("emitter,e", value<std::string>()->default_value("sphere"), "Emitter")
+			("rand,r", value<bool>()->default_value(true), "Random")
+			("sceneJson,j", value<std::string>(), "Json file containing the scene");
 
 
-        store(parse_command_line(argc, argv, desc), vm);
-        notify(vm);
+		store(parse_command_line(argc, argv, desc), vm);
+		notify(vm);
 
-        if (vm.count("help")) {
-          std::cout << desc << '\n';
-          return 0;
-        } else if(vm.count("sceneJson")) {
-            const std::string jsonFilePath = vm["sceneJson"].as<std::string>();
+		if (vm.count("help")) {
+			std::cout << desc << '\n';
+			return 0;
+		} else if (vm.count("sceneJson")) {
+			const std::string jsonFilePath = vm["sceneJson"].as<std::string>();
 
-            // check if file exists
-            std::ifstream stream(jsonFilePath);
-            if (!stream) {
-                std::cout << "File " + jsonFilePath + " doesnt exists!" << std::endl;
-                return 0;
-            }
+			// check if file exists
+			std::ifstream stream(jsonFilePath);
+			if (!stream) {
+				stream = std::ifstream(SCENES_PATH + "/" + jsonFilePath);
 
-            // read json files
-            json j;
-            stream >> j;
+				if (!stream) {
+					std::cout << "File " + jsonFilePath + " doesnt exists!" << std::endl;
+					return 0;
+				}
+			}
 
-            // load scene with json file
-            std::cout << "load scene with json: " << jsonFilePath << '\n';
-            scene = sceneManager->loadScene(j);
-        } else {
-            // load scene with parameters
-            std::cout << "load scene with parameters" << '\n';
-            scene = sceneManager->loadScene(vm);
-        }
-      }
-      catch (const error &ex)
-      {
-        std::cerr << ex.what() << '\n';
-      }
+			// read json files
+			json j;
+			stream >> j;
+
+			// load scene with json file
+			std::cout << "load scene with json: " << jsonFilePath << '\n';
+			scene = sceneManager->loadScene(j);
+		} else {
+			// load scene with parameters
+			std::cout << "load scene with parameters" << '\n';
+			scene = sceneManager->loadScene(vm);
+		}
+	}
+	catch (const error &ex) {
+		std::cerr << ex.what() << '\n';
+	}
 
 
 

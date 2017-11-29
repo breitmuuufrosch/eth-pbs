@@ -12,11 +12,16 @@ namespace pbs17 {
 	public:
 		/**
 		 * \brief Constructor of Asteroid.
-		 * 
-		 * \param filename
-		 *      Relative location to the object-file. (Relative from the data-directory in the source).
 		 */
         explicit Asteroid();
+
+
+		/**
+		 * \brief Constructor of Asteroid with JSON-configuration.
+		 *
+		 * \param j
+		 *      JSON-configuration for the asteroid.
+		 */
         explicit Asteroid(json j);
 
 
@@ -38,8 +43,6 @@ namespace pbs17 {
 		 */
 		void initOsg(Eigen::Vector3d position, double ratio, double scaling) override;
 
-
-		void setOrientation(Eigen::Vector3d o) override;
 	};
 
 }
