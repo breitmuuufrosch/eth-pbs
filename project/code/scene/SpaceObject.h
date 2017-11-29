@@ -5,9 +5,16 @@
 #include <osg/MatrixTransform>
 #include <osg/BoundingBox>
 #include <osg/ShapeDrawable>
+#include <json.hpp>
+#include <string>
+
+#include "../osg/visitors/BoundingBoxVisitor.h"
 #include "../osg/OsgEigenConversions.h"
 #include "../graphics/ConvexHull3D.h"
 #include "../graphics/MinkowskiSum.h"
+
+using json = nlohmann::json;
+
 
 namespace pbs17 {
 
@@ -22,7 +29,8 @@ namespace pbs17 {
 		 * \param filename
 		 *      Relative location to the object-file. (Relative from the data-directory in the source).
 		 */
-		SpaceObject(std::string filename);
+        SpaceObject(std::string filename, int i);
+        SpaceObject(json j);
 
 
 		/**

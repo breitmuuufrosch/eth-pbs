@@ -2,6 +2,9 @@
 
 #include "SpaceObject.h"
 
+using json = nlohmann::json;
+
+
 namespace pbs17 {
 
 	/**
@@ -16,6 +19,15 @@ namespace pbs17 {
 		 *      Size of the planet.
 		 */
 		Planet(double size);
+		
+		
+		/**
+		 * \brief Constructor of Planet with JSON-configuration.
+		 *
+		 * \param j
+		 *      JSON-configuration for the planet.
+		 */
+        Planet(json j);
 
 
 		/**
@@ -49,28 +61,36 @@ namespace pbs17 {
 
 
 		/**
-		* \brief Initialize the space-object for physics.
-		*
-		* \param mass
-		*      Mass: unit = kg
-		* \param linearVelocity
-		*      Linear velocity: unit = m/s
-		* \param angularVelocity
-		*      Angular velocity: unit = rad/s
-		* \param force
-		*      Global force: unit = vector with norm equals to N
-		* \param torque
-		*      Global torque: unit = vector with norm equals to N*m (newton metre)
-		*/
+		 * \brief Initialize the space-object for physics.
+		 *
+		 * \param mass
+		 *      Mass: unit = kg
+		 * \param linearVelocity
+		 *      Linear velocity: unit = m/s
+		 * \param angularVelocity
+		 *      Angular velocity: unit = rad/s
+		 * \param force
+		 *      Global force: unit = vector with norm equals to N
+		 * \param torque
+		 *      Global torque: unit = vector with norm equals to N*m (newton metre)
+		 */
 		void initPhysics(double mass, Eigen::Vector3d linearVelocity, Eigen::Vector3d angularVelocity, Eigen::Vector3d force, Eigen::Vector3d torque) override;
 
+
+		/**
+		 * \brief Get radius of the planet.
+		 * 
+		 * \return Radius of the planet.
+		 */
 		double getRadius() const {
-			return _size;
+			return _radius;
 		}
 
+
 	private:
-		//! Size of the planet
-		double _size;
+
+		//! Radius of the planet
+		double _radius;
 
 	};
 

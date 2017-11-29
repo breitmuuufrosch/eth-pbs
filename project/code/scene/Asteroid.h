@@ -2,6 +2,7 @@
 
 #include "SpaceObject.h"
 
+using json = nlohmann::json;
 namespace pbs17 {
 
 	/**
@@ -11,11 +12,17 @@ namespace pbs17 {
 	public:
 		/**
 		 * \brief Constructor of Asteroid.
-		 * 
-		 * \param filename
-		 *      Relative location to the object-file. (Relative from the data-directory in the source).
 		 */
-		Asteroid(std::string filename);
+        explicit Asteroid();
+
+
+		/**
+		 * \brief Constructor of Asteroid with JSON-configuration.
+		 *
+		 * \param j
+		 *      JSON-configuration for the asteroid.
+		 */
+        explicit Asteroid(json j);
 
 
 		/**

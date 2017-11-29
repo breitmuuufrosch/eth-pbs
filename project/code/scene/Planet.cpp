@@ -5,6 +5,7 @@
 #include <osgDB/ReadFile>
 
 #include "../config.h"
+#include "../osg/JsonEigenConversions.h"
 #include "../osg/OsgEigenConversions.h"
 #include "../osg/ImageManager.h"
 #include "../osg/ModelManager.h"
@@ -20,7 +21,28 @@ using namespace pbs17;
  *      Size of the planet.
  */
 Planet::Planet(double size)
-	: SpaceObject(""), _size(size) {
+    : SpaceObject("", 0), _radius(size) {
+}
+
+
+/**
+ * \brief Constructor of Planet with JSON-configuration.
+ *
+ * \param j
+ *      JSON-configuration for the planet.
+ */
+Planet::Planet(json j) : SpaceObject(j){
+    std::cout << "json=" << j << std::endl;
+    _radius = j["size"].get<double>();
+	Eigen::Vector3d pos = fromJson(j["position"]);
+    initOsg(pos, j["ratio"].get<double>(), j["scaling"].get<double>());
+
+	Eigen::Vector3d linearVelocity = fromJson(j["linearVelocity"]);
+	Eigen::Vector3d angularVelocity = fromJson(j["angularVelocity"]);
+	Eigen::Vector3d force = fromJson(j["force"]);
+	Eigen::Vector3d torque = fromJson(j["torque"]);
+
+    initPhysics(j["mass"].get<double>(),linearVelocity,angularVelocity,force, torque);
 }
 
 
@@ -33,7 +55,7 @@ Planet::Planet(double size)
  *      Relative location to the texture-file. (Relative from the data-directory in the source).
  */
 Planet::Planet(double size, std::string textureName)
-    : SpaceObject("", textureName), _size(size) {
+    : SpaceObject("", textureName), _radius(size) {
 }
 
 
@@ -56,14 +78,15 @@ Planet::~Planet() {}
 void Planet::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 	// Set the position to the space-object
 	_position = position;
-	_scaling = _size;
+	_scaling = _radius;
 
 	// Load the model
 	std::string modelPath = DATA_PATH + "/sphere.obj";
-	_modelFile = ModelManager::Instance()->loadModel(modelPath, ratio, _size);
+	_modelFile = ModelManager::Instance()->loadModel(modelPath, ratio, _radius);
 
 	if (_textureName != "") {
 		std::string texturePath = DATA_PATH + "/texture/" + _textureName;
+        std::cout << texturePath << std::endl;
 		osg::ref_ptr<osg::Texture2D> myTex = ImageManager::Instance()->loadTexture(texturePath);
 		_modelFile->getOrCreateStateSet()->setTextureAttributeAndModes(0, myTex.get());
 	}

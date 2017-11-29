@@ -6,6 +6,7 @@
 #include "../config.h"
 #include "../osg/ModelManager.h"
 #include "../osg/OsgEigenConversions.h"
+#include "../osg/JsonEigenConversions.h"
 #include "../osg/visitors/ConvexHullVisitor.h"
 
 using namespace pbs17;
@@ -13,12 +14,32 @@ using namespace pbs17;
 
 /**
 * \brief Constructor of Asteroid.
-*
-* \param filename
-*      Relative location to the object-file. (Relative from the data-directory in the source).
 */
-Asteroid::Asteroid(std::string filename)
-	: SpaceObject(filename) {}
+Asteroid::Asteroid()
+    : SpaceObject("A2.obj", 0) {
+
+}
+
+
+/**
+ * \brief Constructor of Asteroid with JSON-configuration.
+ * 
+ * \param j
+ *      JSON-configuration for the asteroid.
+ */
+Asteroid::Asteroid(json j) :
+    SpaceObject(j){
+
+    Eigen::Vector3d pos = fromJson(j["position"]);
+    initOsg(pos, j["ratio"].get<double>(), j["scaling"].get<double>());
+
+	Eigen::Vector3d linearVelocity = fromJson(j["linearVelocity"]);
+    Eigen::Vector3d angularVelocity = fromJson(j["angularVelocity"]);
+    Eigen::Vector3d force = fromJson(j["force"]);
+    Eigen::Vector3d torque = fromJson(j["torque"]);
+
+    initPhysics(j["mass"].get<double>(),linearVelocity,angularVelocity,force, torque);
+}
 
 
 /**
