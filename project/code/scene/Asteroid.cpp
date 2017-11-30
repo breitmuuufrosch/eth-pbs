@@ -8,6 +8,7 @@
 #include "../osg/OsgEigenConversions.h"
 #include "../osg/JsonEigenConversions.h"
 #include "../osg/visitors/ConvexHullVisitor.h"
+#include "../osg/ImageManager.h"
 
 using namespace pbs17;
 
@@ -17,7 +18,6 @@ using namespace pbs17;
 */
 Asteroid::Asteroid()
     : SpaceObject("A2.obj", 0) {
-
 }
 
 
@@ -80,6 +80,14 @@ void Asteroid::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 	_convexRenderSwitch = new osg::Switch;
 	_convexRenderSwitch->addChild(_modelFile, false);
 	_convexRenderSwitch->addChild(geodeConvexHull, true);
+
+	// Load the texture
+	if (_textureName != "") {
+		std::string texturePath = DATA_PATH + "/texture/" + _textureName;
+		std::cout << texturePath << std::endl;
+		osg::ref_ptr<osg::Texture2D> myTex = ImageManager::Instance()->loadTexture(texturePath);
+		_convexRenderSwitch->getOrCreateStateSet()->setTextureAttributeAndModes(0, myTex.get());
+	}
 
 	// First transformation-node to handle locale-rotations easier
 	_rotation = new osg::MatrixTransform;

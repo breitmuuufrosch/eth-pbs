@@ -9,14 +9,14 @@
             "obj": "A2.obj",
             "mass": 1.0,
             "position": {
-                "x": -5.0,
+                "x": -2.0,
                 "y": 0.0,
                 "z": 0.0
             },
             "ratio": 1.0,
             "scaling": 1.0,
             "linearVelocity": {
-                "x": 0,
+                "x": 0.5,
                 "y": 0,
                 "z": 0.0
             },
@@ -43,7 +43,7 @@
             "obj": "A2.obj",
             "mass": 1.0,
             "position": {
-                "x": 5.0,
+                "x": 2.0,
                 "y": 0.0,
                 "z": 0.0
             },

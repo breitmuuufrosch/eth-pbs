@@ -1,10 +1,9 @@
 #pragma once
 
 #include <Eigen/Core>
-#include <osg/Geometry>
 #include <limits>
 
-#include "CGAL.h"
+#include "Geometry.h"
 #include "Simplex.h"
 
 namespace pbs17 {
@@ -14,45 +13,59 @@ namespace pbs17 {
 	 */
 	class GjkAlgorithm {
 	public:
-		static bool intersect(std::vector<Eigen::Vector3d> &convex1, std::vector<Eigen::Vector3d> &convex2) {
-			//Get an initial point on the Minkowski difference.
+		static bool intersect(std::vector<Eigen::Vector3d> &convex1, std::vector<Eigen::Vector3d> &convex2, Eigen::Vector3d &normal) {
+			double max = -DBL_MAX;
+			double min = DBL_MAX;
+
+			for (int i = 0; i < convex1.size(); ++i)
+			{
+				max = std::max(convex1[0].x(), max);
+			}
+			for (int i = 0; i < convex2.size(); ++i) {
+				min = std::min(convex2[0].x(), min);
+			}
+
+			std::cout << max << " < " << min << std::endl;
+
+
+			// Get an initial point on the Minkowski difference.
 			Eigen::Vector3d s = support(convex1, convex2, Eigen::Vector3d(1.0, 1.0, 1.0));
 			std::vector<Eigen::Vector3d> sVertices;
 			sVertices.push_back(s);
 
-			//Create our initial simplex.
+			// Create our initial simplex.
 			Simplex simplex(sVertices);
 
-			//Choose an initial direction toward the origin.
+			// Choose an initial direction toward the origin.
 			Eigen::Vector3d d = -s;
 
-			//Choose a maximim number of iterations to avoid an 
-			//infinite loop during a non-convergent search.
+			// Choose a maximim number of iterations to avoid an infinite loop during a non-convergent search.
 			int maxIterations = 50;
 
 			for (int i = 0; i < maxIterations; i++) {
-				//Get our next simplex point toward the origin.
+				// Get our next simplex point toward the origin.
 				Eigen::Vector3d a = support(convex1, convex2, d);
 
-				//If we move toward the origin and didn't pass it 
-				//then we never will and there's no intersection.
+				// If we move toward the origin and didn't pass it then we never will and there's no intersection.
 				if (isOppositeDirection(a, d)) {
 					return false;
 				}
-				//otherwise we add the new
-				//point to the simplex and
-				//process it.
+
+				// Otherwise we add the new point to the simplex and process it.
 				simplex.add(a);
-				//Here we either find a collision or we find the closest feature of
-				//the simplex to the origin, make that the new simplex and update the direction
-				//to move toward the origin from that feature.
+
+				// Here we either find a collision or we find the closest feature of
+				// the simplex to the origin, make that the new simplex and update the direction
+				// to move toward the origin from that feature.
 				if (processSimplex(simplex, d)) {
+					normal = EPA(simplex, convex1, convex2);
 					return true;
 				}
 			}
-			//If we still couldn't find a simplex 
-			//that contains the origin then we
-			//"probably" have an intersection.
+
+			return false;
+			// If we still couldn't find a simplex that contains the origin then we "probably" have an intersection.
+			normal = EPA(simplex, convex1, convex2);
 			return true;
 		}
 
@@ -61,14 +74,13 @@ namespace pbs17 {
 		}
 
 		static Eigen::Vector3d getFurthestPoint(std::vector<Eigen::Vector3d> &convex1, Eigen::Vector3d direction) {
-			double max = DBL_MIN;
-			Eigen::Vector3d maxV(0,0,0);
+			double max = -DBL_MAX;
+			Eigen::Vector3d maxV(0, 0, 0);
 
 			for (int i = 0; i < convex1.size(); ++i) {
-				double dot = (convex1[i].dot(direction));
+				double dot = convex1[i].dot(direction);
 
-				if (dot > max)
-				{
+				if (dot > max) {
 					max = dot;
 					maxV = convex1[i];
 				}
@@ -87,15 +99,9 @@ namespace pbs17 {
 				return processTetrahedron(simplex, direction);
 			}
 		}
-	private:
 
-		static bool isSameDirection(Eigen::Vector3d v1, Eigen::Vector3d v2)
-		{
-			return v1.dot(v2) > 0;
-		}
-		static bool isOppositeDirection(Eigen::Vector3d v1, Eigen::Vector3d v2) {
-			return v1.dot(v2) < 0;
-		}
+
+	private:
 
 		static bool processLine(Simplex &simplex, Eigen::Vector3d &direction) {
 			Eigen::Vector3d a = simplex[1];
@@ -103,11 +109,9 @@ namespace pbs17 {
 			Eigen::Vector3d ab = b - a;
 			Eigen::Vector3d aO = -a;
 
-			if (isSameDirection(ab, aO))
-			{
+			if (isSameDirection(ab, aO)) {
 				direction = (ab.cross(aO)).cross(ab);
-			} else
-			{
+			} else {
 				simplex.remove(b);
 				direction = aO;
 			}
@@ -169,8 +173,6 @@ namespace pbs17 {
 			Eigen::Vector3d ac = c - a;
 			Eigen::Vector3d ad = d - a;
 			Eigen::Vector3d ab = b - a;
-			Eigen::Vector3d bc = c - b;
-			Eigen::Vector3d bd = d - b;
 
 			Eigen::Vector3d acd = ad.cross(ac);
 			Eigen::Vector3d abd = ab.cross(ad);
@@ -222,6 +224,29 @@ namespace pbs17 {
 			}
 
 			return false;
+		}
+
+		static Eigen::Vector3d EPA(Simplex &simplex, std::vector<Eigen::Vector3d> &convex1, std::vector<Eigen::Vector3d> &convex2) {
+			simplex.triangulate();
+			const double TOLERANCE = 0.00001;
+
+			while (true) {
+				Face face = simplex.findClosestFace();
+				Eigen::Vector3d normal = face.getNormal();
+				double distance = face.getDistance();
+
+				Eigen::Vector3d p = support(convex1, convex2, normal);
+
+				double d = abs(p.dot(normal));
+
+				if (d - distance < TOLERANCE) {
+					Eigen::Vector3d bary = barycentric(p, face.getVertex(0), face.getVertex(1), face.getVertex(2));
+					return d * normal;
+				} else {
+					simplex.extend(p);
+					std::cout << d - distance << std::endl;
+				}
+			}
 		}
 
 	};

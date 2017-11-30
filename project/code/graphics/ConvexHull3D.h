@@ -71,29 +71,7 @@ namespace pbs17 {
 		}
 
 
-		/**
-		* \brief Get the cgal-model which is calculated as the convex-hull from cgal.
-		*
-		* \return Polyhedron which represents the convex-hull.
-		*/
-		Nef_Polyhedron_3 getCgalNefModel() const {
-			return _cgalNefModel;
-		}
-
-
-		/**
-		 * \brief Apply an affine transformation to the model.
-		 * 
-		 * \param transformation
-		 *	    Affine transformation to apply.
-		 */
-		void transform(Aff_transformation_3 transformation) {
-			clock_t begin = clock();
-			_cgalNefModel.transform(transformation);
-			clock_t end = clock();
-			double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-			std::cout << "Transform: " << elapsed_secs << std::endl;
-		}
+		static void simplifyCgalModel(Polyhedron_3 &polyhedron, int numEdges);
 
 
 	private:
@@ -106,9 +84,9 @@ namespace pbs17 {
 
 		//! Generated geometry which represents the convex-hull in OSG.
 		osg::ref_ptr<osg::Geometry> _osgModel;
+
 		//! Generated geometry which represents the convex-hull in CGAL.
 		Polyhedron_3 _cgalModel;
-		Nef_Polyhedron_3 _cgalNefModel;
 
 	};
 }

@@ -39,22 +39,7 @@ void ConvexHull3D::init(osg::Vec3Array* vertices) {
 
 	// Define polyhedron to hold convex hull and compute convex hull of non-collinear points
 	CGAL::convex_hull_3(points.begin(), points.end(), _cgalModel);
-	
-	std::cout << "\nStart...\n"
-		<< (_cgalModel.size_of_halfedges() / 2) << " final edges.\n";
-	
-	SMS::Count_stop_predicate<Polyhedron_3> stop(100);
-	int r = SMS::edge_collapse (_cgalModel
-		, stop
-		, CGAL::parameters::vertex_index_map(get(CGAL::vertex_external_index, _cgalModel))
-		.halfedge_index_map(get(CGAL::halfedge_external_index, _cgalModel))
-		.get_cost(SMS::Edge_length_cost <Polyhedron_3>())
-		.get_placement(SMS::Midpoint_placement<Polyhedron_3>())
-	);
-
-	std::cout << "\nFinished...\n" << r << " edges removed.\n"
-		<< (_cgalModel.size_of_halfedges() / 2) << " final edges.\n";
-	_cgalNefModel = Nef_Polyhedron_3(_cgalModel);
+	simplifyCgalModel(_cgalModel, 200);
 
 	// Vectors to store the vertices and faces of the convex-hull
 	osg::ref_ptr<osg::Vec3Array> convexVertices = new osg::Vec3Array;
@@ -89,4 +74,22 @@ void ConvexHull3D::init(osg::Vec3Array* vertices) {
 	_osgModel = new osg::Geometry;
 	_osgModel->setVertexArray(convexVertices);
 	_osgModel->addPrimitiveSet(convexFaces);
+}
+
+
+void ConvexHull3D::simplifyCgalModel(Polyhedron_3& polyhedron, int numEdges) {
+	std::cout << "\nStart with "
+		<< (polyhedron.size_of_halfedges() / 2) << "  edges." << std::endl;
+
+	SMS::Count_stop_predicate<Polyhedron_3> stop(numEdges);
+	int r = SMS::edge_collapse(polyhedron,
+		stop,
+		CGAL::parameters::vertex_index_map(get(CGAL::vertex_external_index, polyhedron))
+		.halfedge_index_map(get(CGAL::halfedge_external_index, polyhedron))
+		.get_cost(SMS::Edge_length_cost <Polyhedron_3>())
+		.get_placement(SMS::Midpoint_placement<Polyhedron_3>())
+	);
+
+	std::cout << "\nFinished...\n" << r << " edges removed."
+		<< (polyhedron.size_of_halfedges() / 2) << " final edges." << std::endl;
 }

@@ -195,8 +195,9 @@ void CollisionManager::narrowPhase(std::vector<std::pair<SpaceObject *, SpaceObj
 		} else {
 			std::vector<Eigen::Vector3d> convexHullP1 = collision[i].first->getConvexHull();
 			std::vector<Eigen::Vector3d> convexHullP2 = collision[i].second->getConvexHull();
+			Eigen::Vector3d normal;
 
-			if (GjkAlgorithm::intersect(convexHullP1, convexHullP2)) {
+			if (GjkAlgorithm::intersect(convexHullP1, convexHullP2, normal)) {
 				collision[i].first->setCollisionState(2);
 				collision[i].second->setCollisionState(2);
 			} else {
