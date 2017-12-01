@@ -3,20 +3,72 @@
 #include <Eigen/Core>
 
 namespace pbs17 {
+	const double EPS = 0.00001;
+
+	/**
+	 * \brief Check if two vectors are lookin in the same direction (+/- 90 degrees)
+	 * 
+	 * \param v1
+	 *      Vector 1 to compare with.
+	 * \param v2
+	 *      Vector 2 to compare with.
+	 * 
+	 * \return True the direction of both vectors is the same.
+	 */
 	inline bool isSameDirection(Eigen::Vector3d v1, Eigen::Vector3d v2) {
 		return v1.dot(v2) > 0;
 	}
 
+
+	/**
+	 * \brief Check if two vectors are lookin in the opposite direction (+/- 90 degrees)
+	 *
+	 * \param v1
+	 *      Vector 1 to compare with.
+	 * \param v2
+	 *      Vector 2 to compare with.
+	 * 
+	 * \return True the direction of both vectors is the opposite.
+	 */
 	inline bool isOppositeDirection(Eigen::Vector3d v1, Eigen::Vector3d v2) {
 		return v1.dot(v2) < 0;
 	}
 
+
+	/**
+	 * \brief Get the normal of a plane given three points which lies on the plane.
+	 * 
+	 * \param a
+	 *      1st point on the plane.
+	 * \param b
+	 *      2nd point on the plane.
+	 * \param c
+	 *      3th point on the plane.
+	 *      
+	 * \return Normal of the plane. This is not normalized so that it can be reused to generate the plane equation.
+	 */
 	inline Eigen::Vector3d getNormalFromPoints(Eigen::Vector3d a, Eigen::Vector3d b, Eigen::Vector3d c) {
-		return (a - b).cross(c - b);
+		Eigen::Vector3d v1 = a - b;
+		Eigen::Vector3d v2 = c - b;
+		return v1.cross(v2);
 	}
 
+
+	/**
+	 * \brief Get the barycentric point on the triangle to calculate the intersection point.
+	 * 
+	 * \param p
+	 *      Point which lies on the triangle/face.
+	 * \param a
+	 *      1st point/vertex of the triangle/face.
+	 * \param b
+	 *      2nd point/vertex of the triangle/face.
+	 * \param c
+	 *      3th point/vertex of the triangle/face.
+	 * 
+	 * \return Coordinates in the world-system of the intersection.
+	 */
 	inline Eigen::Vector3d barycentric(const Eigen::Vector3d &p, const Eigen::Vector3d &a, const Eigen::Vector3d &b, const Eigen::Vector3d &c) {
-		// code from Crister Erickson's Real-Time Collision Detection
 		Eigen::Vector3d v0 = b - a, v1 = c - a, v2 = p - a;
 		double d00 = v0.dot(v0);
 		double d01 = v0.dot(v1);

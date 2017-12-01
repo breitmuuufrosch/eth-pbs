@@ -5,40 +5,88 @@
 namespace pbs17 {
 	class Face {
 	public:
+		/**
+		 * \brief Empty constructor.
+		 */
 		Face()
-			: Face(Eigen::Vector3i(0, 0, 0), std::vector<Eigen::Vector3d>(), 0, Eigen::Vector3d(1, 0, 0)) {}
+			: Face(std::vector<Eigen::Vector3d>(), 0, Eigen::Vector3d(1, 0, 0)) {}
 
-		Face(Eigen::Vector3i indices, std::vector<Eigen::Vector3d> vertices, double distance, Eigen::Vector3d normal)
-			: _indices(indices), _vertices(vertices), _distance(distance), _normal(normal) {}
 
-		Eigen::Vector3i getIndices() const {
-			return _indices;
-		}
+		/**
+		 * \brief Constructor to initialize all values.
+		 * 
+		 * \param vertices
+		 *      The three vertices of the face.
+		 * \param distance
+		 *	    Distance from the face to the zero-point.
+		 * \param normal
+		 *      Normal of the face. (poinring outside)
+		 */
+		Face(std::vector<Eigen::Vector3d> vertices, double distance, Eigen::Vector3d normal)
+			: _vertices(vertices), _distance(distance), _normal(normal) {}
 
-		void setIndices(const Eigen::Vector3i indices) {
-			_indices = indices;
-		}
 
+
+		/**
+		 * \brief Get a single vertex by the position.
+		 * 
+		 * \param pos
+		 *      Position of the vertex in the tiangle-definition.
+		 * 
+		 * \return Vertex at given position in the triangle.
+		 */
 		Eigen::Vector3d getVertex(const int pos) const {
 			return _vertices[pos];
 		}
 
+
+		/**
+		 * \brief Set all vertices at once.
+		 * 
+		 * \param vertices
+		 *      New vertices of the triangle.
+		 */
 		void setVertices(const std::vector<Eigen::Vector3d> vertices) {
 			_vertices = vertices;
 		}
 
+
+		/**
+		 * \brief Get distance of the triangle to the origin.
+		 * 
+		 * \return Distance between the triangle and the origin.
+		 */
 		double getDistance() const {
 			return _distance;
 		}
 
+
+		/**
+		 * \brief Set distance of the triangle to the origin.
+		 * 
+		 * \param distance
+		 *      Distance between the triangle and the origin.
+		 */
 		void setDistance(const double distance) {
 			_distance = distance;
 		}
 
+		
+		/**
+		 * \brief Get the normal of the triangle.
+		 * 
+		 * \return Normal of the triangle (normalized).
+		 */
 		Eigen::Vector3d getNormal() const {
 			return _normal;
 		}
 
+		
+		/**
+		 * \brief Set the normal of the triangle.
+		 * 
+		 * 
+		 */
 		void setNormal(const Eigen::Vector3d normal) {
 			_normal = normal;
 		}

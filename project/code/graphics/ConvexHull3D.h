@@ -73,6 +73,8 @@ namespace pbs17 {
 
 		static void simplifyCgalModel(Polyhedron_3 &polyhedron, int numEdges);
 
+		static void fromPolyhedron(Polyhedron_3 &convexHull, osg::ref_ptr<osg::Geometry> &geometry, std::vector<Eigen::Vector3d> &vertices);
+
 
 	private:
 

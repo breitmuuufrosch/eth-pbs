@@ -39,41 +39,9 @@ void ConvexHull3D::init(osg::Vec3Array* vertices) {
 
 	// Define polyhedron to hold convex hull and compute convex hull of non-collinear points
 	CGAL::convex_hull_3(points.begin(), points.end(), _cgalModel);
-	simplifyCgalModel(_cgalModel, 200);
+	simplifyCgalModel(_cgalModel, 300);
 
-	// Vectors to store the vertices and faces of the convex-hull
-	osg::ref_ptr<osg::Vec3Array> convexVertices = new osg::Vec3Array;
-	osg::ref_ptr<osg::DrawElementsUInt> convexFaces = new osg::DrawElementsUInt(GL_TRIANGLES);
-	_faces.resize(_cgalModel.size_of_facets(), 3);
-
-	// Set the index of each vertex and add it to the convex-hull-vertices (osg)
-	unsigned int index = 0;
-	for (Vertex_iterator v = _cgalModel.vertices_begin(); v != _cgalModel.vertices_end(); ++v, ++index) {
-		v->id() = index;
-		Point_3 vertex = v->point();
-		convexVertices->push_back(osg::Vec3(CGAL::to_double(vertex[0]), CGAL::to_double(vertex[1]), CGAL::to_double(vertex[2])));
-		_vertices.push_back(Eigen::Vector3d(CGAL::to_double(vertex[0]), CGAL::to_double(vertex[1]), CGAL::to_double(vertex[2])));
-	}
-
-	// Store each face of the convex-hull
-	unsigned int row = 0;
-	for (Facet_iterator pFacet = _cgalModel.facets_begin(); pFacet != _cgalModel.facets_end(); ++pFacet) {
-		unsigned int col = 0;
-		Halfedge_around_facet_circulator pHalfedge = pFacet->facet_begin();
-
-		do {
-			_faces(row, col) = pHalfedge->vertex()->id();
-			convexFaces->push_back(pHalfedge->vertex()->id());
-			++col;
-		} while (++pHalfedge != pFacet->facet_begin());
-
-		++row;
-	}
-
-	// Create the osg-entity which represents the convex-hull
-	_osgModel = new osg::Geometry;
-	_osgModel->setVertexArray(convexVertices);
-	_osgModel->addPrimitiveSet(convexFaces);
+	fromPolyhedron(_cgalModel, _osgModel, _vertices);
 }
 
 
@@ -90,6 +58,45 @@ void ConvexHull3D::simplifyCgalModel(Polyhedron_3& polyhedron, int numEdges) {
 		.get_placement(SMS::Midpoint_placement<Polyhedron_3>())
 	);
 
-	std::cout << "\nFinished...\n" << r << " edges removed."
+	std::cout << "\nFinished...\n" << r << " edges removed. "
 		<< (polyhedron.size_of_halfedges() / 2) << " final edges." << std::endl;
+}
+
+
+void ConvexHull3D::fromPolyhedron(Polyhedron_3 &convexHull, osg::ref_ptr<osg::Geometry> &geometry, std::vector<Eigen::Vector3d> &vertices) {
+	// Reset output-parameters
+	geometry = new osg::Geometry;
+	vertices.resize(0);
+
+	// Vectors to store the vertices and faces of the convex-hull
+	osg::ref_ptr<osg::Vec3Array> convexVertices = new osg::Vec3Array;
+	osg::ref_ptr<osg::DrawElementsUInt> convexFaces = new osg::DrawElementsUInt(GL_TRIANGLES);
+
+	// Set the index of each vertex and add it to the convex-hull-vertices (osg)
+	unsigned int index = 0;
+	for (Vertex_iterator v = convexHull.vertices_begin(); v != convexHull.vertices_end(); ++v, ++index) {
+		v->id() = index;
+		Point_3 vertex = v->point();
+
+		convexVertices->push_back(osg::Vec3(CGAL::to_double(vertex[0]), CGAL::to_double(vertex[1]), CGAL::to_double(vertex[2])));
+		vertices.push_back(Eigen::Vector3d(CGAL::to_double(vertex[0]), CGAL::to_double(vertex[1]), CGAL::to_double(vertex[2])));
+	}
+
+	// Store each face of the convex-hull
+	unsigned int row = 0;
+	for (Facet_iterator pFacet = convexHull.facets_begin(); pFacet != convexHull.facets_end(); ++pFacet) {
+		unsigned int col = 0;
+		Halfedge_around_facet_circulator pHalfedge = pFacet->facet_begin();
+
+		do {
+			convexFaces->push_back(pHalfedge->vertex()->id());
+			++col;
+		} while (++pHalfedge != pFacet->facet_begin());
+
+		++row;
+	}
+
+	// Create the osg-entity which represents the convex-hull
+	geometry->setVertexArray(convexVertices);
+	geometry->addPrimitiveSet(convexFaces);
 }

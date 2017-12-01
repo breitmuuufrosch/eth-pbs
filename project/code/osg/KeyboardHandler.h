@@ -11,7 +11,7 @@ namespace pbs17 {
 			: _sceneManager(objects), _showBoundingBox(true), _showConvexHull(true) {}
 
 
-		virtual bool handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter&) {
+		bool handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter&) override {
 			switch (ea.getEventType()) {
 			case(osgGA::GUIEventAdapter::KEYDOWN):
 			{

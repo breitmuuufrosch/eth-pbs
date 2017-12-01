@@ -6,6 +6,12 @@
 namespace pbs17 {
 	class Collision {
 	public:
+		Collision()
+			: Collision(NULL, NULL) {}
+
+		Collision(SpaceObject* first, SpaceObject* second)
+			: _firstObject(first), _secondObject(second) {}
+
 		SpaceObject* getFirstObject() const {
 			return _firstObject;
 		}
@@ -56,6 +62,7 @@ namespace pbs17 {
 
 
 	private:
+
 		//! Pointer to the first colliding object
 		SpaceObject* _firstObject;
 		//! Pointer to the second colliding object

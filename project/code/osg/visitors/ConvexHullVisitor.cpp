@@ -9,7 +9,6 @@
 #include "ConvexHullVisitor.h"
 
 #include <iostream>
-#include <vector>
 
 #include <osg/Geometry>
 

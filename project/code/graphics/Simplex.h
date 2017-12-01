@@ -1,11 +1,11 @@
 #pragma once
 
 #include <algorithm>
+#include <vector>
 
 #include <Eigen/Core>
 
 #include "Face.h"
-#include "Geometry.h"
 #include "Edge.h"
 
 namespace pbs17 {
@@ -15,163 +15,155 @@ namespace pbs17 {
 	 */
 	class Simplex {
 	public:
-		int count() {
+		/**
+		 * \brief Constructor.
+		 * 
+		 * \param vertices
+		 *      List of vertices which forms the simplex at the beginning.
+		 */
+		Simplex(std::vector<Eigen::Vector3d> vertices)
+			: _vertices(vertices) {}
+
+
+		/**
+		 * \brief Get the size of the simplex, which defines the shape of it (line, triangle or tetrahedron).
+		 * 
+		 * \return Size of the simplex points.
+		 */
+		size_t count() const {
 			return _vertices.size();
 		}
 
+
+		/**
+		 * \brief Access vertices directly with the [] operator.
+		 * 
+		 * \param i
+		 *      Position of the wanted vertex.
+		 * 
+		 * \return Vertex at position i.
+		 */
 		Eigen::Vector3d operator[](int i) {
 			return _vertices[i];
 		}
 
-		Simplex(std::vector<Eigen::Vector3d> vertices)
-			: _vertices(vertices) {}
 
+		/**
+		 * \brief Add a new vertex.
+		 * 
+		 * \param v
+		 *      New vertex of the simplex.
+		 */
 		void add(Eigen::Vector3d v) {
 			_vertices.push_back(v);
 		}
 
+
+		/**
+		 * \brief Remove an existing vertex.
+		 * 
+		 * \param v
+		 *      Vertex to remove off the simplex.
+		 */
 		void remove(Eigen::Vector3d v) {
 			_vertices.erase(std::remove(_vertices.begin(), _vertices.end(), v));
 		}
 
-		void triangulate() {
-			switch (_vertices.size()) {
-			case 2:
-			{
-				Eigen::Vector3d o = Eigen::Vector3d(0, 0, 0);
-				Eigen::Vector3d a = _vertices[0];
-				Eigen::Vector3d b = _vertices[1];
-				Eigen::Vector3d toC = (a - b).cross(o - b);
-				_vertices.push_back(a + toC);
 
-				if (isCorrectOrder(0, 1, 2, o))
-				{
-					_triangles.push_back(Eigen::Vector3i(0, 1, 2));
-				} else {
-					_triangles.push_back(Eigen::Vector3i(0, 2, 1));
-				}
+		/**
+		 * \brief Triangulate the simplex. The triangulation is done so that all faces/normals
+		 * point outwards.
+		 */
+		void triangulate();
 
-				break;
-			}
-			case 3:
-			{
-				Eigen::Vector3d o = Eigen::Vector3d(0, 0, 0);
 
-				if (isCorrectOrder(0, 1, 2, o)) {
-					_triangles.push_back(Eigen::Vector3i(0, 1, 2));
-				} else {
-					_triangles.push_back(Eigen::Vector3i(0, 2, 1));
-				}
+		/**
+		 * \brief Only in EPA: Find the closest face to the origin
+		 * TODO: Fix bug => closest face to origin does not need to be the one where the origin is not included!!!
+		 * 
+		 * \return The face with all needed information for EPA.
+		 */
+		Face findClosestFace();
 
-				break;
-			}
-			case 4:
-			{
-				if (isCorrectOrder(0, 1, 2, 3)) {
-					_triangles.push_back(Eigen::Vector3i(0, 1, 2));
-				} else {
-					_triangles.push_back(Eigen::Vector3i(0, 2, 1));
-				}
 
-				if (isCorrectOrder(0, 1, 3, 2)) {
-					_triangles.emplace_back(Eigen::Vector3i(0, 1, 3));
-				} else {
-					_triangles.push_back(Eigen::Vector3i(0, 3, 1));
-				}
-
-				if (isCorrectOrder(0, 2, 3, 1)) {
-					_triangles.push_back(Eigen::Vector3i(0, 2, 3));
-				} else {
-					_triangles.push_back(Eigen::Vector3i(0, 3, 2));
-				}
-
-				if (isCorrectOrder(1, 2, 3, 0)) {
-					_triangles.push_back(Eigen::Vector3i(1, 2, 3));
-				} else {
-					_triangles.push_back(Eigen::Vector3i(1, 3, 2));
-				}
-				break;
-			}
-			}
-		}
-
-		Face findClosestFace() {
-			Face closest;
-			closest.setDistance(DBL_MAX);
-
-			for (int i = 0; i < _triangles.size(); ++i) {
-				Eigen::Vector3d a = _vertices[_triangles[i].x()];
-				Eigen::Vector3d b = _vertices[_triangles[i].y()];
-				Eigen::Vector3d c = _vertices[_triangles[i].z()];
-				Eigen::Vector3d normal = getNormalFromPoints(a, b, c);
-				double d = -normal.dot(a);
-
-				double distance = abs(d / normal.norm());
-
-				if (distance < closest.getDistance()) {
-					closest.setDistance(distance);
-					closest.setNormal(normal.normalized());
-					closest.setIndices(_triangles[i]);
-					closest.setVertices({ a, b, c });
-				}
-			}
-
-			return closest;
-		}
-
-		void extend(Eigen::Vector3d v) {
-			std::vector<Eigen::Vector3i> newTriangles;
-			std::vector<Edge> edges;
-			int newVertexPosition = _vertices.size();
-			_vertices.push_back(v);
-
-			for (int i = 0; i < _triangles.size(); ++i) {
-				int a = _triangles[i].x();
-				int b = _triangles[i].y();
-				int c = _triangles[i].z();
-				Eigen::Vector3d normal = getNormalFromPoints(_vertices[a], _vertices[b], _vertices[c]);
-
-				// Point is visible by face
-				if (isSameDirection(normal, v - _vertices[a])) {
-					addEdge(edges, a, b);
-					addEdge(edges, b, c);
-					addEdge(edges, c, a);
-				} else {
-					newTriangles.push_back(_triangles[i]);
-				}
-			}
-
-			for (int i = 0; i < edges.size(); ++i) {
-				newTriangles.push_back(Eigen::Vector3i(newVertexPosition, edges[i].getA(), edges[i].getB()));
-			}
-
-			_triangles = newTriangles;
-		}
-
-		bool isCorrectOrder(int a, int b, int c, int opposite) {
-			return isCorrectOrder(a, b, c, _vertices[opposite]);
-		}
-
-		bool isCorrectOrder(int a, int b, int c, Eigen::Vector3d opposite) {
-			Eigen::Vector3d normal = getNormalFromPoints(_vertices[a], _vertices[b], _vertices[c]);
-			Eigen::Vector3d height = opposite - _vertices[a];
-
-			return isSameDirection(normal, height);
-		}
-
-		static void addEdge(std::vector<Edge> &edges, int a, int b) {
-			for (int i = 0; i < edges.size(); ++i) {
-				if (edges[i].getA() == b && edges[i].getB() == a) {
-					edges.erase(edges.begin() + i);
-					return;
-				}
-			}
-
-			edges.push_back(Edge(a, b));
-		}
+		/**
+		 * \brief Only in EPA: Extend the triangulated simplex with a new point. All triangles which are
+		 * visible to the point will be removed and replaced by new ones including the new point.
+		 * 
+		 * \param v
+		 *      New point to extend the triangulated simplex.
+		 *      
+		 * \return True if the simplex has been extended successfully, false otherwise.
+		 */
+		bool extend(Eigen::Vector3d v);
 
 	private:
+
+		//! All vertices which are used to define the simplex.
 		std::vector<Eigen::Vector3d> _vertices;
+
+		//! All triangles which are used to define the simplex. (counter-clockwise)
 		std::vector<Eigen::Vector3i> _triangles;
+
+
+		/**
+		 * \brief Check if the polygon defined by vertices a, b and c (in this order) is pointing outwards.
+		 * 
+		 * \param a
+		 *      Index of 1st vertex.
+		 * \param b
+		 *      Index of 2nd vertex.
+		 * \param c
+		 *      Index of 3rd vertex.
+		 * \param opposite
+		 *      Index of the opposite vertex (4th vertex) to check if the normal is pointing outwards.
+		 */
+		bool isCorrectOrder(int a, int b, int c, int opposite);
+
+
+		/**
+		 * \brief Check if the polygon defined by vertices a, b and c (in this order) is pointing outwards.
+		 *
+		 * \param a
+		 *      Index of 1st vertex.
+		 * \param b
+		 *      Index of 2nd vertex.
+		 * \param c
+		 *      Index of 3rd vertex.
+		 * \param opposite
+		 *      Index of the opposite vertex (4th vertex) to check if the normal is pointing outwards.
+		 */
+		bool isCorrectOrder(int a, int b, int c, Eigen::Vector3d opposite);
+
+
+		/**
+		 * \brief Only EPA: while removing the triangles which are seen by the added point, this keeps track
+		 * of the deleted edges. As soon as one edge is added a second time but in the opposite direction,
+		 * we know the edge is connecting two triangles which are both removed, so we can simply remove this
+		 * edge as well and no longer keep track of it.
+		 * 
+		 * \param edges
+		 *      List of all observed (potentially removed) edges.
+		 * \param a
+		 *      Index of the start-vertex.
+		 * \param b
+		 *      Index of the end-vertex.
+		 */
+		static void addEdge(std::vector<Edge> &edges, int a, int b);
+
+
+		/**
+		 * \brief Print the matlab-code in the console for the current simplex to plot in 3D.
+		 */
+		void printMatlabPlot() const;
+
+
+		/**
+		 * \brief Print the matlab-code in the console for the current simplex to plot in 3D.
+		 * 
+		 * \param closest
+		 *      Print the face in the matlab-plot with a special color to see which is the closest to the origin.
+		 */
+		void printMatlabPlot(Face &closest) const;
 	};
 }

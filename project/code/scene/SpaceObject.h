@@ -6,7 +6,6 @@
 #include <osg/BoundingBox>
 #include <osg/ShapeDrawable>
 #include <json.hpp>
-#include <string>
 
 #include "../osg/visitors/BoundingBoxVisitor.h"
 #include "../osg/OsgEigenConversions.h"
@@ -175,7 +174,7 @@ namespace pbs17 {
 
 		void setCollisionState(int c);
 
-		const std::vector<Eigen::Vector3d> getConvexHull() const
+		std::vector<Eigen::Vector3d> getConvexHull() const
 		{
 			// Todo: use Eigen-transformations instead
 			osg::Matrix translation = osg::Matrix::translate(toOsg(_position));

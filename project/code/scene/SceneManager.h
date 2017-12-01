@@ -3,15 +3,14 @@
 #include <osg/Group>
 #include <osgViewer/Viewer>
 #include <boost/program_options.hpp>
-#include <string>
 #include <json.hpp>
 
 #include "SpaceObject.h"
 
 using namespace boost::program_options;
 using json = nlohmann::json;
-namespace pbs17
-{
+
+namespace pbs17 {
 	/**
 	 * \brief Load the objects for the scene and keep track of them.
 	 */
@@ -41,12 +40,45 @@ namespace pbs17
 		 */
 		osg::ref_ptr<osg::Node> loadScene();
 
-
+		
+		/**
+		 * \brief Load the scene based on the input parameters.
+		 * 
+		 * \param vm
+		 *      Input parameters which have been passed by starting the program.
+		 */
         osg::ref_ptr<osg::Node> loadScene(variables_map vm);
+
+
+		/**
+		 * \brief Load the scene based on the specified json-file.
+		 *
+		 * \param j
+		 *      Loaded json-file.
+		 */
         osg::ref_ptr<osg::Node> loadScene(json j);
 
-        std::vector<Eigen::Vector2d> getSamples(int pointCount, bool random);
-        std::vector<Eigen::Vector3d> getSamples3(int pointCount, bool random);
+
+		/**
+		 * \brief Get multiple random samples in the 2d-space.
+		 *
+		 * \param pointCount
+		 *      Number of random 2d-samples.
+		 * \param random
+		 *      Use a random generator (true) or align the samples uniformly on the border.
+		 */
+        std::vector<Eigen::Vector2d> getSamples(int pointCount, bool random) const;
+
+
+		/**
+		 * \brief Get multiple random samples in the 3d-space.
+		 * 
+		 * \param pointCount
+		 *      Number of random 3d-samples.
+		 * \param random
+		 *      Use a random generator (true) or align the samples uniformly on the border.
+		 */
+        std::vector<Eigen::Vector3d> getSamples3(int pointCount, bool random) const;
 
 
 		/**
@@ -72,11 +104,6 @@ namespace pbs17
 
 	private:
 
-        void addSkybox();
-
-        void sphereEmitter(int spheres, int asteroids, bool random);
-        void cubeEmitter(int spheres, int asteroids, bool random);
-
 		//! Root-node of OSG which contains the whole scene (used for rendering)
 		osg::ref_ptr<osg::Group> _scene;
 
@@ -84,5 +111,33 @@ namespace pbs17
 		std::vector<SpaceObject*> _spaceObjects;
 
         const double DEFAULT_MASS = 500000;
+
+
+		/**
+		 * \brief Add the skybox to the scene.
+		 */
+		void addSkybox();
+
+
+		/**
+		* \brief Emmits the number of specified planets and asteroids. The space-objects are aligned in a sphere.
+		*
+		* \param planets
+		*      Number of planets on the scene.
+		* \param asteroids
+		*      Number of asteroids on the scene.
+		*/
+		void sphereEmitter(int planets, int asteroids, bool random);
+
+
+		/**
+		* \brief Emmits the number of specified planets and asteroids. The space-objects are aligned in a cube.
+		*
+		* \param planets
+		*      Number of planets on the scene.
+		* \param asteroids
+		*      Number of asteroids on the scene.
+		*/
+		void cubeEmitter(int planets, int asteroids, bool random);
 	};
 }

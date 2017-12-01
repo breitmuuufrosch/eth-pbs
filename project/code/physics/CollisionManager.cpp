@@ -1,9 +1,13 @@
 #include "CollisionManager.h"
 
 #include <iostream>
+
 #include <Eigen/Core>
+// ReSharper disable CppUnusedIncludeDirective
 #include <Eigen/LU>
 #include <Eigen/Dense>
+// ReSharper restore CppUnusedIncludeDirective
+
 #include "../graphics/GjkAlgorithm.h"
 
 
@@ -117,9 +121,9 @@ void CollisionManager::broadPhase(std::vector<std::pair<SpaceObject *, SpaceObje
 	std::sort(resX.begin(), resX.end());
 	std::sort(resY.begin(), resY.end());
 	std::sort(resZ.begin(), resZ.end());
-	std::cout << "Collisions: " << resX.size()
-		<< ", " << resY.size()
-		<< ", " << resZ.size() << std::endl;
+	//std::cout << "Collisions: " << resX.size()
+	//	<< ", " << resY.size()
+	//	<< ", " << resZ.size() << std::endl;
 
 	std::vector<std::pair<SpaceObject *, SpaceObject *>> resXY;
 
@@ -131,7 +135,7 @@ void CollisionManager::broadPhase(std::vector<std::pair<SpaceObject *, SpaceObje
 		std::back_inserter(res));
 
 	if (res.size() > 0) {
-		std::cout << "Possible collisions: " << res.size() << std::endl;
+		//std::cout << "Possible collisions: " << res.size() << std::endl;
 	}
 }
 
@@ -209,6 +213,7 @@ void CollisionManager::narrowPhase(std::vector<std::pair<SpaceObject *, SpaceObj
 	}
 }
 
+
 Matrix3d CollisionManager::getOrthonormalBasis(Vector3d v) {
 	Vector3d firstTangent;
 	Vector3d secondTangent;
@@ -221,28 +226,28 @@ Matrix3d CollisionManager::getOrthonormalBasis(Vector3d v) {
 		firstTangent.normalize();
 
 		secondTangent[0] = v[1] * firstTangent[0];
-		secondTangent[1] = v[2]*firstTangent[0] - v[0]*firstTangent[2];
+		secondTangent[1] = v[2] * firstTangent[0] - v[0] * firstTangent[2];
 		secondTangent[2] = -v[1] * firstTangent[0];
-	}
-	else {
+	} else {
 		firstTangent[0] = 0;
 		firstTangent[1] = -v[2];
 		firstTangent[2] = v[1];
 
 		firstTangent.normalize();
 
-		secondTangent[0] = v[1]*firstTangent[2] - v[2]*firstTangent[1];
+		secondTangent[0] = v[1] * firstTangent[2] - v[2] * firstTangent[1];
 		secondTangent[1] = -v[0] * firstTangent[2];
 		secondTangent[2] = v[0] * firstTangent[1];
 	}
 
 	Matrix3d result;
 	result << v[0], firstTangent[0], secondTangent[0],
-			  v[1], firstTangent[1], secondTangent[1],
-			  v[2], firstTangent[2], secondTangent[2];
+		v[1], firstTangent[1], secondTangent[1],
+		v[2], firstTangent[2], secondTangent[2];
 
 	return result;
 }
+
 
 void CollisionManager::respondToCollisions() {
 	while (!_collisionQueue.empty()) {
