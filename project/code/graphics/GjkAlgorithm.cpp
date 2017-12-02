@@ -103,7 +103,7 @@ Eigen::Vector3d GjkAlgorithm::support(std::vector<Eigen::Vector3d>& convex1, std
  * \return Furthest point.
  */
 Eigen::Vector3d GjkAlgorithm::getFurthestPoint(std::vector<Eigen::Vector3d>& convex, Eigen::Vector3d direction) {
-	double max = -DBL_MAX;
+	double max = -std::numeric_limits<double>::max();
 	Eigen::Vector3d maxV(0, 0, 0);
 
 	for (unsigned int i = 0; i < convex.size(); ++i) {

@@ -79,10 +79,10 @@ void Simplex::triangulate() {
  */
 Face Simplex::findClosestFace() {
 	Face closest;
-	closest.setDistance(DBL_MAX);
+	closest.setDistance(std::numeric_limits<double>::max());
 
 	// Check each face if it is the closest or not.
-	for (int i = 0; i < _triangles.size(); ++i) {
+	for (unsigned int i = 0; i < _triangles.size(); ++i) {
 		Eigen::Vector3d a = _vertices[_triangles[i].x()];
 		Eigen::Vector3d b = _vertices[_triangles[i].y()];
 		Eigen::Vector3d c = _vertices[_triangles[i].z()];
@@ -201,7 +201,7 @@ bool Simplex::isCorrectOrder(int a, int b, int c, Eigen::Vector3d opposite) {
  *      Index of the end-vertex.
  */
 void Simplex::addEdge(std::vector<Edge>& edges, int a, int b) {
-	for (int i = 0; i < edges.size(); ++i) {
+	for (unsigned int i = 0; i < edges.size(); ++i) {
 		if (edges[i].getA() == b && edges[i].getB() == a) {
 			edges.erase(edges.begin() + i);
 			return;
@@ -221,7 +221,7 @@ void Simplex::printMatlabPlot() const
 	std::string y_0 = "", y_1 = "", y_2 = "";
 	std::string z_0 = "", z_1 = "", z_2 = "";
 
-	for (int i = 0; i < _triangles.size(); ++i) {
+	for (unsigned int i = 0; i < _triangles.size(); ++i) {
 		Eigen::Vector3d a = _vertices[_triangles[i].x()];
 		Eigen::Vector3d b = _vertices[_triangles[i].y()];
 		Eigen::Vector3d c = _vertices[_triangles[i].z()];
@@ -256,7 +256,7 @@ void Simplex::printMatlabPlot(Face &closest) const {
 	std::string y_0 = "", y_1 = "", y_2 = "";
 	std::string z_0 = "", z_1 = "", z_2 = "";
 
-	for (int i = 0; i < _triangles.size(); ++i) {
+	for (unsigned int i = 0; i < _triangles.size(); ++i) {
 		Eigen::Vector3d a = _vertices[_triangles[i].x()];
 		Eigen::Vector3d b = _vertices[_triangles[i].y()];
 		Eigen::Vector3d c = _vertices[_triangles[i].z()];
