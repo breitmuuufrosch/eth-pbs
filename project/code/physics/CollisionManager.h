@@ -34,18 +34,19 @@ namespace pbs17 {
         void handleCollisions(double dt, std::vector<SpaceObject*> &spaceObjects);
 
     private:
-        //! All space-objects in the scene
+
         void broadPhase(std::vector<std::pair<SpaceObject *, SpaceObject *>> &res);
-        void narrowPhase(std::vector<std::pair<SpaceObject *, SpaceObject *>> &collision);
+        void narrowPhase(std::vector<std::pair<SpaceObject *, SpaceObject *>> &collisions);
         void insertionSort(std::vector<SpaceObject *> &A, int dim) const;
 		void respondToCollisions();
 
-        bool checkIntersection(Planet *p1, Planet *p2);
-        void response(Planet *p1, Planet *p2);
+	    static bool checkIntersection(Planet *p1, Planet *p2);
+	    static void response(Planet *p1, Planet *p2);
 	    static void pruneAndSweep(std::vector<SpaceObject*> &A, int dim, std::vector<std::pair<SpaceObject *, SpaceObject *>> &res);
 
-		Eigen::Matrix3d getOrthonormalBasis(Eigen::Vector3d v);
+		static Eigen::Matrix3d getOrthonormalBasis(Eigen::Vector3d v);
 
+        //! All space-objects in the scene
         std::vector<SpaceObject*> _xList;
         std::vector<SpaceObject*> _yList;
         std::vector<SpaceObject*> _zList;

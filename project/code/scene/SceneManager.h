@@ -116,7 +116,7 @@ namespace pbs17 {
 		/**
 		 * \brief Add the skybox to the scene.
 		 */
-		void addSkybox();
+		void addSkybox() const;
 
 
 		/**

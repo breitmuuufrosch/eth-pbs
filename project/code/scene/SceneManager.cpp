@@ -342,7 +342,7 @@ void SceneManager::cubeEmitter(int planets, int asteroids, bool random) {
 /**
  * \brief Add the skybox to the scene.
  */
-void SceneManager::addSkybox() {
+void SceneManager::addSkybox() const {
 	osg::ref_ptr<osg::Drawable> skyDrawable = new osg::ShapeDrawable;
 	skyDrawable->setShape(new osg::Sphere(osg::Vec3(), 10));
 

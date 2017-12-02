@@ -7,7 +7,7 @@ namespace pbs17 {
 	class Collision {
 	public:
 		Collision()
-			: Collision(NULL, NULL) {}
+			: Collision(nullptr, nullptr) {}
 
 		Collision(SpaceObject* first, SpaceObject* second)
 			: _firstObject(first), _secondObject(second) {}
@@ -78,7 +78,7 @@ namespace pbs17 {
 	};
 
 	struct CollisionCompareLess {
-		bool operator() (Collision & lhs, Collision & rhs) {
+		bool operator() (Collision & lhs, Collision & rhs) const {
 			return lhs.getIntersectionVector().norm() < rhs.getIntersectionVector().norm();
 		}
 	};

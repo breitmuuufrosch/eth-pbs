@@ -23,7 +23,7 @@ using json = nlohmann::json;
 
 int main(int argc, const char *argv[]) {
     pbs17::SceneManager* sceneManager = new pbs17::SceneManager;
-    osg::ref_ptr<osg::Node> scene = NULL;
+    osg::ref_ptr<osg::Node> scene = nullptr;
 
 	std::cout << std::fixed << std::setprecision(6);
     variables_map vm;

@@ -175,6 +175,7 @@ namespace pbs17 {
 
 		std::vector<Eigen::Vector3d> getConvexHull() const {
 			// Todo: use Eigen-transformations instead
+			osg::Matrix scaling = osg::Matrix::scale(_scaling, _scaling, _scaling);
 			osg::Matrix translation = osg::Matrix::translate(toOsg(_position));
 			osg::Matrix rotation = osg::Matrixd::rotate(osg::Quat(_orientation[0], osg::X_AXIS, _orientation[1], osg::Y_AXIS, _orientation[2], osg::Z_AXIS));
 
@@ -182,10 +183,29 @@ namespace pbs17 {
 			std::vector<Eigen::Vector3d> current = _convexHull->getVertices();
 
 			for (unsigned int i = 0; i < current.size(); ++i) {
-				transformed.push_back(fromOsg(toOsg(current[i]) * rotation * translation));
+				transformed.push_back(fromOsg(toOsg(current[i]) * rotation * translation * scaling));
 			}
 
 			return transformed;
+		}
+
+		Eigen::Vector3d toWorld(Eigen::Vector3d v) const {
+			// Todo: use Eigen-transformations instead
+			osg::Matrix scaling = osg::Matrix::scale(_scaling, _scaling, _scaling);
+			osg::Matrix translation = osg::Matrix::translate(toOsg(_position));
+			osg::Matrix rotation = osg::Matrixd::rotate(osg::Quat(_orientation[0], osg::X_AXIS, _orientation[1], osg::Y_AXIS, _orientation[2], osg::Z_AXIS));
+
+			return fromOsg(toOsg(v) * rotation * translation * scaling);
+		}
+
+		Eigen::Vector3d toLocal(Eigen::Vector3d v) const {
+			// Todo: use Eigen-transformations instead
+			osg::Matrix scaling = osg::Matrix::scale(_scaling, _scaling, _scaling);
+			osg::Matrix translation = osg::Matrix::translate(toOsg(_position));
+			osg::Matrix rotation = osg::Matrixd::rotate(osg::Quat(_orientation[0], osg::X_AXIS, _orientation[1], osg::Y_AXIS, _orientation[2], osg::Z_AXIS));
+			osg::Matrix transform = rotation * translation * scaling;
+			transform.inverse(transform);
+			return fromOsg(toOsg(v) * transform);
 		}
 
 

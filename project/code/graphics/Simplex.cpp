@@ -10,6 +10,7 @@
 #include <Eigen/Core>
 // ReSharper disable once CppUnusedIncludeDirective
 #include <Eigen/Geometry>
+#include <limits>
 
 #include "Geometry.h"
 #include <iostream>

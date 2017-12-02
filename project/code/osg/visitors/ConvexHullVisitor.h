@@ -29,7 +29,7 @@ namespace pbs17 {
 			_globalTransform = globalTransform;
 
 			_vertices = new osg::Vec3Array;
-			_convexHull = NULL;;
+			_convexHull = nullptr;;
 			_isCalculated = false;
 		}
 

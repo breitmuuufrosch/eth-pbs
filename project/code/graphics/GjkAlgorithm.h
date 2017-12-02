@@ -79,6 +79,7 @@ namespace pbs17 {
 
 
 	private:
+
 		//! Choose a maximim number of iterations to avoid an infinite loop during a non-convergent search.
 		static const int MAX_ITERATIONS;
 
