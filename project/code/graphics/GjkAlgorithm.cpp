@@ -8,8 +8,10 @@
 #include "GjkAlgorithm.h"
 
 #include <Eigen/Core>
-// ReSharper disable once CppUnusedIncludeDirective
+// ReSharper disable CppUnusedIncludeDirective
 #include <Eigen/Geometry>
+#include <limits>
+// ReSharper restore CppUnusedIncludeDirective
 
 #include "Geometry.h"
 

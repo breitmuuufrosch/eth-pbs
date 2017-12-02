@@ -27,8 +27,8 @@ namespace pbs17 {
 		 * \param filename
 		 *      Relative location to the object-file. (Relative from the data-directory in the source).
 		 */
-        SpaceObject(std::string filename, int i);
-        SpaceObject(json j);
+		SpaceObject(std::string filename, int i);
+		SpaceObject(json j);
 
 
 		/**
@@ -91,8 +91,7 @@ namespace pbs17 {
 			return _convexRenderSwitch;
 		}
 
-		osg::ref_ptr<osg::MatrixTransform> getTranslation() const
-		{
+		osg::ref_ptr<osg::MatrixTransform> getTranslation() const {
 			return _translation;
 		}
 
@@ -174,25 +173,20 @@ namespace pbs17 {
 
 		void setCollisionState(int c);
 
-		std::vector<Eigen::Vector3d> getConvexHull() const
-		{
+		std::vector<Eigen::Vector3d> getConvexHull() const {
 			// Todo: use Eigen-transformations instead
 			osg::Matrix translation = osg::Matrix::translate(toOsg(_position));
 			osg::Matrix rotation = osg::Matrixd::rotate(osg::Quat(_orientation[0], osg::X_AXIS, _orientation[1], osg::Y_AXIS, _orientation[2], osg::Z_AXIS));
 
 			std::vector<Eigen::Vector3d> transformed;
-			std::vector<Eigen::Vector3d> current= _convexHull->getVertices();
+			std::vector<Eigen::Vector3d> current = _convexHull->getVertices();
 
-			for (int i = 0; i < current.size(); ++i) {
+			for (unsigned int i = 0; i < current.size(); ++i) {
 				transformed.push_back(fromOsg(toOsg(current[i]) * rotation * translation));
 			}
 
 			return transformed;
 		}
-
-		//const ConvexHull3D* getConvexHull() const {
-		//	return _convexHull;
-		//}
 
 
 	protected:
