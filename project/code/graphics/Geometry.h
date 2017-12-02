@@ -1,9 +1,19 @@
+﻿/**
+ * \brief Helper-functions for simple geometric calculations
+ *
+ * \Author: Alexander Lelidis (14-907-562), Andreas Emch (08-631-384), Uroš Tešić (17-950-346)
+ * \Date:   2017-11-29
+ */
+
 #pragma once
 
 #include <Eigen/Core>
 
 namespace pbs17 {
+
+	//! Define a small number number for a small threshold.
 	const double EPS = 0.00001;
+
 
 	/**
 	 * \brief Check if two vectors are lookin in the same direction (+/- 90 degrees)

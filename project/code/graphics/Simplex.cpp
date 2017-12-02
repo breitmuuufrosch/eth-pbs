@@ -1,3 +1,10 @@
+﻿/**
+ * \brief Representation of the simplex during the GJK-algorithm and EPA.
+ *
+ * \Author: Alexander Lelidis (14-907-562), Andreas Emch (08-631-384), Uroš Tešić (17-950-346)
+ * \Date:   2017-11-29
+ */
+
 #include "Simplex.h"
 
 #include <Eigen/Core>
@@ -66,14 +73,15 @@ void Simplex::triangulate() {
 
 
 /**
-* \brief Only in EPA: Find the closest face to the origin.
-*
-* \return The face with all needed information for EPA.
-*/
+ * \brief Only in EPA: Find the closest face to the origin.
+ *
+ * \return The face with all needed information for EPA.
+ */
 Face Simplex::findClosestFace() {
 	Face closest;
 	closest.setDistance(DBL_MAX);
 
+	// Check each face if it is the closest or not.
 	for (int i = 0; i < _triangles.size(); ++i) {
 		Eigen::Vector3d a = _vertices[_triangles[i].x()];
 		Eigen::Vector3d b = _vertices[_triangles[i].y()];
@@ -100,6 +108,8 @@ Face Simplex::findClosestFace() {
  *
  * \param v
  *      New point to extend the triangulated simplex.
+ * 
+ * \return True if the new vertex has been inserted; false otherwise (when vertex was already in the simplex)
  */
 bool Simplex::extend(Eigen::Vector3d v) {
 	if (std::find(_vertices.begin(), _vertices.end(), v) != _vertices.end()) {
@@ -111,7 +121,10 @@ bool Simplex::extend(Eigen::Vector3d v) {
 	int newVertexPosition = static_cast<int>(_vertices.size());
 	_vertices.push_back(v);
 
-	for (int i = 0; i < _triangles.size(); ++i) {
+	// Check each triangle if the new point is visible:
+	//  - yes: remove the trianlge and keep edge-information which edges to keep.
+	//  - no:  keep the triangle
+	for (unsigned int i = 0; i < _triangles.size(); ++i) {
 		int a = _triangles[i].x();
 		int b = _triangles[i].y();
 		int c = _triangles[i].z();
@@ -127,7 +140,8 @@ bool Simplex::extend(Eigen::Vector3d v) {
 		}
 	}
 
-	for (int i = 0; i < edges.size(); ++i) {
+	// Create new triangles based on the remaining edges and the new vertex.
+	for (unsigned int i = 0; i < edges.size(); ++i) {
 		newTriangles.push_back(Eigen::Vector3i(newVertexPosition, edges[i].getA(), edges[i].getB()));
 	}
 

@@ -1,8 +1,19 @@
+﻿/**
+ * \brief Helper-class to store the information of the triangles in the EPA.
+ *
+ * \Author: Alexander Lelidis (14-907-562), Andreas Emch (08-631-384), Uroš Tešić (17-950-346)
+ * \Date:   2017-11-29
+ */
+
 #pragma once
 
 #include <Eigen/Core>
 
 namespace pbs17 {
+	/**
+	 * \brief Helper-class for geometric processng. Stores a triangle on a mesh with the needed
+	 * information during the EPA.
+	 */
 	class Face {
 	public:
 		/**

@@ -1,3 +1,10 @@
+﻿/**
+ * \brief Calculate the convex-hull of a given object and store all relevant information for further processing.
+ *
+ * \Author: Alexander Lelidis (14-907-562), Andreas Emch (08-631-384), Uroš Tešić (17-950-346)
+ * \Date:   2017-11-29
+ */
+
 #include "ConvexHull3D.h"
 
 #include <CGAL/convex_hull_3.h>
@@ -45,6 +52,16 @@ void ConvexHull3D::init(osg::Vec3Array* vertices) {
 }
 
 
+/**
+ * \brief Simplify the convex-hull model so that it only has the given amount of edges.
+ *
+ * \param polyhedron
+ *		Output-parameter:
+ *			Input:		Convex-hull-polyhedron which might be to complex
+ *			Output:		Simplified convex-hull-polyhedron which represents the convex-hull to simplify
+ * \param numEdges
+ *      Number of edges to keep maximally.
+ */
 void ConvexHull3D::simplifyCgalModel(Polyhedron_3& polyhedron, int numEdges) {
 	std::cout << "\nStart with "
 		<< (polyhedron.size_of_halfedges() / 2) << "  edges." << std::endl;
@@ -63,6 +80,21 @@ void ConvexHull3D::simplifyCgalModel(Polyhedron_3& polyhedron, int numEdges) {
 }
 
 
+/**
+ * \brief Convert the polyhedron from CGAL to the geometry from OSG (to render)
+ * and to Eigen to calculate further operations (collision-detection etc)
+ *
+ * \param convexHull
+ *      Polyhedron which is the convex-hull (optimally already simplified)
+ * \param geometry
+ *      Output-parameter:
+ *			Input:		ignored
+ *			Output:		Geometry for OSG to render the convex-hull
+ * \param vertices
+ *		Output-parameter:
+ *			Input:		ignored
+ *			Output:		Eigen-vectors with all the vertices
+ */
 void ConvexHull3D::fromPolyhedron(Polyhedron_3 &convexHull, osg::ref_ptr<osg::Geometry> &geometry, std::vector<Eigen::Vector3d> &vertices) {
 	// Reset output-parameters
 	geometry = new osg::Geometry;

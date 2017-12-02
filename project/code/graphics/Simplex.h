@@ -1,3 +1,10 @@
+﻿/**
+* \brief Representation of the simplex during the GJK-algorithm and EPA.
+*
+* \Author: Alexander Lelidis (14-907-562), Andreas Emch (08-631-384), Uroš Tešić (17-950-346)
+* \Date:   2017-11-29
+*/
+
 #pragma once
 
 #include <algorithm>
@@ -79,7 +86,6 @@ namespace pbs17 {
 
 		/**
 		 * \brief Only in EPA: Find the closest face to the origin
-		 * TODO: Fix bug => closest face to origin does not need to be the one where the origin is not included!!!
 		 * 
 		 * \return The face with all needed information for EPA.
 		 */
@@ -92,8 +98,8 @@ namespace pbs17 {
 		 * 
 		 * \param v
 		 *      New point to extend the triangulated simplex.
-		 *      
-		 * \return True if the simplex has been extended successfully, false otherwise.
+		 * 
+		 * \return True if the new vertex has been inserted; false otherwise (when vertex was already in the simplex)      
 		 */
 		bool extend(Eigen::Vector3d v);
 

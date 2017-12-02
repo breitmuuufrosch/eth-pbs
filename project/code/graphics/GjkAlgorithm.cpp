@@ -1,3 +1,10 @@
+﻿/**
+ * \brief Implementation of the Gilbert-Johnson-Keerthi distance algorithm (GJK) and the expanding polytope algorithm (EPA).
+ *
+ * \Author: Alexander Lelidis (14-907-562), Andreas Emch (08-631-384), Uroš Tešić (17-950-346)
+ * \Date:   2017-11-29
+ */
+
 #include "GjkAlgorithm.h"
 
 #include <Eigen/Core>
