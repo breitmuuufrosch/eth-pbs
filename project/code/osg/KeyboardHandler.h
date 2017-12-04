@@ -3,20 +3,22 @@
 #include "osgGA/GUIEventHandler"
 
 #include "../scene/SpaceObject.h"
+#include "../physics/SimulationManager.h"
 
 namespace pbs17 {
 	class KeyHandler : public osgGA::GUIEventHandler {
 	public:
 		KeyHandler(const std::vector<SpaceObject*> &objects)
-			: _sceneManager(objects), _showBoundingBox(true), _showConvexHull(true) {}
+			: _sceneManager(objects), _showBoundingBox(true), _showConvexHull(true), _isPaused(false) {}
 
 
 		bool handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter&) override {
 			switch (ea.getEventType()) {
-			case(osgGA::GUIEventAdapter::KEYDOWN):
+			case osgGA::GUIEventAdapter::KEYDOWN:
 			{
-				if (ea.getKey() == osgGA::GUIEventAdapter::KEY_B) {
-					// Place your code here...
+				switch (ea.getKey()) {
+				case osgGA::GUIEventAdapter::KEY_B:
+				{
 					_showBoundingBox = !_showBoundingBox;
 
 					for (auto it = _sceneManager.begin(); it != _sceneManager.end(); ++it) {
@@ -24,10 +26,10 @@ namespace pbs17 {
 					}
 
 					return true;
-				}
 
-				if (ea.getKey() == osgGA::GUIEventAdapter::KEY_C) {
-					// Place your code here...
+				}
+				case osgGA::GUIEventAdapter::KEY_C:
+				{
 					_showConvexHull = !_showConvexHull;
 
 					for (auto it = _sceneManager.begin(); it != _sceneManager.end(); ++it) {
@@ -36,6 +38,13 @@ namespace pbs17 {
 					}
 
 					return true;
+				}
+				case osgGA::GUIEventAdapter::KEY_P:
+				{
+					_isPaused = !_isPaused;
+
+					SimulationManager::setIsPaused(_isPaused);
+				}
 				}
 			}
 
@@ -50,5 +59,6 @@ namespace pbs17 {
 
 		bool _showBoundingBox;
 		bool _showConvexHull;
+		bool _isPaused;
 	};
 }
