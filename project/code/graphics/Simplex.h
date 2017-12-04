@@ -14,6 +14,7 @@
 
 #include "Face.h"
 #include "Edge.h"
+#include "SupportPoint.h"
 
 namespace pbs17 {
 
@@ -28,7 +29,7 @@ namespace pbs17 {
 		 * \param vertices
 		 *      List of vertices which forms the simplex at the beginning.
 		 */
-		Simplex(std::vector<Eigen::Vector3d> vertices)
+		Simplex(std::vector<SupportPoint*> vertices)
 			: _vertices(vertices) {}
 
 
@@ -50,7 +51,7 @@ namespace pbs17 {
 		 * 
 		 * \return Vertex at position i.
 		 */
-		Eigen::Vector3d operator[](int i) {
+		SupportPoint* operator[](int i) {
 			return _vertices[i];
 		}
 
@@ -61,7 +62,7 @@ namespace pbs17 {
 		 * \param v
 		 *      New vertex of the simplex.
 		 */
-		void add(Eigen::Vector3d v) {
+		void add(SupportPoint* v) {
 			_vertices.push_back(v);
 		}
 
@@ -72,8 +73,9 @@ namespace pbs17 {
 		 * \param v
 		 *      Vertex to remove off the simplex.
 		 */
-		void remove(Eigen::Vector3d v) {
+		void remove(SupportPoint* v) {
 			_vertices.erase(std::remove(_vertices.begin(), _vertices.end(), v));
+			delete v;
 		}
 
 
@@ -101,12 +103,12 @@ namespace pbs17 {
 		 * 
 		 * \return True if the new vertex has been inserted; false otherwise (when vertex was already in the simplex)      
 		 */
-		bool extend(Eigen::Vector3d v);
+		bool extend(SupportPoint* v);
 
 	private:
 
 		//! All vertices which are used to define the simplex.
-		std::vector<Eigen::Vector3d> _vertices;
+		std::vector<SupportPoint*> _vertices;
 
 		//! All triangles which are used to define the simplex. (counter-clockwise)
 		std::vector<Eigen::Vector3i> _triangles;

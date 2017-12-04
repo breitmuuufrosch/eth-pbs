@@ -93,4 +93,8 @@ namespace pbs17 {
 
 		return Eigen::Vector3d(u, v, w);
 	}
+
+	inline Eigen::Vector3d cartesian(const Eigen::Vector3d &bary, const Eigen::Vector3d &a, const Eigen::Vector3d &b, const Eigen::Vector3d &c) {
+		return bary.x() * a + bary.y() * b + bary.z() * c;
+	}
 }

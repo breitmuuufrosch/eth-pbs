@@ -35,14 +35,14 @@ void Simplex::triangulate() {
 		// Add another vertex which is close to the origin. With this, the hope is that after few steps the valid
 		// and correct tetrahedron is computed and contains the origin (or at least that the origin is on the surface).
 		Eigen::Vector3d o = Eigen::Vector3d(0, 0, 0);
-		Eigen::Vector3d a = _vertices[0];
-		Eigen::Vector3d b = _vertices[1];
+		Eigen::Vector3d a = _vertices[0]->getMinkowskiPoint();
+		Eigen::Vector3d b = _vertices[1]->getMinkowskiPoint();
 		Eigen::Vector3d ba = a - b;
 		Eigen::Vector3d bo = o - b;
 
 		Eigen::Vector3d toC = ba.cross(bo);
-		_vertices.push_back(a + toC.normalized() * 0.1);
-		_vertices.push_back(b + (1.0 + EPS) * bo);
+		_vertices.push_back(new SupportPoint(a + toC.normalized() * 0.1, Eigen::Vector3d(0,0,0), Eigen::Vector3d(0,0,0)));
+		_vertices.push_back(new SupportPoint(b + (1.0 + EPS) * bo, Eigen::Vector3d(0,0,0), Eigen::Vector3d(0,0,0)));
 	}
 
 	if (_vertices.size() == 3) {
@@ -51,10 +51,10 @@ void Simplex::triangulate() {
 		// If only a triangle is available at the moment when GJK converged, add one point to form a tetrahedron.
 		// Add the point so that the origin is included or at least that the origin is on the surface.
 		Eigen::Vector3d o = Eigen::Vector3d(0, 0, 0);
-		Eigen::Vector3d b = _vertices[1];
+		Eigen::Vector3d b = _vertices[1]->getMinkowskiPoint();
 		Eigen::Vector3d bo = o - b;
 
-		_vertices.push_back(b + (1.0 + EPS) * bo);
+		_vertices.push_back(new SupportPoint(b + (1.0 + EPS) * bo, Eigen::Vector3d(0,0,0), Eigen::Vector3d(0,0,0)));
 	}
 
 	// Triangulate the tetrahedron so that the normals point all outwards.
@@ -84,9 +84,12 @@ Face Simplex::findClosestFace() {
 
 	// Check each face if it is the closest or not.
 	for (unsigned int i = 0; i < _triangles.size(); ++i) {
-		Eigen::Vector3d a = _vertices[_triangles[i].x()];
-		Eigen::Vector3d b = _vertices[_triangles[i].y()];
-		Eigen::Vector3d c = _vertices[_triangles[i].z()];
+		SupportPoint* aSP = _vertices[_triangles[i].x()];
+		SupportPoint* bSP = _vertices[_triangles[i].y()];
+		SupportPoint* cSP = _vertices[_triangles[i].z()];
+		Eigen::Vector3d a = aSP->getMinkowskiPoint();
+		Eigen::Vector3d b = bSP->getMinkowskiPoint();
+		Eigen::Vector3d c = cSP->getMinkowskiPoint();
 		Eigen::Vector3d normal = getNormalFromPoints(a, b, c);
 		double d = -normal.dot(a);
 
@@ -95,7 +98,7 @@ Face Simplex::findClosestFace() {
 		if (distance < closest.getDistance()) {
 			closest.setDistance(distance);
 			closest.setNormal(normal.normalized());
-			closest.setVertices({ a, b, c });
+			closest.setVertices({ aSP, bSP, cSP });
 		}
 	}
 
@@ -112,9 +115,11 @@ Face Simplex::findClosestFace() {
  * 
  * \return True if the new vertex has been inserted; false otherwise (when vertex was already in the simplex)
  */
-bool Simplex::extend(Eigen::Vector3d v) {
-	if (std::find(_vertices.begin(), _vertices.end(), v) != _vertices.end()) {
-		return false;
+bool Simplex::extend(SupportPoint* v) {
+	for (std::vector<SupportPoint*>::iterator it = _vertices.begin(); it != _vertices.end(); ++it) {
+		if ((*it)->getMinkowskiPoint() == v->getMinkowskiPoint()) {
+			return false;
+		}
 	}
 
 	std::vector<Eigen::Vector3i> newTriangles;
@@ -129,10 +134,10 @@ bool Simplex::extend(Eigen::Vector3d v) {
 		int a = _triangles[i].x();
 		int b = _triangles[i].y();
 		int c = _triangles[i].z();
-		Eigen::Vector3d normal = getNormalFromPoints(_vertices[a], _vertices[b], _vertices[c]);
+		Eigen::Vector3d normal = getNormalFromPoints(_vertices[a]->getMinkowskiPoint(), _vertices[b]->getMinkowskiPoint(), _vertices[c]->getMinkowskiPoint());
 
 		// Point is visible by face
-		if (isSameDirection(normal, v - _vertices[a])) {
+		if (isSameDirection(normal, v->getMinkowskiPoint() - _vertices[a]->getMinkowskiPoint())) {
 			addEdge(edges, a, b);
 			addEdge(edges, b, c);
 			addEdge(edges, c, a);
@@ -164,7 +169,7 @@ bool Simplex::extend(Eigen::Vector3d v) {
  *      Index of the opposite vertex (4th vertex) to check if the normal is pointing outwards.
  */
 bool Simplex::isCorrectOrder(int a, int b, int c, int opposite) {
-	return isCorrectOrder(a, b, c, _vertices[opposite]);
+	return isCorrectOrder(a, b, c, _vertices[opposite]->getMinkowskiPoint());
 }
 
 
@@ -181,8 +186,8 @@ bool Simplex::isCorrectOrder(int a, int b, int c, int opposite) {
  *      Position of the opposite vertex (4th vertex) to check if the normal is pointing outwards.
  */
 bool Simplex::isCorrectOrder(int a, int b, int c, Eigen::Vector3d opposite) {
-	Eigen::Vector3d normal = getNormalFromPoints(_vertices[a], _vertices[b], _vertices[c]);
-	Eigen::Vector3d height = opposite - _vertices[a];
+	Eigen::Vector3d normal = getNormalFromPoints(_vertices[a]->getMinkowskiPoint(), _vertices[b]->getMinkowskiPoint(), _vertices[c]->getMinkowskiPoint());
+	Eigen::Vector3d height = opposite - _vertices[a]->getMinkowskiPoint();
 
 	return isOppositeDirection(normal, height);
 }
@@ -223,9 +228,9 @@ void Simplex::printMatlabPlot() const
 	std::string z_0 = "", z_1 = "", z_2 = "";
 
 	for (unsigned int i = 0; i < _triangles.size(); ++i) {
-		Eigen::Vector3d a = _vertices[_triangles[i].x()];
-		Eigen::Vector3d b = _vertices[_triangles[i].y()];
-		Eigen::Vector3d c = _vertices[_triangles[i].z()];
+		Eigen::Vector3d a = _vertices[_triangles[i].x()]->getMinkowskiPoint();
+		Eigen::Vector3d b = _vertices[_triangles[i].y()]->getMinkowskiPoint();
+		Eigen::Vector3d c = _vertices[_triangles[i].z()]->getMinkowskiPoint();
 
 		x_0 += " " + std::to_string(a.x());
 		x_1 += " " + std::to_string(b.x());
@@ -258,9 +263,9 @@ void Simplex::printMatlabPlot(Face &closest) const {
 	std::string z_0 = "", z_1 = "", z_2 = "";
 
 	for (unsigned int i = 0; i < _triangles.size(); ++i) {
-		Eigen::Vector3d a = _vertices[_triangles[i].x()];
-		Eigen::Vector3d b = _vertices[_triangles[i].y()];
-		Eigen::Vector3d c = _vertices[_triangles[i].z()];
+		Eigen::Vector3d a = _vertices[_triangles[i].x()]->getMinkowskiPoint();
+		Eigen::Vector3d b = _vertices[_triangles[i].y()]->getMinkowskiPoint();
+		Eigen::Vector3d c = _vertices[_triangles[i].z()]->getMinkowskiPoint();
 
 		x_0 += " " + std::to_string(a.x());
 		x_1 += " " + std::to_string(b.x());
@@ -277,9 +282,9 @@ void Simplex::printMatlabPlot(Face &closest) const {
 		<< "Y = [" << y_0 << ";" << y_1 << ";" << y_2 << "];" << std::endl
 		<< "Z = [" << z_0 << ";" << z_1 << ";" << z_2 << "];" << std::endl
 		<< "C = [ 0 0 1];" << std::endl
-		<< "X_closest = [ " << closest.getVertex(0).x() << "; " << closest.getVertex(1).x() << "; " << closest.getVertex(2).x() << "];" << std::endl
-		<< "Y_closest = [ " << closest.getVertex(0).y() << "; " << closest.getVertex(1).y() << "; " << closest.getVertex(2).y() << "];" << std::endl
-		<< "Z_closest = [ " << closest.getVertex(0).z() << "; " << closest.getVertex(1).z() << "; " << closest.getVertex(2).z() << "];" << std::endl
+		<< "X_closest = [ " << closest[0]->getMinkowskiPoint().x() << "; " << closest[1]->getMinkowskiPoint().x() << "; " << closest[2]->getMinkowskiPoint().x() << "];" << std::endl
+		<< "Y_closest = [ " << closest[0]->getMinkowskiPoint().y() << "; " << closest[1]->getMinkowskiPoint().y() << "; " << closest[2]->getMinkowskiPoint().y() << "];" << std::endl
+		<< "Z_closest = [ " << closest[0]->getMinkowskiPoint().z() << "; " << closest[1]->getMinkowskiPoint().z() << "; " << closest[2]->getMinkowskiPoint().z() << "];" << std::endl
 		<< "C_closest = [ 1 0 0 ];" << std::endl << std::endl
 		<< "figure" << std::endl << "patch(X, Y, Z, C);" << std::endl << "patch(X_closest, Y_closest, Z_closest, C_closest);" << std::endl;
 }

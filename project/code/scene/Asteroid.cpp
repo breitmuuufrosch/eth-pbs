@@ -104,3 +104,24 @@ void Asteroid::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 	_modelRoot->addChild(_translation, true);
 	_modelRoot->addChild(_aabbRendering, true);
 }
+
+/**
+ * \brief Initialize the space-object for physics.
+ *
+ * \param mass
+ *      Mass: unit = kg
+ * \param linearVelocity
+ *      Linear velocity: unit = m/s
+ * \param angularVelocity
+ *      Angular velocity: unit = rad/s
+ * \param force
+ *      Global force: unit = vector with norm equals to N
+ * \param torque
+ *      Global torque: unit = vector with norm equals to N*m (newton metre)
+ */
+void Asteroid::initPhysics(double mass, Eigen::Vector3d linearVelocity, Eigen::Vector3d angularVelocity, Eigen::Vector3d force, Eigen::Vector3d torque) {
+	SpaceObject::initPhysics(mass, linearVelocity, angularVelocity, force, torque);
+
+	_momentOfInertia = Eigen::Matrix3d();
+	_momentOfInertia.setIdentity();
+}

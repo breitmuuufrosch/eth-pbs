@@ -7,6 +7,8 @@
 
 #include "GjkAlgorithm.h"
 
+#include <vector>
+
 #include <Eigen/Core>
 // ReSharper disable once CppUnusedIncludeDirective
 #include <Eigen/Geometry>
@@ -30,28 +32,30 @@ const double GjkAlgorithm::EPA_TOLERANCE = 0.00001;
  *      Convex-hull of first object.
  * \param convex2
  *      Convex-hull of second object.
- * \param normal
- *      Output-parameter: Direction of the intersection.
+ * \param collision
+ *	    Output-parameter:
+ *			Input:		Collision-object with the link to the two space-objects.
+ *			Output:		Collision-object with all information of the intersection. (if there is any)
  *
  * \return True if there is an intersection, false otherwise.
  */
-bool GjkAlgorithm::intersect(std::vector<Eigen::Vector3d>& convex1, std::vector<Eigen::Vector3d>& convex2, Eigen::Vector3d& normal) {
+bool GjkAlgorithm::intersect(std::vector<Eigen::Vector3d> &convex1, std::vector<Eigen::Vector3d> &convex2, Collision &collision) {
 	// Get an initial point on the Minkowski-sum.
-	Eigen::Vector3d s = support(convex1, convex2, Eigen::Vector3d(1.0, 1.0, 1.0));
-	std::vector<Eigen::Vector3d> sVertices;
+	SupportPoint* s = support(convex1, convex2, Eigen::Vector3d(1.0, 1.0, 1.0));
+	std::vector<SupportPoint*> sVertices;
 	sVertices.push_back(s);
 
 	// Create our initial simplex with the single point and initialize the search toward the origin.
 	Simplex simplex(sVertices);
-	Eigen::Vector3d d = -s;
+	Eigen::Vector3d d = -s->getMinkowskiPoint();
 
 	// Try to find out if the origin is contained in the minkowski-sum or not.
 	for (int i = 0; i < MAX_ITERATIONS; i++) {
 		// Get our next simplex point toward the origin.
-		Eigen::Vector3d a = support(convex1, convex2, d);
+		SupportPoint* a = support(convex1, convex2, d);
 
 		// If we move toward the origin and didn't pass it then we never will and there's no intersection.
-		if (isOppositeDirection(a, d)) {
+		if (isOppositeDirection(a->getMinkowskiPoint(), d)) {
 			return false;
 		}
 
@@ -69,7 +73,7 @@ bool GjkAlgorithm::intersect(std::vector<Eigen::Vector3d>& convex1, std::vector<
 	// Two cases:
 	// - We are sure that there is a collision and we stopped the loop
 	// - We still couldn't find a simplex that contains the origin and so we "probably" have an intersection
-	normal = EPA(simplex, convex1, convex2);
+	EPA(simplex, convex1, convex2, collision);
 	return true;
 }
 
@@ -84,10 +88,12 @@ bool GjkAlgorithm::intersect(std::vector<Eigen::Vector3d>& convex1, std::vector<
  * \param direction
  *      Direction in which we are searching the support-function.
  *
- * \return Furthest point on the Minkowski-sum.
+ * \return Furthest point on the Minkowski-sum with corresponding two vertices of convex hull.
  */
-Eigen::Vector3d GjkAlgorithm::support(std::vector<Eigen::Vector3d>& convex1, std::vector<Eigen::Vector3d>& convex2, Eigen::Vector3d direction) {
-	return getFurthestPoint(convex1, direction) - getFurthestPoint(convex2, -direction);
+SupportPoint* GjkAlgorithm::support(std::vector<Eigen::Vector3d> &convex1, std::vector<Eigen::Vector3d> &convex2, Eigen::Vector3d direction) {
+	Eigen::Vector3d conv1Point = getFurthestPoint(convex1, direction);
+	Eigen::Vector3d conv2Point = getFurthestPoint(convex2, -direction);
+	return new SupportPoint(conv1Point - conv2Point, conv1Point, conv2Point);
 }
 
 
@@ -101,7 +107,7 @@ Eigen::Vector3d GjkAlgorithm::support(std::vector<Eigen::Vector3d>& convex1, std
  *
  * \return Furthest point.
  */
-Eigen::Vector3d GjkAlgorithm::getFurthestPoint(std::vector<Eigen::Vector3d>& convex, Eigen::Vector3d direction) {
+Eigen::Vector3d GjkAlgorithm::getFurthestPoint(std::vector<Eigen::Vector3d> &convex, Eigen::Vector3d direction) {
 	double max = -std::numeric_limits<double>::max();
 	Eigen::Vector3d maxV(0, 0, 0);
 
@@ -129,7 +135,7 @@ Eigen::Vector3d GjkAlgorithm::getFurthestPoint(std::vector<Eigen::Vector3d>& con
  *
  * \return True if the simplex contains the origin; false otherwise.
  */
-bool GjkAlgorithm::processSimplex(Simplex& simplex, Eigen::Vector3d& direction) {
+bool GjkAlgorithm::processSimplex(Simplex &simplex, Eigen::Vector3d &direction) {
 	switch (simplex.count()) {
 	case 2:
 		return processLine(simplex, direction);
@@ -151,16 +157,18 @@ bool GjkAlgorithm::processSimplex(Simplex& simplex, Eigen::Vector3d& direction) 
  *
  * \return False, since a line does not "include" the origin.
  */
-bool GjkAlgorithm::processLine(Simplex& simplex, Eigen::Vector3d& direction) {
-	Eigen::Vector3d a = simplex[1];
-	Eigen::Vector3d b = simplex[0];
+bool GjkAlgorithm::processLine(Simplex &simplex, Eigen::Vector3d &direction) {
+	SupportPoint* aSP = simplex[1];
+	SupportPoint* bSP = simplex[0];
+	Eigen::Vector3d a = aSP->getMinkowskiPoint();
+	Eigen::Vector3d b = bSP->getMinkowskiPoint();
 	Eigen::Vector3d ab = b - a;
 	Eigen::Vector3d aO = -a;
 
 	if (isSameDirection(ab, aO)) {
 		direction = (ab.cross(aO)).cross(ab);
 	} else {
-		simplex.remove(b);
+		simplex.remove(bSP);
 		direction = aO;
 	}
 
@@ -178,10 +186,13 @@ bool GjkAlgorithm::processLine(Simplex& simplex, Eigen::Vector3d& direction) {
  *
  * \return False, since a triangle does not "include" the origin.
  */
-bool GjkAlgorithm::processTriangle(Simplex& simplex, Eigen::Vector3d& direction) {
-	Eigen::Vector3d a = simplex[2];
-	Eigen::Vector3d b = simplex[1];
-	Eigen::Vector3d c = simplex[0];
+bool GjkAlgorithm::processTriangle(Simplex &simplex, Eigen::Vector3d &direction) {
+	SupportPoint* aSP = simplex[2];
+	SupportPoint* bSP = simplex[1];
+	SupportPoint* cSP = simplex[0];
+	Eigen::Vector3d a = aSP->getMinkowskiPoint();
+	Eigen::Vector3d b = bSP->getMinkowskiPoint();
+	Eigen::Vector3d c = cSP->getMinkowskiPoint();
 	Eigen::Vector3d ab = b - a;
 	Eigen::Vector3d ac = c - a;
 	Eigen::Vector3d abc = ab.cross(ac);
@@ -191,26 +202,26 @@ bool GjkAlgorithm::processTriangle(Simplex& simplex, Eigen::Vector3d& direction)
 
 	if (isSameDirection(acNormal, aO)) {
 		if (isSameDirection(ac, aO)) {
-			simplex.remove(b);
+			simplex.remove(bSP);
 			direction = (ac.cross(aO)).cross(ac);
 		} else {
 			if (isSameDirection(ab, aO)) {
-				simplex.remove(c);
+				simplex.remove(cSP);
 				direction = (ab.cross(aO)).cross(ab);
 			} else {
-				simplex.remove(b);
-				simplex.remove(c);
+				simplex.remove(bSP);
+				simplex.remove(cSP);
 				direction = aO;
 			}
 		}
 	} else {
 		if (isSameDirection(abNormal, aO)) {
 			if (isSameDirection(ab, aO)) {
-				simplex.remove(c);
+				simplex.remove(cSP);
 				direction = (ab.cross(aO)).cross(ab);
 			} else {
-				simplex.remove(b);
-				simplex.remove(c);
+				simplex.remove(bSP);
+				simplex.remove(cSP);
 				direction = aO;
 			}
 		} else {
@@ -236,11 +247,15 @@ bool GjkAlgorithm::processTriangle(Simplex& simplex, Eigen::Vector3d& direction)
  *
  * \return True if the tetrahedron contains the origin; false otherwise.
  */
-bool GjkAlgorithm::processTetrahedron(Simplex& simplex, Eigen::Vector3d& direction) {
-	Eigen::Vector3d a = simplex[3];
-	Eigen::Vector3d b = simplex[2];
-	Eigen::Vector3d c = simplex[1];
-	Eigen::Vector3d d = simplex[0];
+bool GjkAlgorithm::processTetrahedron(Simplex &simplex, Eigen::Vector3d &direction) {
+	SupportPoint* aSP = simplex[3];
+	SupportPoint* bSP = simplex[2];
+	SupportPoint* cSP = simplex[1];
+	SupportPoint* dSP = simplex[0];
+	Eigen::Vector3d a = aSP->getMinkowskiPoint();
+	Eigen::Vector3d b = bSP->getMinkowskiPoint();
+	Eigen::Vector3d c = cSP->getMinkowskiPoint();
+	Eigen::Vector3d d = dSP->getMinkowskiPoint();
 	Eigen::Vector3d ac = c - a;
 	Eigen::Vector3d ad = d - a;
 	Eigen::Vector3d ab = b - a;
@@ -253,41 +268,41 @@ bool GjkAlgorithm::processTetrahedron(Simplex& simplex, Eigen::Vector3d& directi
 
 	if (isSameDirection(abc, aO)) {
 		if (isSameDirection(abc.cross(ac), aO)) {
-			simplex.remove(b);
-			simplex.remove(d);
+			simplex.remove(bSP);
+			simplex.remove(dSP);
 			direction = (ac.cross(aO)).cross(ac);
 		} else if (isSameDirection(ab.cross(abc), aO)) {
-			simplex.remove(c);
-			simplex.remove(d);
+			simplex.remove(cSP);
+			simplex.remove(dSP);
 			direction = (ab.cross(aO)).cross(ab);
 		} else {
-			simplex.remove(d);
+			simplex.remove(dSP);
 			direction = abc;
 		}
 	} else if (isSameDirection(acd, aO)) {
 		if (isSameDirection(acd.cross(ad), aO)) {
-			simplex.remove(b);
-			simplex.remove(c);
+			simplex.remove(bSP);
+			simplex.remove(cSP);
 			direction = (ad.cross(aO)).cross(ad);
 		} else if (isSameDirection(ac.cross(acd), aO)) {
-			simplex.remove(b);
-			simplex.remove(d);
+			simplex.remove(bSP);
+			simplex.remove(dSP);
 			direction = (ac.cross(aO)).cross(ac);
 		} else {
-			simplex.remove(b);
+			simplex.remove(bSP);
 			direction = acd;
 		}
 	} else if (isSameDirection(abd, aO)) {
 		if (isSameDirection(abd.cross(ab), aO)) {
-			simplex.remove(c);
-			simplex.remove(d);
+			simplex.remove(cSP);
+			simplex.remove(dSP);
 			direction = (ab.cross(aO)).cross(ab);
 		} else if (isSameDirection(ad.cross(abd), aO)) {
-			simplex.remove(b);
-			simplex.remove(c);
+			simplex.remove(bSP);
+			simplex.remove(cSP);
 			direction = (ad.cross(aO)).cross(ad);
 		} else {
-			simplex.remove(c);
+			simplex.remove(cSP);
 			direction = abd;
 		}
 	} else {
@@ -308,33 +323,52 @@ bool GjkAlgorithm::processTetrahedron(Simplex& simplex, Eigen::Vector3d& directi
  *      Convex-hull of first object.
  * \param convex2
  *      Convex-hull of second object.
+ * \param collision
+ *	    Output-parameter:
+ *			Input:		Collision-object with the link to the two space-objects.
+ *			Output:		Collision-object with all information of the intersection. (if there is any)
  *
  * \return Direction of the colision.
  */
-Eigen::Vector3d GjkAlgorithm::EPA(Simplex& simplex, std::vector<Eigen::Vector3d>& convex1, std::vector<Eigen::Vector3d>& convex2) {
+bool GjkAlgorithm::EPA(Simplex &simplex, std::vector<Eigen::Vector3d>& convex1, std::vector<Eigen::Vector3d>& convex2, Collision &collision) {
 	simplex.triangulate();
-
+	
 	while (true) {
+		bool stop = false;
+
 		// Get the closest face to the origin.
 		Face face = simplex.findClosestFace();
 		Eigen::Vector3d normal = face.getNormal();
 		double distance = face.getDistance();
 
 		// Get the new support-point in the direction of the faces normal to expand the simplex.
-		Eigen::Vector3d p = support(convex1, convex2, normal);
+		SupportPoint* p = support(convex1, convex2, normal);
 
-		// CHeck the distance to the new support point.
-		double d = abs(p.dot(normal));
+		// Check the distance to the new support point.
+		double d = abs(p->getMinkowskiPoint().dot(normal));
 
 		// - New point does not expand the simplex => converged
 		if (d - distance < EPA_TOLERANCE) {
-			//Eigen::Vector3d bary = barycentric(p, face.getVertex(0), face.getVertex(1), face.getVertex(2));
-			return d * normal;
+			stop = true;
 		}
 
 		// - New point has already been visited once => converged (since jumping between vertices does not expand anything)
 		if (!simplex.extend(p)) {
-			return d * normal;
+			stop = true;
+		}
+
+		// To finish the EPA, store the needed intersection-information on the collision
+		if (stop) {
+			Eigen::Vector3d bary = barycentric(p->getMinkowskiPoint(), face[0]->getMinkowskiPoint(), face[1]->getMinkowskiPoint(), face[2]->getMinkowskiPoint());
+			Eigen::Vector3d poc1 = cartesian(bary, face[0]->getConvexHull1Point(), face[1]->getConvexHull1Point(), face[2]->getConvexHull1Point());
+			Eigen::Vector3d poc2 = cartesian(bary, face[0]->getConvexHull2Point(), face[1]->getConvexHull2Point(), face[2]->getConvexHull2Point());
+
+			collision.setFirstPOC(collision.getFirstObject()->toWorld(poc1));
+			collision.setSecondPOC(collision.getSecondObject()->toWorld(poc2));
+			collision.setIntersectionVector(d * normal);
+			collision.setUnitNormal((collision.getFirstObject()->getPosition() - collision.getSecondObject()->getPosition()).normalized());
+
+			return true;
 		}
 	}
 }

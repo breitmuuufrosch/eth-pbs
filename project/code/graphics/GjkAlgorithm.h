@@ -10,6 +10,8 @@
 #include <Eigen/Core>
 
 #include "Simplex.h"
+#include "SupportPoint.h"
+#include "../Physics/Collision.h"
 
 namespace pbs17 {
 
@@ -28,12 +30,14 @@ namespace pbs17 {
 		 *      Convex-hull of first object.
 		 * \param convex2
 		 *      Convex-hull of second object.
-		 * \param normal
-		 *      Output-parameter: Direction of the intersection.
+		 * \param collision
+		 *	    Output-parameter:
+		 *			Input:		Collision-object with the link to the two space-objects.
+		 *			Output:		Collision-object with all information of the intersection. (if there is any)
 		 * 
 		 * \return True if there is an intersection, false otherwise.
 		 */
-		static bool intersect(std::vector<Eigen::Vector3d>& convex1, std::vector<Eigen::Vector3d>& convex2, Eigen::Vector3d& normal);
+		static bool intersect(std::vector<Eigen::Vector3d> &convex1, std::vector<Eigen::Vector3d> &convex2, Collision &collision);
 
 
 		/**
@@ -46,9 +50,9 @@ namespace pbs17 {
 		 * \param direction
 		 *      Direction in which we are searching the support-function.
 		 * 
-		 * \return Furthest point on the Minkowski-sum.
+		 * \return Furthest point on the Minkowski-sum with corresponding two vertices of convex hull.
 		 */
-		static Eigen::Vector3d support(std::vector<Eigen::Vector3d>& convex1, std::vector<Eigen::Vector3d>& convex2, Eigen::Vector3d direction);
+		static SupportPoint* support(std::vector<Eigen::Vector3d> &convex1, std::vector<Eigen::Vector3d> &convex2, Eigen::Vector3d direction);
 
 
 		/**
@@ -61,7 +65,7 @@ namespace pbs17 {
 		 *      
 		 * \return Furthest point.
 		 */
-		static Eigen::Vector3d getFurthestPoint(std::vector<Eigen::Vector3d>& convex, Eigen::Vector3d direction);
+		static Eigen::Vector3d getFurthestPoint(std::vector<Eigen::Vector3d> &convex, Eigen::Vector3d direction);
 
 
 		/**
@@ -75,7 +79,7 @@ namespace pbs17 {
 		 * 
 		 * \return True if the simplex contains the origin; false otherwise.
 		 */
-		static bool processSimplex(Simplex& simplex, Eigen::Vector3d& direction);
+		static bool processSimplex(Simplex &simplex, Eigen::Vector3d &direction);
 
 
 	private:
@@ -97,7 +101,7 @@ namespace pbs17 {
 		 * 
 		 * \return False, since a line does not "include" the origin.
 		 */
-		static bool processLine(Simplex& simplex, Eigen::Vector3d& direction);
+		static bool processLine(Simplex &simplex, Eigen::Vector3d& direction);
 
 
 		/**
@@ -110,7 +114,7 @@ namespace pbs17 {
 		 *
 		 * \return False, since a triangle does not "include" the origin.
 		 */
-		static bool processTriangle(Simplex& simplex, Eigen::Vector3d& direction);
+		static bool processTriangle(Simplex &simplex, Eigen::Vector3d &direction);
 
 
 		/**
@@ -123,7 +127,7 @@ namespace pbs17 {
 		 *
 		 * \return True if the tetrahedron contains the origin; false otherwise.
 		 */
-		static bool processTetrahedron(Simplex& simplex, Eigen::Vector3d& direction);
+		static bool processTetrahedron(Simplex &simplex, Eigen::Vector3d &direction);
 
 
 		/**
@@ -136,9 +140,13 @@ namespace pbs17 {
 		 *      Convex-hull of first object.
 		 * \param convex2
 		 *      Convex-hull of second object.
+		 * \param collision
+		 *	    Output-parameter:
+		 *			Input:		Collision-object with the link to the two space-objects.
+		 *			Output:		Collision-object with all information of the intersection. (if there is any)
 		 *
 		 * \return Direction of the colision.
 		 */
-		static Eigen::Vector3d EPA(Simplex& simplex, std::vector<Eigen::Vector3d>& convex1, std::vector<Eigen::Vector3d>& convex2);
+		static bool EPA(Simplex &simplex, std::vector<Eigen::Vector3d> &convex1, std::vector<Eigen::Vector3d> &convex2, Collision &collision);
 	};
 }

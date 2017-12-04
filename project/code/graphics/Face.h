@@ -8,6 +8,7 @@
 #pragma once
 
 #include <Eigen/Core>
+#include "SupportPoint.h"
 
 namespace pbs17 {
 	/**
@@ -20,7 +21,7 @@ namespace pbs17 {
 		 * \brief Empty constructor.
 		 */
 		Face()
-			: Face(std::vector<Eigen::Vector3d>(), 0, Eigen::Vector3d(1, 0, 0)) {}
+			: Face(std::vector<SupportPoint*>(), 0, Eigen::Vector3d(1, 0, 0)) {}
 
 
 		/**
@@ -33,7 +34,7 @@ namespace pbs17 {
 		 * \param normal
 		 *      Normal of the face. (poinring outside)
 		 */
-		Face(std::vector<Eigen::Vector3d> vertices, double distance, Eigen::Vector3d normal)
+		Face(std::vector<SupportPoint*> vertices, double distance, Eigen::Vector3d normal)
 			: _vertices(vertices), _distance(distance), _normal(normal) {}
 
 
@@ -46,7 +47,7 @@ namespace pbs17 {
 		 * 
 		 * \return Vertex at given position in the triangle.
 		 */
-		Eigen::Vector3d getVertex(const int pos) const {
+		SupportPoint* operator[](const int pos) const {
 			return _vertices[pos];
 		}
 
@@ -57,7 +58,7 @@ namespace pbs17 {
 		 * \param vertices
 		 *      New vertices of the triangle.
 		 */
-		void setVertices(const std::vector<Eigen::Vector3d> vertices) {
+		void setVertices(const std::vector<SupportPoint*> vertices) {
 			_vertices = vertices;
 		}
 
@@ -104,7 +105,7 @@ namespace pbs17 {
 		
 	private:
 		Eigen::Vector3i _indices;
-		std::vector<Eigen::Vector3d> _vertices;
+		std::vector<SupportPoint*> _vertices;
 		double _distance;
 		Eigen::Vector3d _normal;
 	};
