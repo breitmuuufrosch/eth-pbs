@@ -11,7 +11,7 @@
 
 #include "Simplex.h"
 #include "SupportPoint.h"
-#include "../Physics/Collision.h"
+#include "../physics/Collision.h"
 
 namespace pbs17 {
 
