@@ -6,7 +6,7 @@
 
 ### Prerequisites
 
-#### Open Scene Graph (OSG)
+#### Open Scene Graph (OSG, Version > 3.2.1)
 Windows:
 * Download the libraries of OSG from here: http://objexx.com/OpenSceneGraph.html (debug and release if you want to build in both)
 * Extract to `<path_to_osg>/` (I pasted release and debug in the same, since they use a "d" as postfix for each files => no problems with overwritting etc)
@@ -18,7 +18,7 @@ Ubuntu:
 * For the examples one can use "sudo apt-get install openscenegraph-examples". These can then simply called by the command "osgteapot" for example.
 * Includes should be at "/usr/include" and libraries at `/usr/lib/x86_64-linux-gnu` (at least for me.. ;-) )
 
-### Boost
+### Boost (Version > 1.54)
 Windows:
 * Instructions: http://www.boost.org/doc/libs/1_65_1/more/getting_started/windows.html
 * Set environment-variable `BOOST_ROOT` to `<path_to_boost>`
@@ -27,7 +27,7 @@ Ubuntu:
 * Instructions: http://www.boost.org/doc/libs/1_65_1/more/getting_started/unix-variants.html
 * Install the libraries with "sudo apt-get install libboost*" (except you know which you really need ;-) )
 
-#### CGAL
+#### CGAL (Version 4.12-I-900 - Install from git-source)
 Windows:
 * Instructions: https://www.cgal.org/download/windows.html
 * Download the installer `CGAL-4.11-Setup.exe` from here: https://github.com/CGAL/cgal/releases
