@@ -6,50 +6,28 @@
  */
 
 #include <osg/Node>
-#include <osgDB/ReadFile>
 #include <osgDB/WriteFile>
-#include <osgUtil/Optimizer>
-#include <osgDB/FileNameUtils>
-
-
+#include <osgViewer/Viewer>
 #include <osgViewer/ViewerEventHandlers>
 
-#include <osgGA/TrackballManipulator>
+#include <boost/program_options.hpp>
+
+#include <string>
+#include <iomanip>
+#include <json.hpp>
 
 #include <iostream>
 #include <stdint.h>
 
-#include <osgViewer/Viewer>
-#include <boost/program_options.hpp>
-#include <string>
-
-#include <iomanip>
 #include "scene/SceneManager.h"
 #include "physics/SimulationManager.h"
-#include <json.hpp>
+#include "osg/SnapImageDrawCallback.h"
 #include "config.h"
 
 
 using namespace boost::program_options;
 // for convenience
 using json = nlohmann::json;
-
-class WriteToFileCaptureOperation : public osgViewer::ScreenCaptureHandler::CaptureOperation
-{
-public:
-
-    WriteToFileCaptureOperation(const std::string& filename):
-      _filename( filename )
-    {
-    }
-
-    virtual void operator()(const osg::Image& image, const unsigned int context_id)
-    {
-        osgDB::writeImageFile(image, _filename );
-    }
-
-    std::string _filename;
-};
 
 int main(int argc, const char *argv[]) {
     pbs17::SceneManager* sceneManager = new pbs17::SceneManager;
@@ -113,6 +91,10 @@ int main(int argc, const char *argv[]) {
 
     //osg::ref_ptr<osg::Node> scene = sceneManager->loadScene();
 	osg::ref_ptr<osgViewer::Viewer> viewer = sceneManager->initViewer(scene);
+	
+	// Set-up the screenshot functionality
+	osg::ref_ptr<pbs17::SnapImageDrawCallback> screenshotCallback = new pbs17::SnapImageDrawCallback();
+	viewer->getCamera()->setPostDrawCallback(screenshotCallback.get());
 
 	pbs17::SimulationManager* simulationManager = new pbs17::SimulationManager(sceneManager->getSpaceObjects());
 
@@ -128,14 +110,16 @@ int main(int argc, const char *argv[]) {
 		double currentTime = viewer->elapsedTime();
 		double dt = currentTime - startTime;
 		//std::cout << "Frame: " << frameNumber << "\tdt: " << dt << "\tfps: " << 1.0 / dt << std::endl;
+
         if(captureFrame) {
             std::string screenCaptureFilename =  std::to_string(frameNumber) + "_frame.png";
-            osg::ref_ptr<osgViewer::ScreenCaptureHandler::CaptureOperation> writeFile = new WriteToFileCaptureOperation(screenCaptureFilename);
-            osg::ref_ptr<osgViewer::ScreenCaptureHandler> screenCaptureHandler = new osgViewer::ScreenCaptureHandler(writeFile.get());
-            viewer->addEventHandler(screenCaptureHandler);
-            screenCaptureHandler->setFramesToCapture(1000);
-            screenCaptureHandler->captureNextFrame(*viewer.get());
-            screenCaptureHandler->stopCapture();
+			osg::ref_ptr<pbs17::SnapImageDrawCallback> snapImageDrawCallback = dynamic_cast<pbs17::SnapImageDrawCallback*>(viewer->getCamera()->getPostDrawCallback());
+			
+        	if (snapImageDrawCallback.get()) {
+				std::cout << "make screenshot" << std::endl;
+				snapImageDrawCallback->setFileName(screenCaptureFilename);
+				snapImageDrawCallback->setSnapImageOnNextFrame(true);
+			}
         }
 
 		dt = 0.01;
