@@ -155,17 +155,19 @@ namespace pbs17 {
 			_angularVelocity = av;
 		}
 
-		Eigen::Vector3d getOrientation() const {
+		osg::Quat getOrientation() const {
 			return _orientation;
 		}
 
-		void setOrientation(Eigen::Vector3d o) {
+		void setOrientation(osg::Quat o) {
 			_orientation = o;
-			_rotation->setMatrix(osg::Matrixd::rotate(osg::Quat(o[0], osg::X_AXIS, o[1], osg::Y_AXIS, o[2], osg::Z_AXIS)));
+			Quat rotMat;
+			o.get(rotMat);
+			_rotation->setMatrix(rotMat);
 			calculateAABB();
 		}
 
-		void updatePositionOrientation(Eigen::Vector3d p, Eigen::Vector3d dtv, Eigen::Vector3d o, Eigen::Vector3d dto);
+		void updatePositionOrientation(Eigen::Vector3d p, Eigen::Vector3d dtv, Quat newOrientation);
 
 		void calculateAABB();
 
@@ -177,7 +179,8 @@ namespace pbs17 {
 			// Todo: use Eigen-transformations instead
 			osg::Matrix scaling = osg::Matrix::scale(_scaling, _scaling, _scaling);
 			osg::Matrix translation = osg::Matrix::translate(toOsg(_position));
-			osg::Matrix rotation = osg::Matrixd::rotate(osg::Quat(_orientation[0], osg::X_AXIS, _orientation[1], osg::Y_AXIS, _orientation[2], osg::Z_AXIS));
+			osg::Matrix rotation; 
+			_orientation.get(rotation);
 
 			std::vector<Eigen::Vector3d> transformed;
 			std::vector<Eigen::Vector3d> current = _convexHull->getVertices();
@@ -193,7 +196,8 @@ namespace pbs17 {
 			// Todo: use Eigen-transformations instead
 			osg::Matrix scaling = osg::Matrix::scale(_scaling, _scaling, _scaling);
 			osg::Matrix translation = osg::Matrix::translate(toOsg(_position));
-			osg::Matrix rotation = osg::Matrixd::rotate(osg::Quat(_orientation[0], osg::X_AXIS, _orientation[1], osg::Y_AXIS, _orientation[2], osg::Z_AXIS));
+			osg::Matrix rotation;
+			_orientation.get(rotation);
 
 			return fromOsg(toOsg(v) * rotation * translation * scaling);
 		}
@@ -202,7 +206,8 @@ namespace pbs17 {
 			// Todo: use Eigen-transformations instead
 			osg::Matrix scaling = osg::Matrix::scale(_scaling, _scaling, _scaling);
 			osg::Matrix translation = osg::Matrix::translate(toOsg(_position));
-			osg::Matrix rotation = osg::Matrixd::rotate(osg::Quat(_orientation[0], osg::X_AXIS, _orientation[1], osg::Y_AXIS, _orientation[2], osg::Z_AXIS));
+			osg::Matrix rotation;
+			_orientation.get(rotation);
 			osg::Matrix transform = rotation * translation * scaling;
 			transform.inverse(transform);
 			return fromOsg(toOsg(v) * transform);
@@ -234,7 +239,7 @@ namespace pbs17 {
 		//! Position
 		Eigen::Vector3d _position;
 		//! Orientation
-		Eigen::Vector3d _orientation;
+		osg::Quat _orientation;
 		//! AABB of the object
 		osg::BoundingBox _aabbLocal;
 		osg::BoundingBox _aabbGlobal;
