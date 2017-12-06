@@ -1,3 +1,10 @@
+﻿/**
+ * \brief Calculate the convex-hull of a given object and store all relevant information for further processing.
+ *
+ * \Author: Alexander Lelidis (14-907-562), Andreas Emch (08-631-384), Uroš Tešić (17-950-346)
+ * \Date:   2017-11-29
+ */
+
 #include "ConvexHull3D.h"
 
 #include <CGAL/convex_hull_3.h>
@@ -39,49 +46,81 @@ void ConvexHull3D::init(osg::Vec3Array* vertices) {
 
 	// Define polyhedron to hold convex hull and compute convex hull of non-collinear points
 	CGAL::convex_hull_3(points.begin(), points.end(), _cgalModel);
-	
-	std::cout << "\nStart...\n"
-		<< (_cgalModel.size_of_halfedges() / 2) << " final edges.\n";
-	
-	SMS::Count_stop_predicate<Polyhedron_3> stop(20);
-	int r = SMS::edge_collapse (_cgalModel
-		, stop
-		, CGAL::parameters::vertex_index_map(get(CGAL::vertex_external_index, _cgalModel))
-		.halfedge_index_map(get(CGAL::halfedge_external_index, _cgalModel))
+	simplifyCgalModel(_cgalModel, 300);
+
+	fromPolyhedron(_cgalModel, _osgModel, _vertices);
+}
+
+
+/**
+ * \brief Simplify the convex-hull model so that it only has the given amount of edges.
+ *
+ * \param polyhedron
+ *		Output-parameter:
+ *			Input:		Convex-hull-polyhedron which might be to complex
+ *			Output:		Simplified convex-hull-polyhedron which represents the convex-hull to simplify
+ * \param numEdges
+ *      Number of edges to keep maximally.
+ */
+void ConvexHull3D::simplifyCgalModel(Polyhedron_3& polyhedron, int numEdges) {
+	std::cout << "\nStart with "
+		<< (polyhedron.size_of_halfedges() / 2) << "  edges." << std::endl;
+
+	SMS::Count_stop_predicate<Polyhedron_3> stop(numEdges);
+	int r = SMS::edge_collapse(polyhedron,
+		stop,
+		CGAL::parameters::vertex_index_map(get(CGAL::vertex_external_index, polyhedron))
+		.halfedge_index_map(get(CGAL::halfedge_external_index, polyhedron))
 		.get_cost(SMS::Edge_length_cost <Polyhedron_3>())
 		.get_placement(SMS::Midpoint_placement<Polyhedron_3>())
 	);
 
-	std::cout << "\nFinished...\n" << r << " edges removed.\n"
-		<< (_cgalModel.size_of_halfedges() / 2) << " final edges.\n";
-	_cgalNefModel = Nef_Polyhedron_3(_cgalModel);
+	std::cout << "\nFinished...\n" << r << " edges removed. "
+		<< (polyhedron.size_of_halfedges() / 2) << " final edges." << std::endl;
+}
+
+
+/**
+ * \brief Convert the polyhedron from CGAL to the geometry from OSG (to render)
+ * and to Eigen to calculate further operations (collision-detection etc)
+ *
+ * \param convexHull
+ *      Polyhedron which is the convex-hull (optimally already simplified)
+ * \param geometry
+ *      Output-parameter:
+ *			Input:		ignored
+ *			Output:		Geometry for OSG to render the convex-hull
+ * \param vertices
+ *		Output-parameter:
+ *			Input:		ignored
+ *			Output:		Eigen-vectors with all the vertices
+ */
+void ConvexHull3D::fromPolyhedron(Polyhedron_3 &convexHull, osg::ref_ptr<osg::Geometry> &geometry, std::vector<Eigen::Vector3d> &vertices) {
+	// Reset output-parameters
+	geometry = new osg::Geometry;
+	vertices.resize(0);
 
 	// Vectors to store the vertices and faces of the convex-hull
 	osg::ref_ptr<osg::Vec3Array> convexVertices = new osg::Vec3Array;
 	osg::ref_ptr<osg::DrawElementsUInt> convexFaces = new osg::DrawElementsUInt(GL_TRIANGLES);
-	_vertices.resize(_cgalModel.size_of_vertices(), 3);
-	_faces.resize(_cgalModel.size_of_facets(), 3);
 
 	// Set the index of each vertex and add it to the convex-hull-vertices (osg)
 	unsigned int index = 0;
-	for (Vertex_iterator v = _cgalModel.vertices_begin(); v != _cgalModel.vertices_end(); ++v, ++index) {
+	for (Vertex_iterator v = convexHull.vertices_begin(); v != convexHull.vertices_end(); ++v, ++index) {
 		v->id() = index;
 		Point_3 vertex = v->point();
-		convexVertices->push_back(osg::Vec3(CGAL::to_double(vertex[0]), CGAL::to_double(vertex[1]), CGAL::to_double(vertex[2])));
 
-		_vertices(index, 0) = CGAL::to_double(vertex[0]);
-		_vertices(index, 1) = CGAL::to_double(vertex[1]);
-		_vertices(index, 2) = CGAL::to_double(vertex[2]);
+		convexVertices->push_back(osg::Vec3(CGAL::to_double(vertex[0]), CGAL::to_double(vertex[1]), CGAL::to_double(vertex[2])));
+		vertices.push_back(Eigen::Vector3d(CGAL::to_double(vertex[0]), CGAL::to_double(vertex[1]), CGAL::to_double(vertex[2])));
 	}
 
 	// Store each face of the convex-hull
 	unsigned int row = 0;
-	for (Facet_iterator pFacet = _cgalModel.facets_begin(); pFacet != _cgalModel.facets_end(); ++pFacet) {
+	for (Facet_iterator pFacet = convexHull.facets_begin(); pFacet != convexHull.facets_end(); ++pFacet) {
 		unsigned int col = 0;
 		Halfedge_around_facet_circulator pHalfedge = pFacet->facet_begin();
 
 		do {
-			_faces(row, col) = pHalfedge->vertex()->id();
 			convexFaces->push_back(pHalfedge->vertex()->id());
 			++col;
 		} while (++pHalfedge != pFacet->facet_begin());
@@ -90,7 +129,6 @@ void ConvexHull3D::init(osg::Vec3Array* vertices) {
 	}
 
 	// Create the osg-entity which represents the convex-hull
-	_osgModel = new osg::Geometry;
-	_osgModel->setVertexArray(convexVertices);
-	_osgModel->addPrimitiveSet(convexFaces);
+	geometry->setVertexArray(convexVertices);
+	geometry->addPrimitiveSet(convexFaces);
 }

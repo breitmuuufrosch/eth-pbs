@@ -84,15 +84,9 @@ void Planet::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 	std::string modelPath = DATA_PATH + "/sphere.obj";
 	_modelFile = ModelManager::Instance()->loadModel(modelPath, ratio, _radius);
 
-	if (_textureName != "") {
-		std::string texturePath = DATA_PATH + "/texture/" + _textureName;
-        std::cout << texturePath << std::endl;
-		osg::ref_ptr<osg::Texture2D> myTex = ImageManager::Instance()->loadTexture(texturePath);
-		_modelFile->getOrCreateStateSet()->setTextureAttributeAndModes(0, myTex.get());
-	}
-
 	// Compute convex hull
-	ConvexHullVisitor convexHull;
+	osg::Matrix scalingMatrix = osg::Matrix::scale(_scaling, _scaling, _scaling);
+	ConvexHullVisitor convexHull(scalingMatrix);
 	_modelFile->accept(convexHull);
 	_convexHull = convexHull.getConvexHull();
 
@@ -103,6 +97,14 @@ void Planet::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 	_convexRenderSwitch = new osg::Switch;
 	_convexRenderSwitch->addChild(_modelFile, true);
 	_convexRenderSwitch->addChild(geodeConvexHull, false);
+
+	// Load the texture
+	if (_textureName != "") {
+		std::string texturePath = DATA_PATH + "/texture/" + _textureName;
+        std::cout << texturePath << std::endl;
+		osg::ref_ptr<osg::Texture2D> myTex = ImageManager::Instance()->loadTexture(texturePath);
+		_convexRenderSwitch->getOrCreateStateSet()->setTextureAttributeAndModes(0, myTex.get());
+	}
 
 	// First transformation-node to handle locale-rotations easier
 	_rotation = new osg::MatrixTransform;
@@ -122,19 +124,19 @@ void Planet::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 
 
 /**
-* \brief Initialize the space-object for physics.
-*
-* \param mass
-*      Mass: unit = kg
-* \param linearVelocity
-*      Linear velocity: unit = m/s
-* \param angularVelocity
-*      Angular velocity: unit = rad/s
-* \param force
-*      Global force: unit = vector with norm equals to N
-* \param torque
-*      Global torque: unit = vector with norm equals to N*m (newton metre)
-*/
+ * \brief Initialize the space-object for physics.
+ *
+ * \param mass
+ *      Mass: unit = kg
+ * \param linearVelocity
+ *      Linear velocity: unit = m/s
+ * \param angularVelocity
+ *      Angular velocity: unit = rad/s
+ * \param force
+ *      Global force: unit = vector with norm equals to N
+ * \param torque
+ *      Global torque: unit = vector with norm equals to N*m (newton metre)
+ */
 void Planet::initPhysics(double mass, Eigen::Vector3d linearVelocity, Eigen::Vector3d angularVelocity, Eigen::Vector3d force, Eigen::Vector3d torque) {
 	SpaceObject::initPhysics(mass, linearVelocity, angularVelocity, force, torque);
 
