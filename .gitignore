@@ -38,3 +38,6 @@
 Debug
 *.vcxproj
 *.vcxproj.*
+
+# Screenshots
+/project/code/screenshots/*.png

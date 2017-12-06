@@ -13,5 +13,6 @@
 
 const std::string DATA_PATH = "${DATA_MODEL_PATH}";
 const std::string SCENES_PATH = "${SCENES_PATH}";
+const std::string SCREENSHOT_PATH = "${SCREENSHOT_PATH}";
 
 #endif /* EXAMPLE_H */
