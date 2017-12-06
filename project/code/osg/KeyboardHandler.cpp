@@ -1,5 +1,3 @@
-#pragma once
-
 #include "KeyboardHandler.h"
 
 using namespace pbs17;

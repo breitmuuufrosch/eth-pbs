@@ -4,9 +4,9 @@
     "objects": [
         {
             "id": "0",
-            "size": 2.05,
+            "size": 0.05,
             "type": "asteroid",
-            "obj": "asteroid OBJ.obj",
+            "obj": "A2.obj",
             "texture": "earthmap1k.jpg",
             "mass": 1.0,
             "position": {
