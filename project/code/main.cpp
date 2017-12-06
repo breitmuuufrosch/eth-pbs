@@ -7,6 +7,18 @@
 
 #include <osg/Node>
 #include <osgDB/ReadFile>
+#include <osgDB/WriteFile>
+#include <osgUtil/Optimizer>
+#include <osgDB/FileNameUtils>
+
+
+#include <osgViewer/ViewerEventHandlers>
+
+#include <osgGA/TrackballManipulator>
+
+#include <iostream>
+#include <stdint.h>
+
 #include <osgViewer/Viewer>
 #include <boost/program_options.hpp>
 #include <string>
@@ -17,9 +29,27 @@
 #include <json.hpp>
 #include "config.h"
 
+
 using namespace boost::program_options;
 // for convenience
 using json = nlohmann::json;
+
+class WriteToFileCaptureOperation : public osgViewer::ScreenCaptureHandler::CaptureOperation
+{
+public:
+
+    WriteToFileCaptureOperation(const std::string& filename):
+      _filename( filename )
+    {
+    }
+
+    virtual void operator()(const osg::Image& image, const unsigned int context_id)
+    {
+        osgDB::writeImageFile(image, _filename );
+    }
+
+    std::string _filename;
+};
 
 int main(int argc, const char *argv[]) {
     pbs17::SceneManager* sceneManager = new pbs17::SceneManager;
@@ -87,19 +117,32 @@ int main(int argc, const char *argv[]) {
 	pbs17::SimulationManager* simulationManager = new pbs17::SimulationManager(sceneManager->getSpaceObjects());
 
 	double startTime = 0.0;
+    bool captureFrame = true;
+
 
 	while (!viewer->done()) {
-		viewer->frame();
+
+        viewer->frame();
 
 		long frameNumber = viewer->getFrameStamp()->getFrameNumber();
 		double currentTime = viewer->elapsedTime();
 		double dt = currentTime - startTime;
 		//std::cout << "Frame: " << frameNumber << "\tdt: " << dt << "\tfps: " << 1.0 / dt << std::endl;
+        if(captureFrame) {
+            std::string screenCaptureFilename =  std::to_string(frameNumber) + "_frame.png";
+            osg::ref_ptr<osgViewer::ScreenCaptureHandler::CaptureOperation> writeFile = new WriteToFileCaptureOperation(screenCaptureFilename);
+            osg::ref_ptr<osgViewer::ScreenCaptureHandler> screenCaptureHandler = new osgViewer::ScreenCaptureHandler(writeFile.get());
+            viewer->addEventHandler(screenCaptureHandler);
+            screenCaptureHandler->setFramesToCapture(1000);
+            screenCaptureHandler->captureNextFrame(*viewer.get());
+            screenCaptureHandler->stopCapture();
+        }
 
 		dt = 0.01;
 		simulationManager->simulate(dt);
 
 		startTime = currentTime;
+
 	}
 
 	delete sceneManager;
