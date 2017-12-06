@@ -44,6 +44,7 @@ int main(int argc, const char *argv[]) {
 			("asteroids,a", value<int>()->default_value(0), "Asteroids")
 			("emitter,e", value<std::string>()->default_value("sphere"), "Emitter")
 			("rand,r", value<bool>()->default_value(true), "Random")
+            ("saveFrames,f", value<bool>()->default_value(false), "Save frame sto image files")
 			("sceneJson,j", value<std::string>(), "Json file containing the scene");
 
 
@@ -99,7 +100,7 @@ int main(int argc, const char *argv[]) {
 	pbs17::SimulationManager* simulationManager = new pbs17::SimulationManager(sceneManager->getSpaceObjects());
 
 	double startTime = 0.0;
-    bool captureFrame = true;
+    bool captureFrame = vm["saveFrames"].as<bool>();
 
 
 	while (!viewer->done()) {
