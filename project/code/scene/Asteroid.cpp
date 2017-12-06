@@ -9,6 +9,8 @@
 #include "../osg/JsonEigenConversions.h"
 #include "../osg/visitors/ConvexHullVisitor.h"
 #include "../osg/ImageManager.h"
+#include "../osg/visitors/ComputeTangentVisitor.h"
+#include "../osg/shaders.h"
 
 using namespace pbs17;
 
@@ -78,15 +80,40 @@ void Asteroid::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 
 	// Switch to decide if the convex hull or the model has to be rendered.
 	_convexRenderSwitch = new osg::Switch;
-	_convexRenderSwitch->addChild(_modelFile, false);
-	_convexRenderSwitch->addChild(geodeConvexHull, true);
+	_convexRenderSwitch->addChild(_modelFile, true);
+	_convexRenderSwitch->addChild(geodeConvexHull, false);
+
+	// Apply bumpmap-shaders
+	ComputeTangentVisitor ctv;
+	ctv.setTraversalMode(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN);
+	_modelFile->accept(ctv);
+
+	osg::ref_ptr<osg::Program> program = new osg::Program;
+	program->addShader(new osg::Shader(osg::Shader::VERTEX, vertBumpMap));
+	program->addShader(new osg::Shader(osg::Shader::FRAGMENT, fragBumpMap));
+	program->addBindAttribLocation("tangent", 6);
+	program->addBindAttribLocation("binormal", 7);
+
+	std::string bumpmapPath = DATA_PATH + "/texture/whitemetal_normal.jpg";
+	std::cout << bumpmapPath << std::endl;
+	osg::ref_ptr<osg::Texture2D> normalTex = ImageManager::Instance()->loadTexture(bumpmapPath);
 
 	// Load the texture
 	if (_textureName != "") {
-		std::string texturePath = DATA_PATH + "/texture/" + _textureName;
+		std::string texturePath = DATA_PATH + "/texture/whitemetal_diffuse.jpg"; // +_textureName;
 		std::cout << texturePath << std::endl;
-		osg::ref_ptr<osg::Texture2D> myTex = ImageManager::Instance()->loadTexture(texturePath);
-		_convexRenderSwitch->getOrCreateStateSet()->setTextureAttributeAndModes(0, myTex.get());
+		osg::ref_ptr<osg::Texture2D> colorTex = ImageManager::Instance()->loadTexture(texturePath);
+
+		osg::ref_ptr<osg::StateSet> stateset = _modelFile->getOrCreateStateSet();
+		//stateset->setTextureAttributeAndModes(0, myTex.get());
+
+		stateset->addUniform(new osg::Uniform("colorTex", 0));
+		stateset->addUniform(new osg::Uniform("normalTex", 1));
+		stateset->setAttributeAndModes(program.get());
+
+		osg::StateAttribute::GLModeValue value = osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE;
+		stateset->setTextureAttributeAndModes(0, colorTex.get(), value);
+		stateset->setTextureAttributeAndModes(1, normalTex.get(), value);
 	}
 
 	// First transformation-node to handle locale-rotations easier

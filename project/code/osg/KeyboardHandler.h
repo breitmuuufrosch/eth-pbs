@@ -9,8 +9,7 @@ namespace pbs17 {
 	class KeyboardHandler : public osgGA::GUIEventHandler {
 	public:
 		KeyboardHandler(const std::vector<SpaceObject*> &objects)
-			: _sceneManager(objects), _showBoundingBox(true), _showConvexHull(true), _isPaused(false) {}
-
+			: _sceneManager(objects), _showBoundingBox(true), _showConvexHull(false), _isPaused(false) {}
 
 		bool handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter&) override;
 

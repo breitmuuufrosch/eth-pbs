@@ -21,6 +21,22 @@ using namespace boost::program_options;
 // for convenience
 using json = nlohmann::json;
 
+osg::Light *createLight(osg::Vec4 color)
+{
+	osg::Light *light = new osg::Light();
+
+	// each light must have a unique number
+	light->setLightNum(0);
+
+	// we set the light's position via a PositionAttitudeTransform object
+	light->setPosition(osg::Vec4(0.0, 0.0, 0.0, 1.0));
+	light->setDiffuse(color);
+	light->setSpecular(osg::Vec4(1.0, 1.0, 1.0, 1.0));
+	light->setAmbient(osg::Vec4(0.0, 0.0, 0.0, 1.0));
+
+	return light;
+}
+
 int main(int argc, const char *argv[]) {
     pbs17::SceneManager* sceneManager = new pbs17::SceneManager;
     osg::ref_ptr<osg::Node> scene = nullptr;
@@ -83,6 +99,13 @@ int main(int argc, const char *argv[]) {
 
     //osg::ref_ptr<osg::Node> scene = sceneManager->loadScene();
 	osg::ref_ptr<osgViewer::Viewer> viewer = sceneManager->initViewer(scene);
+
+	osg::StateSet *lightStateSet = scene->getOrCreateStateSet();
+	osg::LightSource *lightSource = new osg::LightSource();
+	lightSource->setLight(createLight(osg::Vec4(1.0, 0.0, 0.0, 1.0)));
+	lightSource->setLocalStateSetModes(osg::StateAttribute::ON);
+	lightSource->setStateSetModes(*lightStateSet, osg::StateAttribute::ON);
+	scene->asGroup()->addChild(lightSource);
 
 	pbs17::SimulationManager* simulationManager = new pbs17::SimulationManager(sceneManager->getSpaceObjects());
 

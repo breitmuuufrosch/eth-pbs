@@ -21,7 +21,7 @@ ColorVisitor::ColorVisitor(const osg::Vec4 &color) : NodeVisitor(NodeVisitor::TR
 	_color = color;
 	_colorArrays = new osg::Vec4Array;
 	_colorArrays->push_back(_color);
-};
+}
 
 
 ColorVisitor::~ColorVisitor() {}

@@ -4,9 +4,10 @@
     "objects": [
         {
             "id": "0",
-            "size": 0.05,
+            "size": 2.05,
             "type": "asteroid",
-            "obj": "A2.obj",
+            "obj": "asteroid OBJ.obj",
+            "texture": "earthmap1k.jpg",
             "mass": 1.0,
             "position": {
                 "x": -2.0,
@@ -41,6 +42,7 @@
             "size": 0.05,
             "type": "asteroid",
             "obj": "A2.obj",
+            "texture": "earthmap1k.jpg",
             "mass": 1.0,
             "position": {
                 "x": 2.0,
