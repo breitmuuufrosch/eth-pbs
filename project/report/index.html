@@ -44,19 +44,32 @@ html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:1
             </ul>
         </div>
     </nav>
+</div>
+<div id="header">
+    <h2 class="title">Astroid Simulation</h2>
+    <p>
+        by Alexander Lelidis, Andreas Emch and Uros Tesic 
+    </p>
+</div>
+        
+<div class="container">
     <section class="header" id="intro">
-        <h2 class="title">Astroid Simulation</h2>
-        <p>
-            by Alexander Lelidis, Andreas Emch and Uros Tesic 
-        </p>
+        <div id="header">
+            <h2 class="title">Astroid Simulation</h2>
+            <p>
+                by Alexander Lelidis, Andreas Emch and Uros Tesic 
+            </p>
+        </div>
         <hr>
         <p> 
-            Here we write a general introduction with sample reference [<a href="#wenzel2014_1">1</a>]. 
+            Simulating planets and astroids in space is an intersesting multi dimensional challange. Due to the nature of the set up, we have to solve a few hard challanges to achieve a real time engine. The first part of the problem is the numerical computation of gravitational forces. This problem is today only solved analytically for 2 bodies. Since our objective is to have an asteroid field we using numerical methodes to approximated these forces. Once the bodies start to move around the second challange is to handle collisions and compute phyiscally correct responses. Again this needs to be done in rather fast fasion to be able to run in real time. 
         </p>
     </section>
     <div class="docs-section" id="overview">
         <h3 class="section-heading">Overview</h3>
         <p class="section-description">
+            To achieve the objective of having a real time n-body engine with collision detection, we are going to use a few libaries to not reinvent the wheel. Starting with the render engine openSceneGraph [<a href="#osg">1</a>], which we are using to visualize our simulation. This is a reasonable trade of due to the objective is to create the simulation engine and not to learn openGL. For our arithmetic opertations we rely on the fast linear algebra libary Eigen [<a href="#eigen">2</a>], which we are using for matrix and vector opertations. We included the computational geometry algorithms libary (CGAL)[<a href="#cgal">3</a>] into our project to compute the convex hull of our models. Each rendered object in our implementation has two meshes, one detailed mesh for rendering purpose and the simpler mesh of the convex hull for simulation purpose. 
+
             In this section we are going to give an overview of the basic theory.
         </p>
         <p class="section-description">
@@ -108,6 +121,7 @@ for channel in range(3):
         <h3 class="section-heading">N-body results</h3>
         <p class="section-description">
             In this section we are going to describe our results. 
+            Here we write a general introduction with sample reference [<a href="#wenzel2014_1">1</a>]. 
         </p>
         <h4 class="section-heading">Fourier approximation</h4>
         
@@ -182,12 +196,27 @@ for channel in range(3):
 
             <!-- reference 1 start -->                 
             <li>    
-            <div id="wenzel2014_1"><b>[wenzel2014,1]</b></div> 
+            <div id="osg"><b>[openSceneGraph,1]</b></div> 
             <p>
-            Wenzel Jakob, Eugene D'Eon, Otto Jakob, Steve Marschner "A Comprehensive Framework for Rendering Layered Materials"<br>
-            ACM Transactions on Graphics (ACM SIGGRAPH 2014)<br>
-            Online: <a href="http://www.cs.cornell.edu/projects/layered-sg14/" target="_blank">http://www.cs.cornell.edu/projects/layered-sg14/</a><br>
-            Last accessed: 18. January 2016
+            OpenSceneGraph is an open source 3D graphics application programming interface, used by application developers in fields such as visual simulation, computer games, virtual reality, scientific visualization and modeling. <br>
+            Online: <a href="http://www.openscenegraph.org/" target="_blank">http://www.openscenegraph.org/</a><br>
+            Last accessed: 18. December 2017
+            </p><br><br>
+            </li>
+            <li>    
+            <div id="eigen"><b>[Eigen,2]</b></div> 
+            <p>
+            Eigen is a high-level C++ library of template headers for linear algebra, matrix and vector operations, geometrical transformations, numerical solvers and related algorithms. <br>
+            Online: <a href="http://eigen.tuxfamily.org/index.php" target="_blank">http://eigen.tuxfamily.org/index.php</a><br>
+            Last accessed: 18. December 2017
+            </p><br><br>
+            </li>
+            <li>    
+            <div id="cgal"><b>[CGAL,3]</b></div> 
+            <p>
+            The Computational Geometry Algorithms Library is a software library of computational geometry algorithms. While primarily written in C++, Scilab bindings and bindings generated with SWIG are also available. <br>
+            Online: <a href="https://www.cgal.org/" target="_blank">https://www.cgal.org/</a><br>
+            Last accessed: 18. December 2017
             </p><br><br>
             </li>
             </ul>
