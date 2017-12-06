@@ -15,27 +15,33 @@ namespace pbs17 {
 	{
 	public:
 		/**
-		* \brief Constructor of the simulation-manager.
-		*
-		* \param spaceObjects
-		*      All space-objects in the scene.
-		*/
+		 * \brief Constructor of the simulation-manager.
+		 *
+		 * \param spaceObjects
+		 *      All space-objects in the scene.
+		 */
 		SimulationManager(std::vector<SpaceObject*> spaceObjects);
 
 
 		/**
-		* \brief Simulate the scene.
-		*
-		* \param dt
-		*      Time difference since between the last frames.
-		*/
+		 * \brief Simulate the scene.
+		 *
+		 * \param dt
+		 *      Time difference since between the last frames.
+		 */
 		void simulate(double dt);
+
+		static void setIsPaused(const bool isPaused) {
+			IS_PAUSED = isPaused;
+		}
 
 	private:
 		//! All space-objects in the scene
 		std::vector<SpaceObject*> _spaceObjects;
         CollisionManager* _cManager;
         NBodyManager* _nManager;
+
+		static bool IS_PAUSED;
 	};
 
 }

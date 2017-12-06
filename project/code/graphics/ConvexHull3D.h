@@ -1,3 +1,10 @@
+﻿/**
+ * \brief Calculate the convex-hull of a given object and store all relevant information for further processing.
+ *
+ * \Author: Alexander Lelidis (14-907-562), Andreas Emch (08-631-384), Uroš Tešić (17-950-346)
+ * \Date:   2017-11-26
+ */
+
 #pragma once
 
 #include <Eigen/Core>
@@ -36,7 +43,7 @@ namespace pbs17 {
 		 * 
 		 * \return (#V x 3)-matrix of vertices.
 		 */
-		const Eigen::MatrixXd& getVertices() const {
+		const std::vector<Eigen::Vector3d>& getVertices() const {
 			return _vertices;
 		}
 
@@ -72,42 +79,49 @@ namespace pbs17 {
 
 
 		/**
-		* \brief Get the cgal-model which is calculated as the convex-hull from cgal.
-		*
-		* \return Polyhedron which represents the convex-hull.
-		*/
-		Nef_Polyhedron_3 getCgalNefModel() const {
-			return _cgalNefModel;
-		}
+		 * \brief Simplify the convex-hull model so that it only has the given amount of edges.
+		 * 
+		 * \param polyhedron
+		 *		Output-parameter:
+		 *			Input:		Convex-hull-polyhedron which might be to complex
+		 *			Output:		Simplified convex-hull-polyhedron which represents the convex-hull to simplify
+		 * \param numEdges
+		 *      Number of edges to keep maximally.
+		 */
+		static void simplifyCgalModel(Polyhedron_3 &polyhedron, int numEdges);
 
 
 		/**
-		 * \brief Apply an affine transformation to the model.
+		 * \brief Convert the polyhedron from CGAL to the geometry from OSG (to render)
+		 * and to Eigen to calculate further operations (collision-detection etc)
 		 * 
-		 * \param transformation
-		 *	    Affine transformation to apply.
+		 * \param convexHull
+		 *      Polyhedron which is the convex-hull (optimally already simplified)
+		 * \param geometry
+		 *      Output-parameter:
+		 *			Input:		ignored
+		 *			Output:		Geometry for OSG to render the convex-hull
+		 * \param vertices
+		 *		Output-parameter:
+		 *			Input:		ignored
+		 *			Output:		Eigen-vectors with all the vertices
 		 */
-		void transform(Aff_transformation_3 transformation) {
-			clock_t begin = clock();
-			_cgalNefModel.transform(transformation);
-			clock_t end = clock();
-			double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-			std::cout << "Transform: " << elapsed_secs << std::endl;
-		}
+		static void fromPolyhedron(Polyhedron_3 &convexHull, osg::ref_ptr<osg::Geometry> &geometry, std::vector<Eigen::Vector3d> &vertices);
 
 
 	private:
 
 		//! Vertices which belongs on the convex-hull => (#V x 3)-matrix.
-		Eigen::MatrixXd _vertices;
+		std::vector<Eigen::Vector3d> _vertices;
+		
 		//! Faced which belongs on the convex-hull => (#F x 3)-matrix. (based on _vertices)
 		Eigen::MatrixXi _faces;
 
 		//! Generated geometry which represents the convex-hull in OSG.
 		osg::ref_ptr<osg::Geometry> _osgModel;
+
 		//! Generated geometry which represents the convex-hull in CGAL.
 		Polyhedron_3 _cgalModel;
-		Nef_Polyhedron_3 _cgalNefModel;
 
 	};
 }

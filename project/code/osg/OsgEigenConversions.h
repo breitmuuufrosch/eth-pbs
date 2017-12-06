@@ -1,6 +1,5 @@
 #pragma once
 
-#include <osg/MatrixTransform>
 #include <Eigen/Core>
 
 namespace pbs17 {

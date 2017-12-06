@@ -2,6 +2,8 @@
 
 using namespace pbs17;
 
+bool SimulationManager::IS_PAUSED = false;
+
 /**
  * \brief Constructor of the simulation-manager.
  * 
@@ -22,6 +24,10 @@ SimulationManager::SimulationManager(std::vector<SpaceObject*> spaceObjects)
  *      Time difference since between the last frames.
  */
 void SimulationManager::simulate(double dt) {
+	if (IS_PAUSED) {
+		return;
+	}
+
     // simulate on step
     _nManager->simulateStep(dt, this->_spaceObjects);
 

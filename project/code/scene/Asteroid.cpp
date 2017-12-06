@@ -8,6 +8,7 @@
 #include "../osg/OsgEigenConversions.h"
 #include "../osg/JsonEigenConversions.h"
 #include "../osg/visitors/ConvexHullVisitor.h"
+#include "../osg/ImageManager.h"
 
 using namespace pbs17;
 
@@ -17,7 +18,6 @@ using namespace pbs17;
 */
 Asteroid::Asteroid()
     : SpaceObject("A2.obj", 0) {
-
 }
 
 
@@ -68,7 +68,8 @@ void Asteroid::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 	_modelFile = ModelManager::Instance()->loadModel(modelPath, ratio, scaling);
 
 	// Compute convex hull
-	ConvexHullVisitor convexHull;
+	osg::Matrix scalingMatrix = osg::Matrix::scale(_scaling, _scaling, _scaling);
+	ConvexHullVisitor convexHull(scalingMatrix);
 	_modelFile->accept(convexHull);
 	_convexHull = convexHull.getConvexHull();
 	
@@ -79,6 +80,14 @@ void Asteroid::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 	_convexRenderSwitch = new osg::Switch;
 	_convexRenderSwitch->addChild(_modelFile, false);
 	_convexRenderSwitch->addChild(geodeConvexHull, true);
+
+	// Load the texture
+	if (_textureName != "") {
+		std::string texturePath = DATA_PATH + "/texture/" + _textureName;
+		std::cout << texturePath << std::endl;
+		osg::ref_ptr<osg::Texture2D> myTex = ImageManager::Instance()->loadTexture(texturePath);
+		_convexRenderSwitch->getOrCreateStateSet()->setTextureAttributeAndModes(0, myTex.get());
+	}
 
 	// First transformation-node to handle locale-rotations easier
 	_rotation = new osg::MatrixTransform;
@@ -94,4 +103,25 @@ void Asteroid::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 	_modelRoot = new osg::Switch;
 	_modelRoot->addChild(_translation, true);
 	_modelRoot->addChild(_aabbRendering, true);
+}
+
+/**
+ * \brief Initialize the space-object for physics.
+ *
+ * \param mass
+ *      Mass: unit = kg
+ * \param linearVelocity
+ *      Linear velocity: unit = m/s
+ * \param angularVelocity
+ *      Angular velocity: unit = rad/s
+ * \param force
+ *      Global force: unit = vector with norm equals to N
+ * \param torque
+ *      Global torque: unit = vector with norm equals to N*m (newton metre)
+ */
+void Asteroid::initPhysics(double mass, Eigen::Vector3d linearVelocity, Eigen::Vector3d angularVelocity, Eigen::Vector3d force, Eigen::Vector3d torque) {
+	SpaceObject::initPhysics(mass, linearVelocity, angularVelocity, force, torque);
+
+	_momentOfInertia = Eigen::Matrix3d();
+	_momentOfInertia.setIdentity();
 }
