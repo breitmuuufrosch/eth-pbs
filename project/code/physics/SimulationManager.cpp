@@ -3,6 +3,7 @@
 using namespace pbs17;
 
 bool SimulationManager::IS_PAUSED = false;
+double SimulationManager::SIMULATION_DT = 0.01;;
 
 /**
  * \brief Constructor of the simulation-manager.

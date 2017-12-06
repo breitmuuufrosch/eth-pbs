@@ -376,7 +376,7 @@ osg::ref_ptr<osgViewer::Viewer> SceneManager::initViewer(osg::ref_ptr<osg::Node>
 	//viewer->setUpViewOnSingleScreen(0);
 	viewer->setUpViewInWindow(80, 80, 1000, 600, 0);
 	viewer->setSceneData(scene);
-	viewer->addEventHandler(new KeyHandler(_spaceObjects));
+	viewer->addEventHandler(new KeyboardHandler(_spaceObjects));
 
 	osg::ref_ptr<osgGA::TrackballManipulator> manipulator = new osgGA::TrackballManipulator;
 	viewer->setCameraManipulator(manipulator);

@@ -96,7 +96,7 @@ int main(int argc, const char *argv[]) {
 		double dt = currentTime - startTime;
 		//std::cout << "Frame: " << frameNumber << "\tdt: " << dt << "\tfps: " << 1.0 / dt << std::endl;
 
-		dt = 0.01;
+		dt = pbs17::SimulationManager::getSimulationDt();
 		simulationManager->simulate(dt);
 
 		startTime = currentTime;
