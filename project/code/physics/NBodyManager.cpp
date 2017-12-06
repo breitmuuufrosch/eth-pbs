@@ -69,7 +69,11 @@ void NBodyManager::simulateStep(double dt, std::vector<SpaceObject *> &spaceObje
 		osg::Quat q;
         double sinQuat = sin(dto.norm() / 2);
         double cosQuat = cos(dto.norm() / 2);
-        q.set(sinQuat*dto(0) / dto.norm(), sinQuat*dto(1) / dto.norm(), sinQuat*dto(2) / dto.norm(), cosQuat);
+        if(dto.norm() > 0) {
+            q.set(sinQuat*dto(0) / dto.norm(), sinQuat*dto(1) / dto.norm(), sinQuat*dto(2) / dto.norm(), cosQuat);
+        } else {
+            q.set(0.0, 0.0, 0.0, 1.0);
+        }
         osg::Quat newQ = q*spaceObject->getOrientation();
 
 

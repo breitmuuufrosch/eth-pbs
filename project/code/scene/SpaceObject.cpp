@@ -116,14 +116,14 @@ void SpaceObject::initPhysics(double mass, Eigen::Vector3d linearVelocity, Eigen
 }
 
 
-void SpaceObject::updatePositionOrientation(Eigen::Vector3d p, Eigen::Vector3d dtv, Quat newOrientation) {
+void SpaceObject::updatePositionOrientation(Eigen::Vector3d p, Eigen::Vector3d dtv, osg::Quat newOrientation) {
 	_position = p;
-	_orientation = o;
+    _orientation = newOrientation;
 
 	_translation->setMatrix(osg::Matrix::translate(toOsg(p)));
 	osg::Matrixd rotMat;
-	o->get(RotMat);
-	_rotation->setMatrix(rotMat);
+    newOrientation.get(rotMat);
+    _rotation->setMatrix(rotMat);
 
 	calculateAABB();
 }

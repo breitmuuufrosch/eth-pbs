@@ -161,13 +161,13 @@ namespace pbs17 {
 
 		void setOrientation(osg::Quat o) {
 			_orientation = o;
-			Quat rotMat;
+            osg::Matrixd rotMat;
 			o.get(rotMat);
 			_rotation->setMatrix(rotMat);
 			calculateAABB();
 		}
 
-		void updatePositionOrientation(Eigen::Vector3d p, Eigen::Vector3d dtv, Quat newOrientation);
+        void updatePositionOrientation(Eigen::Vector3d p, Eigen::Vector3d dtv, osg::Quat newOrientation);
 
 		void calculateAABB();
 

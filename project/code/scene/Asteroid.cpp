@@ -89,7 +89,8 @@ void Asteroid::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 		osg::ref_ptr<osg::Texture2D> myTex = ImageManager::Instance()->loadTexture(texturePath);
 		_convexRenderSwitch->getOrCreateStateSet()->setTextureAttributeAndModes(0, myTex.get());
 	}
-	
+    VertexListVisitor vListVisitor;
+    _modelFile->accept(vListVisitor);
 	const osg::Vec3Array* vertices = dynamic_cast<const osg::Vec3Array*>(vListVisitor.getVertices());
 
 	double minX = DBL_MAX, maxX = -DBL_MAX, minY = DBL_MAX, maxY = -DBL_MAX, minZ = DBL_MAX, maxZ = -DBL_MAX;
@@ -165,5 +166,5 @@ void Asteroid::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 void Asteroid::initPhysics(double mass, Eigen::Vector3d linearVelocity, Eigen::Vector3d angularVelocity, Eigen::Vector3d force, Eigen::Vector3d torque) {
 	SpaceObject::initPhysics(mass, linearVelocity, angularVelocity, force, torque);
 
-	_momentOfInertia = mass * _momentOfInertia();
+    _momentOfInertia = mass * _momentOfInertia;
 }
