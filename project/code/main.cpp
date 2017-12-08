@@ -32,7 +32,7 @@ osg::Light *createLight(osg::Vec4 color)
 	light->setPosition(osg::Vec4(0.0, 0.0, 0.0, 1.0));
 	light->setDiffuse(color);
 	light->setSpecular(osg::Vec4(1.0, 1.0, 1.0, 1.0));
-	light->setAmbient(osg::Vec4(0.0, 0.0, 0.0, 1.0));
+	light->setAmbient(osg::Vec4(255.0, 234.0, 160.0, 0.0) / 10255.0);
 
 	return light;
 }
@@ -99,10 +99,13 @@ int main(int argc, const char *argv[]) {
 
     //osg::ref_ptr<osg::Node> scene = sceneManager->loadScene();
 	osg::ref_ptr<osgViewer::Viewer> viewer = sceneManager->initViewer(scene);
+	osg::StateSet* state = scene->getOrCreateStateSet();
+	state->setMode(GL_LIGHTING, osg::StateAttribute::ON);
+	state->setMode(GL_LIGHT0, osg::StateAttribute::ON);
 
 	osg::StateSet *lightStateSet = scene->getOrCreateStateSet();
 	osg::LightSource *lightSource = new osg::LightSource();
-	lightSource->setLight(createLight(osg::Vec4(1.0, 0.0, 0.0, 1.0)));
+	lightSource->setLight(createLight(osg::Vec4(255.0, 234.0, 160.0, 255.0) / 255.0));
 	lightSource->setLocalStateSetModes(osg::StateAttribute::ON);
 	lightSource->setStateSetModes(*lightStateSet, osg::StateAttribute::ON);
 	scene->asGroup()->addChild(lightSource);

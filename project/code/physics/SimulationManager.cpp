@@ -2,7 +2,7 @@
 
 using namespace pbs17;
 
-bool SimulationManager::IS_PAUSED = false;
+bool SimulationManager::IS_PAUSED = true;
 double SimulationManager::SIMULATION_DT = 0.01;;
 
 /**

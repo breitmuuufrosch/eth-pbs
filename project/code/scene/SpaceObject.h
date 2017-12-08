@@ -208,6 +208,8 @@ namespace pbs17 {
 			return fromOsg(toOsg(v) * transform);
 		}
 
+		void initTexturing();
+
 
 	protected:
 
@@ -230,7 +232,7 @@ namespace pbs17 {
 		osg::ref_ptr<osg::MatrixTransform> _rotation;
 
 		//! Scaling ratio
-		double _scaling;
+		double _scaling = 1.0;
 		//! Position
 		Eigen::Vector3d _position;
 		//! Orientation
@@ -239,10 +241,10 @@ namespace pbs17 {
 		osg::BoundingBox _aabbLocal;
 		osg::BoundingBox _aabbGlobal;
 		//! ConvexHull of the object
-		ConvexHull3D* _convexHull;
+		ConvexHull3D* _convexHull = nullptr;
 
 		//! Mass: unit = kg
-		double _mass;
+		double _mass = 1.0;
 		//! Linear velocity : unit = m / s
 		Eigen::Vector3d _linearVelocity;
 		//! Angular velocity : unit = rad / s
@@ -254,7 +256,7 @@ namespace pbs17 {
 		//! Global torque : unit = vector with norm equals to N*m(newton metre)
 		Eigen::Vector3d _torque;
 
-		int _collisionState;
+		int _collisionState = 0;
 
 
 	private:

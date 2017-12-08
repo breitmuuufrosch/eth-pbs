@@ -40,6 +40,7 @@ namespace pbs17 {
 
 		static void setSimulationDt(const double dt) {
 			SIMULATION_DT = std::max(dt, 0.0);
+			SIMULATION_DT = std::min(SIMULATION_DT, 1.0);
 		}
 
 		static void increaseSimulationDt(const double dt) {

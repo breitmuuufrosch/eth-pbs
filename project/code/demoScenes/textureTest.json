@@ -4,25 +4,24 @@
     "objects": [
         {
             "id": "0",
-            "size": 0.05,
-            "type": "asteroid",
-            "obj": "sphere.obj",
-            "texture": "earthmap1k.jpg",
-            "mass": 1.0,
+            "size": 2.0,
+            "type": "planet",
+            "texture": "sunmap.jpg",
+            "mass": 40.0,
             "position": {
-                "x": -2.0,
+                "x": 0.0,
                 "y": 0.0,
                 "z": 0.0
             },
             "ratio": 1.0,
             "scaling": 1.0,
             "linearVelocity": {
-                "x": 0.5,
-                "y": 0,
+                "x": 0.0,
+                "y": 0.0,
                 "z": 0.0
             },
             "angularVelocity": {
-                "x": 1.0,
+                "x": 0.0,
                 "y": 0.0,
                 "z": 0.0
             },
@@ -39,27 +38,60 @@
         },
         {
             "id": "1",
-            "size": 0.05,
-            "type": "asteroid",
-            "obj": "A2.obj",
+            "size": 1,
+            "type": "planet",
             "texture": "earthmap1k.jpg",
-            "mass": 1.0,
+            "mass": 0.1,
             "position": {
-                "x": 2.0,
+                "x": -10.0,
                 "y": 0.0,
                 "z": 0.0
             },
             "ratio": 1.0,
             "scaling": 1.0,
             "linearVelocity": {
-                "x": -0.5,
-                "y": 0,
+                "x": 0.0,
+                "y": 2.0,
                 "z": 0.0
             },
             "angularVelocity": {
                 "x": 0.0,
                 "y": 0.0,
+                "z": 2.0
+            },
+            "force": {
+                "x": 0.0,
+                "y": 0.0,
                 "z": 0.0
+            },
+            "torque": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            }
+        },
+        {
+            "id": "2",
+            "size": 1,
+            "type": "planet",
+            "texture": "earthmap1k.jpg",
+            "mass": 0.1,
+            "position": {
+                "x": -5.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "ratio": 1.0,
+            "scaling": 1.0,
+            "linearVelocity": {
+                "x": 0.0,
+                "y": 3.0,
+                "z": 0.0
+            },
+            "angularVelocity": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 2.0
             },
             "force": {
                 "x": 0.0,

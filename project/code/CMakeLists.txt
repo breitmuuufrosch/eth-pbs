@@ -150,6 +150,11 @@ FILE(GLOB osg_visitors_HDRS "./osg/visitors/*.h")
 SOURCE_GROUP(Osg\\Visitors FILES ${osg_visitors_SRCS} ${osg_visitors_HDRS})
 LIST(APPEND SOURCES ${osg_visitors_SRCS} ${osg_visitors_HDRS})
 
+FILE(GLOB osg_shaders_SRCS "./osg/shaders/*.cpp")
+FILE(GLOB osg_shaders_HDRS "./osg/shaders/*.h")
+SOURCE_GROUP(Osg\\Shaders FILES ${osg_shaders_SRCS} ${osg_shaders_HDRS})
+LIST(APPEND SOURCES ${osg_shaders_SRCS} ${osg_shaders_HDRS})
+
 FILE(GLOB physics_SRCS "./physics/*.cpp")
 FILE(GLOB physics_HDRS "./physics/*.h")
 SOURCE_GROUP(Physics FILES ${physics_SRCS} ${physics_HDRS})

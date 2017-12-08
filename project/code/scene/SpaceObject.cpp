@@ -1,9 +1,14 @@
 #include "SpaceObject.h"
 
-#include <osgDB/ReadFile>
 #include <osg/PolygonMode>
 #include <osg/ShapeDrawable>
+#include <osg/Material>
+
 #include "../osg/visitors/BoundingBoxVisitor.h"
+#include "../osg/ImageManager.h"
+#include "../osg/visitors/ComputeTangentVisitor.h"
+#include "../osg/shaders/BumpmapShader.h"
+#include "../config.h"
 
 using namespace pbs17;
 
@@ -155,4 +160,39 @@ void SpaceObject::setCollisionState(int c) {
 	//ColorVisitor colorVisitor(c == 1 ? osg::Vec4(0, 1, 0, 1) : osg::Vec4(1, 0, 0, 1));
 	_aabbShape->setColor(c == 1 ? osg::Vec4(0, 1, 0, 1) : osg::Vec4(1, 0, 0, 1));
 	//_aabbRendering->accept(colorVisitor);
+}
+
+
+void SpaceObject::initTexturing() {
+	// Apply bumpmap-shaders
+	ComputeTangentVisitor ctv;
+	ctv.setTraversalMode(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN);
+	_modelFile->accept(ctv);
+
+	// Load the texture
+	if (_textureName != "") {
+		std::string bumpmapPath = DATA_PATH + "/texture/elev_bump_16k.jpg";
+		std::cout << bumpmapPath << std::endl;
+		osg::ref_ptr<osg::Texture2D> normalTex = ImageManager::Instance()->loadTexture(bumpmapPath);
+
+		std::string texturePath = DATA_PATH + "/texture/" + _textureName;
+		std::cout << texturePath << std::endl;
+		osg::ref_ptr<osg::Texture2D> colorTex = ImageManager::Instance()->loadTexture(texturePath);
+		
+		BumpmapShader bumpmapShader(colorTex, normalTex);
+		//bumpmapShader.apply(_modelFile);
+		
+		osg::ref_ptr<osg::StateSet> stateset = _modelFile->getOrCreateStateSet();
+
+		osg::ref_ptr<osg::Material> material = new osg::Material();
+		material->setDiffuse(osg::Material::FRONT, osg::Vec4(1.0, 1.0, 1.0, 1.0));
+		material->setSpecular(osg::Material::FRONT, osg::Vec4(0.0, 0.0, 0.0, 1.0));
+		material->setAmbient(osg::Material::FRONT, osg::Vec4(0.1, 0.1, 0.1, 1.0));
+		material->setEmission(osg::Material::FRONT, osg::Vec4(0.0, 0.0, 0.0, 1.0));
+		material->setShininess(osg::Material::FRONT, 100);
+		stateset->setAttribute(material);
+	}
+
+	//CartoonShader cs(osg::Vec4(1.0, 0.0, 0.0, 1.0));
+	//cs.apply(_modelFile);
 }

@@ -120,6 +120,8 @@ void Planet::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 	_modelRoot = new osg::Switch;
 	_modelRoot->addChild(_translation, true);
 	_modelRoot->addChild(_aabbRendering, true);
+
+	initTexturing();
 }
 
 
