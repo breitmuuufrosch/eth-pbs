@@ -132,25 +132,79 @@ void SpaceShip::initPhysics(double mass, Eigen::Vector3d linearVelocity, Eigen::
 }
 
 void SpaceShip::turnUp() {
-	// Todo
+    Eigen::Vector3d p = getPosition();
+    osg::Quat q;
+    double sinQuat = sin(_rotationAngle / 2);
+    double cosQuat = cos(_rotationAngle / 2);
+
+    q.set(sinQuat * 0.0,
+          sinQuat * 1.0,
+          sinQuat * 0.0,
+          cosQuat);
+    osg::Quat newQ = q * getOrientation();
+
+    updatePositionOrientation(p, newQ);
+    updateDirectionOrientation(getLinearVelocity(), newQ);
 }
 
 void SpaceShip::turnDown() {
-	// Todo
+    Eigen::Vector3d p = getPosition();
+    osg::Quat q;
+    double sinQuat = sin(_rotationAngle / 2);
+    double cosQuat = cos(_rotationAngle / 2);
+
+    q.set(sinQuat * 0.0,
+          sinQuat * -1.0,
+          sinQuat * 0.0,
+          cosQuat);
+    osg::Quat newQ = q * getOrientation();
+
+    updatePositionOrientation(p, newQ);
+    updateDirectionOrientation(getLinearVelocity(), newQ);
 }
 
 void SpaceShip::turnLeft() {
-	// Todo
+    Eigen::Vector3d p = getPosition();
+    osg::Quat q;
+    double sinQuat = sin(_rotationAngle / 2);
+    double cosQuat = cos(_rotationAngle / 2);
+
+    q.set(sinQuat * 1.0,
+          sinQuat * 0.0,
+          sinQuat * 0.0,
+          cosQuat);
+    osg::Quat newQ = q * getOrientation();
+
+    updatePositionOrientation(p, newQ);
+    updateDirectionOrientation(getLinearVelocity(), newQ);
 }
 
 void SpaceShip::turnRight() {
-	// Todo
+    Eigen::Vector3d p = getPosition();
+    osg::Quat q;
+    double sinQuat = sin(_rotationAngle / 2);
+    double cosQuat = cos(_rotationAngle / 2);
+
+    q.set(sinQuat * -1.0,
+          sinQuat * 0.0,
+          sinQuat * 0.0,
+          cosQuat);
+    osg::Quat newQ = q * getOrientation();
+
+    updatePositionOrientation(p, newQ);
+    updateDirectionOrientation(getLinearVelocity(), newQ);
 }
 
 void SpaceShip::accelerate() {
-	// Todo
+    Eigen::Vector3d v = getLinearVelocity() * _acceleration;
+    if(v.norm() < 0.0001) {
+        v = Eigen::Vector3d (1.0, 0.0, 0.0);
+    }
+
+    setLinearVelocity(v);
 }
 
 void SpaceShip::decelerate() {
-	// Todo
+    Eigen::Vector3d v = getLinearVelocity() * _decelerate;
+    setLinearVelocity(v);
 }
