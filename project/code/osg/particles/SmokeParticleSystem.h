@@ -10,6 +10,8 @@
 #include <osgParticle/ModularProgram>
 #include <osgParticle/FluidFrictionOperator>
 #include <osgParticle/AccelOperator>
+
+#include "../../config.h"
 #include "EmitterUpdateCallback .h"
 
 namespace pbs17 {
@@ -20,12 +22,7 @@ namespace pbs17 {
 			osgParticle::ParticleSystem* dustParticleSystem = new osgParticle::ParticleSystem;
 			osg::Geode *geode = new osg::Geode();
 			geode->addDrawable(dustParticleSystem);
-
-			osg::MatrixTransform *rotation = new osg::MatrixTransform;
-			rotation->setMatrix(osg::Matrixd::rotate(osg::DegreesToRadians(-90.0), osg::Y_AXIS));
-			rotation->addChild(geode);
-
-			this->addChild(rotation);
+			this->addChild(geode);
 
 			// Set particle system state
 			dustParticleSystem->setDefaultAttributes(DATA_PATH + "/texture/dust.png", false, false);
@@ -48,7 +45,7 @@ namespace pbs17 {
 			// Add a ModularEmitter
 			osgParticle::ModularEmitter *emitter = new osgParticle::ModularEmitter;
 			emitter->setParticleSystem(dustParticleSystem);
-			this->addChild(emitter);
+			scene->addChild(emitter);
 
 			osgParticle::RandomRateCounter *dustRate =
 				static_cast<osgParticle::RandomRateCounter *>(emitter->getCounter());

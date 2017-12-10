@@ -105,12 +105,12 @@ void SpaceShip::initOsg(Eigen::Vector3d position, double ratio, double scaling) 
 	calculateAABB();
 
 	// Particle system
-	osg::ref_ptr<SmokeParticleSystem> smoke = new SmokeParticleSystem(nullptr, _translation.get());
+	osg::ref_ptr<SmokeParticleSystem> smoke = new SmokeParticleSystem(_convexRenderSwitch, _translation.get());
 
 	_modelRoot = new osg::Switch;
 	_modelRoot->addChild(_translation, true);
 	_modelRoot->addChild(_aabbRendering, true);
-	_modelRoot->addChild(smoke, true);
+	_convexRenderSwitch->addChild(smoke, true);
 
 	initTexturing();
 }
