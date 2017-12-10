@@ -6,16 +6,24 @@
  */
 
 #include <osg/Node>
-#include <osgDB/ReadFile>
+#include <osgDB/WriteFile>
 #include <osgViewer/Viewer>
-#include <boost/program_options.hpp>
-#include <string>
+#include <osgViewer/ViewerEventHandlers>
 
+#include <boost/program_options.hpp>
+
+#include <string>
 #include <iomanip>
+#include <json.hpp>
+
+#include <iostream>
+#include <stdint.h>
+
 #include "scene/SceneManager.h"
 #include "physics/SimulationManager.h"
-#include <json.hpp>
+#include "osg/SnapImageDrawCallback.h"
 #include "config.h"
+
 
 using namespace boost::program_options;
 // for convenience
@@ -52,6 +60,7 @@ int main(int argc, const char *argv[]) {
 			("asteroids,a", value<int>()->default_value(0), "Asteroids")
 			("emitter,e", value<std::string>()->default_value("sphere"), "Emitter")
 			("rand,r", value<bool>()->default_value(true), "Random")
+            ("saveFrames,f", value<bool>()->default_value(false), "Save frame sto image files")
 			("sceneJson,j", value<std::string>(), "Json file containing the scene");
 
 
@@ -109,23 +118,42 @@ int main(int argc, const char *argv[]) {
 	lightSource->setLocalStateSetModes(osg::StateAttribute::ON);
 	lightSource->setStateSetModes(*lightStateSet, osg::StateAttribute::ON);
 	scene->asGroup()->addChild(lightSource);
+	
+	// Set-up the screenshot functionality
+	osg::ref_ptr<pbs17::SnapImageDrawCallback> screenshotCallback = new pbs17::SnapImageDrawCallback();
+	viewer->getCamera()->setPostDrawCallback(screenshotCallback.get());
 
 	pbs17::SimulationManager* simulationManager = new pbs17::SimulationManager(sceneManager->getSpaceObjects());
 
 	double startTime = 0.0;
+    bool captureFrame = vm["saveFrames"].as<bool>();
+
 
 	while (!viewer->done()) {
-		viewer->frame();
+
+        viewer->frame();
 
 		long frameNumber = viewer->getFrameStamp()->getFrameNumber();
 		double currentTime = viewer->elapsedTime();
 		double dt = currentTime - startTime;
 		//std::cout << "Frame: " << frameNumber << "\tdt: " << dt << "\tfps: " << 1.0 / dt << std::endl;
 
+        if(captureFrame) {
+            std::string screenCaptureFilename =  std::to_string(frameNumber) + "_frame.png";
+			osg::ref_ptr<pbs17::SnapImageDrawCallback> snapImageDrawCallback = dynamic_cast<pbs17::SnapImageDrawCallback*>(viewer->getCamera()->getPostDrawCallback());
+			
+        	if (snapImageDrawCallback.get()) {
+				std::cout << "make screenshot" << std::endl;
+				snapImageDrawCallback->setFileName(screenCaptureFilename);
+				snapImageDrawCallback->setSnapImageOnNextFrame(true);
+			}
+        }
+
 		dt = pbs17::SimulationManager::getSimulationDt();
 		simulationManager->simulate(dt);
 
 		startTime = currentTime;
+
 	}
 
 	delete sceneManager;

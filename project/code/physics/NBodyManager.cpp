@@ -66,8 +66,16 @@ void NBodyManager::simulateStep(double dt, std::vector<SpaceObject *> &spaceObje
         Vector3d p = spaceObject->getPosition() + dtv;
 
 		Vector3d dto = dt * spaceObject->getAngularVelocity();
-		Vector3d o = spaceObject->getOrientation() + dto;
+		osg::Quat q;
+        double sinQuat = sin(dto.norm() / 2);
+        double cosQuat = cos(dto.norm() / 2);
+        if(dto.norm() > 0) {
+            q.set(sinQuat*dto(0) / dto.norm(), sinQuat*dto(1) / dto.norm(), sinQuat*dto(2) / dto.norm(), cosQuat);
+        } else {
+            q.set(0.0, 0.0, 0.0, 1.0);
+        }
+        osg::Quat newQ = q*spaceObject->getOrientation();
 
-		spaceObject->updatePositionOrientation(p, o);
+		spaceObject->updatePositionOrientation(p, newQ);
     }
 }

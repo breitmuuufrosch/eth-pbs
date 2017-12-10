@@ -8,6 +8,7 @@
 
 const std::string DATA_PATH = "${DATA_MODEL_PATH}";
 const std::string SCENES_PATH = "${SCENES_PATH}";
+const std::string SCREENSHOT_PATH = "${SCREENSHOT_PATH}";
 
 const double MATH_PI		= 3.14159265358979323846;
 const double MATH_PI_2		= 1.57079632679489661923;

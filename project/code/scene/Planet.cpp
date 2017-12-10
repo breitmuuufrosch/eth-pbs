@@ -1,13 +1,11 @@
 #include "Planet.h"
 
-#include <osg/Texture2D>
 #include <osg/Switch>
 #include <osgDB/ReadFile>
 
 #include "../config.h"
 #include "../osg/JsonEigenConversions.h"
 #include "../osg/OsgEigenConversions.h"
-#include "../osg/ImageManager.h"
 #include "../osg/ModelManager.h"
 #include "../osg/visitors/ConvexHullVisitor.h"
 
