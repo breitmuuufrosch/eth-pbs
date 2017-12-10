@@ -162,6 +162,11 @@ FILE(GLOB osg_events_HDRS "./osg/events/*.h")
 SOURCE_GROUP(Osg\\Events FILES ${osg_events_SRCS} ${osg_events_HDRS})
 LIST(APPEND SOURCES ${osg_events_SRCS} ${osg_events_HDRS})
 
+FILE(GLOB osg_particles_SRCS "./osg/particles/*.cpp")
+FILE(GLOB osg_particles_HDRS "./osg/particles/*.h")
+SOURCE_GROUP(Osg\\Particles FILES ${osg_particles_SRCS} ${osg_particles_HDRS})
+LIST(APPEND SOURCES ${osg_particles_SRCS} ${osg_particles_HDRS})
+
 FILE(GLOB physics_SRCS "./physics/*.cpp")
 FILE(GLOB physics_HDRS "./physics/*.h")
 SOURCE_GROUP(Physics FILES ${physics_SRCS} ${physics_HDRS})

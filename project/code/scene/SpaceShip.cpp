@@ -10,6 +10,7 @@
 #include "../osg/OsgEigenConversions.h"
 #include "../osg/JsonEigenConversions.h"
 #include "../osg/visitors/ConvexHullVisitor.h"
+#include "../osg/particles/SmokeParticleSystem.h"
 
 using namespace pbs17;
 
@@ -92,9 +93,13 @@ void SpaceShip::initOsg(Eigen::Vector3d position, double ratio, double scaling) 
 
 	calculateAABB();
 
+	// Particle system
+	osg::ref_ptr<SmokeParticleSystem> smoke = new SmokeParticleSystem(nullptr, _translation.get());
+
 	_modelRoot = new osg::Switch;
 	_modelRoot->addChild(_translation, true);
 	_modelRoot->addChild(_aabbRendering, true);
+	_modelRoot->addChild(smoke, true);
 
 	initTexturing();
 }
