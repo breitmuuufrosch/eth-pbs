@@ -8,6 +8,7 @@
 #include "../osg/OsgEigenConversions.h"
 #include "../osg/JsonEigenConversions.h"
 #include "../osg/visitors/ConvexHullVisitor.h"
+#include "../osg/visitors/VertexListVisitor.h"
 
 using namespace pbs17;
 
@@ -80,6 +81,50 @@ void Asteroid::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 	_convexRenderSwitch->addChild(_modelFile, true);
 	_convexRenderSwitch->addChild(geodeConvexHull, false);
 
+    VertexListVisitor vListVisitor;
+    _modelFile->accept(vListVisitor);
+	const osg::Vec3Array* vertices = dynamic_cast<const osg::Vec3Array*>(vListVisitor.getVertices());
+
+	double minX = DBL_MAX, maxX = -DBL_MAX, minY = DBL_MAX, maxY = -DBL_MAX, minZ = DBL_MAX, maxZ = -DBL_MAX;
+
+	for (int i = 0; i < vertices->size(); i++) {
+		if (vertices->at(i).x() < minX) {
+			minX = vertices->at(i).x();
+		}
+
+		if (vertices->at(i).x() > maxX) {
+			maxX = vertices->at(i).x();
+		}
+
+		if (vertices->at(i).y() < minY) {
+			minY = vertices->at(i).y();
+		}
+
+		if (vertices->at(i).y() > maxY) {
+			maxY = vertices->at(i).y();
+		}
+
+		if (vertices->at(i).z() < minZ) {
+			minZ = vertices->at(i).z();
+		}
+
+		if (vertices->at(i).z() > maxZ) {
+			maxZ = vertices->at(i).z();
+		}
+	}
+	double a = maxX - minX;
+	double b = maxY - minY;
+	double c = maxZ - minZ;
+	double Ixx = 1. / 12.*(b*b + c*c) * scaling * scaling;
+	double Iyy = 1. / 12.*(a*a + c*c) * scaling * scaling;
+	double Izz = 1. / 12.*(a*a + b*b) * scaling * scaling;
+
+	_momentOfInertia = Eigen::Matrix3d();
+	_momentOfInertia.setIdentity();
+	_momentOfInertia(0, 0) = Ixx;
+	_momentOfInertia(1, 1) = Iyy;
+	_momentOfInertia(2, 2) = Izz;
+
 	// First transformation-node to handle locale-rotations easier
 	_rotation = new osg::MatrixTransform;
 	_rotation->addChild(_convexRenderSwitch);
@@ -115,6 +160,5 @@ void Asteroid::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 void Asteroid::initPhysics(double mass, Eigen::Vector3d linearVelocity, Eigen::Vector3d angularVelocity, Eigen::Vector3d force, Eigen::Vector3d torque) {
 	SpaceObject::initPhysics(mass, linearVelocity, angularVelocity, force, torque);
 
-	_momentOfInertia = Eigen::Matrix3d();
-	_momentOfInertia.setIdentity();
+    _momentOfInertia = mass * _momentOfInertia;
 }

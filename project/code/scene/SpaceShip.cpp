@@ -132,45 +132,25 @@ void SpaceShip::initPhysics(double mass, Eigen::Vector3d linearVelocity, Eigen::
 }
 
 void SpaceShip::turnUp() {
-	Eigen::Vector3d dto = 0.1 * Eigen::Vector3d(0.0, 1.0, 0.0);
-	Eigen::Vector3d o = getOrientation() + dto;
-
-	setOrientation(o);
-	setLinearVelocity(_velocity * o);
+	// Todo
 }
 
 void SpaceShip::turnDown() {
-	Eigen::Vector3d dto = -0.1 * Eigen::Vector3d(0.0, 1.0, 0.0);
-	Eigen::Vector3d o = getOrientation() + dto;
-
-	setOrientation(o);
-	setLinearVelocity(_velocity * o);
+	// Todo
 }
 
 void SpaceShip::turnLeft() {
-	Eigen::Vector3d dto = 0.1 * Eigen::Vector3d(1.0, 0.0, 0.0);
-	Eigen::Vector3d o = getOrientation() + dto;
-
-	setOrientation(o);
-	setLinearVelocity(_velocity * o);
+	// Todo
 }
 
 void SpaceShip::turnRight() {
-	Eigen::Vector3d dto = -0.1 * Eigen::Vector3d(1.0, 0.0, 0.0);
-	Eigen::Vector3d o = getOrientation() + dto;
-
-	setOrientation(o);
-	setLinearVelocity(_velocity * o);
+	// Todo
 }
 
 void SpaceShip::accelerate() {
-	_velocity += 0.1;
-	setLinearVelocity(_velocity * _orientation);
-	std::cout << _velocity << std::endl;
+	// Todo
 }
 
 void SpaceShip::decelerate() {
-	_velocity -= 0.1;
-	setLinearVelocity(_velocity * _orientation);
-	std::cout << _velocity << std::endl;
+	// Todo
 }

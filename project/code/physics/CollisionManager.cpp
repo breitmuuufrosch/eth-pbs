@@ -278,10 +278,10 @@ void CollisionManager::respondToCollisions() {
 		Matrix3d foOrientationX, foOrientationY, foOrientationZ;
 		Matrix3d soOrientationX, soOrientationY, soOrientationZ;
 
-		Vector3d orientation1 = object1->getOrientation();
-		Vector3d orientation2 = object2->getOrientation();
+		osg::Quat orientation1 = object1->getOrientation();
+		osg::Quat orientation2 = object2->getOrientation();
 
-		foOrientationX << 1., 0., 0.,
+		/*foOrientationX << 1., 0., 0.,
 			0., cos(orientation1[0]), -sin(orientation1[0]),
 			0., sin(orientation1[0]), cos(orientation1[0]);
 
@@ -303,10 +303,10 @@ void CollisionManager::respondToCollisions() {
 
 		soOrientationZ << cos(orientation2[2]), -sin(orientation2[2]), 0,
 			sin(orientation2[2]), cos(orientation2[2]), 0,
-			0, 0, 1;
+			0, 0, 1;*/
 
-		Eigen::Matrix3d foRotationMatrix = foOrientationZ * foOrientationY * foOrientationX;
-		Eigen::Matrix3d soRotationMatrix = soOrientationZ * soOrientationY * soOrientationX;
+		Eigen::Matrix3d foRotationMatrix = fromOsg(osg::Matrix::rotate(orientation1)).block(0,0,3,3);
+		Eigen::Matrix3d soRotationMatrix = fromOsg(osg::Matrix::rotate(orientation2)).block(0,0,3,3);
 
 		Eigen::Matrix3d foWorldInertia = foRotationMatrix.inverse().transpose() * object1->getMomentOfInertia() * foRotationMatrix.inverse();
 		Eigen::Matrix3d soWorldInertia = soRotationMatrix.inverse().transpose() * object2->getMomentOfInertia() * soRotationMatrix.inverse();
