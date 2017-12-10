@@ -128,6 +128,7 @@ SET(SOURCES "")
 
 SET(DATA_MODEL_PATH ${CMAKE_CURRENT_LIST_DIR}/data)
 SET(SCENES_PATH ${CMAKE_CURRENT_LIST_DIR}/demoScenes)
+SET(VERSION "0.9.1")
 CONFIGURE_FILE(precompile/config.h.in ${CMAKE_CURRENT_LIST_DIR}/config.h)
 
 FILE(GLOB main_SRCS "./*.cpp")
@@ -154,6 +155,11 @@ FILE(GLOB osg_shaders_SRCS "./osg/shaders/*.cpp")
 FILE(GLOB osg_shaders_HDRS "./osg/shaders/*.h")
 SOURCE_GROUP(Osg\\Shaders FILES ${osg_shaders_SRCS} ${osg_shaders_HDRS})
 LIST(APPEND SOURCES ${osg_shaders_SRCS} ${osg_shaders_HDRS})
+
+FILE(GLOB osg_events_SRCS "./osg/events/*.cpp")
+FILE(GLOB osg_events_HDRS "./osg/events/*.h")
+SOURCE_GROUP(Osg\\Events FILES ${osg_events_SRCS} ${osg_events_HDRS})
+LIST(APPEND SOURCES ${osg_events_SRCS} ${osg_events_HDRS})
 
 FILE(GLOB physics_SRCS "./physics/*.cpp")
 FILE(GLOB physics_HDRS "./physics/*.h")

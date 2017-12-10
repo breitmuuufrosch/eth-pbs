@@ -165,7 +165,7 @@ namespace pbs17 {
 			calculateAABB();
 		}
 
-		void updatePositionOrientation(Eigen::Vector3d p, Eigen::Vector3d dtv, Eigen::Vector3d o, Eigen::Vector3d dto);
+		void updatePositionOrientation(Eigen::Vector3d p, Eigen::Vector3d o);
 
 		void calculateAABB();
 
@@ -217,6 +217,9 @@ namespace pbs17 {
 		std::string _filename;
 		//! Filename of the loaded texture
 		std::string _textureName = "";
+		//! Filename of the loaded bumpmap
+		std::string _bumpmapName = "";
+
 		//! Unique identifier for the object
 		long _id;
 

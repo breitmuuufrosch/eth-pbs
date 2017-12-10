@@ -29,7 +29,7 @@ osg::Light *createLight(osg::Vec4 color)
 	light->setLightNum(0);
 
 	// we set the light's position via a PositionAttitudeTransform object
-	light->setPosition(osg::Vec4(0.0, 0.0, 0.0, 1.0));
+	light->setPosition(osg::Vec4(0.0, 0.0, 5.0, 1.0));
 	light->setDiffuse(color);
 	light->setSpecular(osg::Vec4(1.0, 1.0, 1.0, 1.0));
 	light->setAmbient(osg::Vec4(255.0, 234.0, 160.0, 0.0) / 10255.0);
@@ -105,7 +105,7 @@ int main(int argc, const char *argv[]) {
 
 	osg::StateSet *lightStateSet = scene->getOrCreateStateSet();
 	osg::LightSource *lightSource = new osg::LightSource();
-	lightSource->setLight(createLight(osg::Vec4(255.0, 234.0, 160.0, 255.0) / 255.0));
+	lightSource->setLight(createLight(osg::Vec4(255.0, 234.0, 100.0, 255.0) / 255.0));
 	lightSource->setLocalStateSetModes(osg::StateAttribute::ON);
 	lightSource->setStateSetModes(*lightStateSet, osg::StateAttribute::ON);
 	scene->asGroup()->addChild(lightSource);

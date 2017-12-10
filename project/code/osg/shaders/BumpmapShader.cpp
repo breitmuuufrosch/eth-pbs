@@ -54,14 +54,14 @@ BumpmapShader::BumpmapShader(osg::ref_ptr<osg::Texture2D> texture, osg::ref_ptr<
 		"	 gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);\n"
 		"	 vec4 diffuse = vec4(0.0, 0.0, 0.0, 0.0);\n"
 		"	 vec4 specular = vec4(0.0, 0.0, 0.0, 0.0);\n"
-		"	 vec4 ambient = gl_LightSource[0].ambient;\n"
+		"	 vec4 ambient = gl_FrontMaterial.ambient * gl_LightSource[0].ambient;\n"
 
 		"    if (lambert > 0.0)\n"
 		"    {\n"
-		"        diffuse = base * gl_LightSource[0].diffuse * lambert;\n"
-		"        specular = gl_LightSource[0].specular * pow(lambert, gl_FrontMaterial.shininess);\n"
+		"        diffuse = gl_FrontMaterial.diffuse * base * gl_LightSource[0].diffuse * lambert;\n"
+		"        specular = gl_FrontMaterial.specular * gl_LightSource[0].specular * pow(lambert, gl_FrontMaterial.shininess);\n"
 		"    }\n"
-		"    gl_FragColor = ambient + diffuse + specular;\n"
+		"    gl_FragColor += ambient + diffuse + specular;\n"
 		"}\n"
 	);
 }

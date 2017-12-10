@@ -29,7 +29,8 @@ SpaceObject::SpaceObject(std::string filename, int i)
 }
 
 SpaceObject::SpaceObject(json j) {
-    _textureName = j["texture"].is_string()? j["texture"].get<std::string>(): "";
+	_textureName = j["texture"].is_string() ? j["texture"].get<std::string>() : "";
+	_bumpmapName = j["bumpmap"].is_string() ? j["bumpmap"].get<std::string>() : "";
     std::cout << "_textureName = "<< _textureName << std::endl;
     _filename = j["obj"].is_string()? j["obj"].get<std::string>(): "";
     _id = RunningId;
@@ -119,7 +120,7 @@ void SpaceObject::initPhysics(double mass, Eigen::Vector3d linearVelocity, Eigen
 }
 
 
-void SpaceObject::updatePositionOrientation(Eigen::Vector3d p, Eigen::Vector3d dtv, Eigen::Vector3d o, Eigen::Vector3d dto) {
+void SpaceObject::updatePositionOrientation(Eigen::Vector3d p, Eigen::Vector3d o) {
 	_position = p;
 	_orientation = o;
 
@@ -164,6 +165,9 @@ void SpaceObject::setCollisionState(int c) {
 
 
 void SpaceObject::initTexturing() {
+	bool useBumpmap = _bumpmapName != "";
+	osg::ref_ptr<osg::StateSet> stateset = _modelFile->getOrCreateStateSet();
+
 	// Apply bumpmap-shaders
 	ComputeTangentVisitor ctv;
 	ctv.setTraversalMode(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN);
@@ -171,27 +175,30 @@ void SpaceObject::initTexturing() {
 
 	// Load the texture
 	if (_textureName != "") {
-		std::string bumpmapPath = DATA_PATH + "/texture/elev_bump_16k.jpg";
-		std::cout << bumpmapPath << std::endl;
-		osg::ref_ptr<osg::Texture2D> normalTex = ImageManager::Instance()->loadTexture(bumpmapPath);
-
 		std::string texturePath = DATA_PATH + "/texture/" + _textureName;
 		std::cout << texturePath << std::endl;
 		osg::ref_ptr<osg::Texture2D> colorTex = ImageManager::Instance()->loadTexture(texturePath);
 		
-		BumpmapShader bumpmapShader(colorTex, normalTex);
-		//bumpmapShader.apply(_modelFile);
-		
-		osg::ref_ptr<osg::StateSet> stateset = _modelFile->getOrCreateStateSet();
+		if (useBumpmap) {
+			std::string bumpmapPath = DATA_PATH + "/texture/" + _bumpmapName;
+			std::cout << bumpmapPath << std::endl;
+			osg::ref_ptr<osg::Texture2D> normalTex = ImageManager::Instance()->loadTexture(bumpmapPath);
 
-		osg::ref_ptr<osg::Material> material = new osg::Material();
-		material->setDiffuse(osg::Material::FRONT, osg::Vec4(1.0, 1.0, 1.0, 1.0));
-		material->setSpecular(osg::Material::FRONT, osg::Vec4(0.0, 0.0, 0.0, 1.0));
-		material->setAmbient(osg::Material::FRONT, osg::Vec4(0.1, 0.1, 0.1, 1.0));
-		material->setEmission(osg::Material::FRONT, osg::Vec4(0.0, 0.0, 0.0, 1.0));
-		material->setShininess(osg::Material::FRONT, 100);
-		stateset->setAttribute(material);
+			BumpmapShader bumpmapShader(colorTex, normalTex);
+			bumpmapShader.apply(_modelFile);
+		} else
+		{
+			stateset->setTextureAttributeAndModes(0, colorTex.get(), osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE);
+		}
 	}
+
+	osg::ref_ptr<osg::Material> material = new osg::Material();
+	material->setDiffuse(osg::Material::FRONT, osg::Vec4(1.0, 1.0, 1.0, 1.0));
+	material->setSpecular(osg::Material::FRONT, osg::Vec4(0.0, 0.0, 0.0, 1.0));
+	material->setAmbient(osg::Material::FRONT, osg::Vec4(0.1, 0.1, 0.1, 1.0));
+	material->setEmission(osg::Material::FRONT, osg::Vec4(0.0, 0.0, 0.0, 1.0));
+	material->setShininess(osg::Material::FRONT, 100);
+	stateset->setAttribute(material);
 
 	//CartoonShader cs(osg::Vec4(1.0, 0.0, 0.0, 1.0));
 	//cs.apply(_modelFile);

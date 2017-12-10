@@ -2,13 +2,21 @@
 
 #include <osg/Group>
 #include <osgViewer/Viewer>
+#include <Eigen/Core>
 #include <boost/program_options.hpp>
 #include <json.hpp>
 
-#include "SpaceObject.h"
 
 using namespace boost::program_options;
 using json = nlohmann::json;
+
+
+// Forward declarations
+namespace pbs17 {
+	class SpaceObject;
+	class SpaceShip;
+	class KeyboardHandler;
+}
 
 namespace pbs17 {
 	/**
@@ -109,6 +117,15 @@ namespace pbs17 {
 
 		//! All space-objects in the scene (used for calcualtions)
 		std::vector<SpaceObject*> _spaceObjects;
+
+		//! True if it is a game and false if it is a simulation
+		bool _isGame = false;
+
+		//! Spaceship for the player.
+		SpaceShip *_player = nullptr;
+
+		//! Keyboard-handler
+		KeyboardHandler* _keyboardHandler = nullptr;
 
         const double DEFAULT_MASS = 500000;
 

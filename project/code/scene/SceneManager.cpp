@@ -12,7 +12,10 @@
 #include "Planet.h"
 #include "../osg/SkyBox.h"
 #include "../config.h"
-#include "../osg/KeyboardHandler.h"
+#include "SpaceShip.h"
+
+#include "../osg/events/SimulationKeyboardHandler.h"
+#include "../osg/events/GameKeyboardHandler.h"
 
 using namespace pbs17;
 
@@ -103,6 +106,8 @@ osg::ref_ptr<osg::Node> SceneManager::loadScene() {
 		planets->addChild(planet2->getModel());
 	}
 
+	_keyboardHandler = new SimulationKeyboardHandler(_spaceObjects);
+
 	return _scene;
 }
 
@@ -115,6 +120,7 @@ osg::ref_ptr<osg::Node> SceneManager::loadScene() {
  */
 osg::ref_ptr<osg::Node> SceneManager::loadScene(variables_map vm) {
 	_scene = new osg::Group();
+
 	// add the skybox
 	addSkybox();
 
@@ -129,6 +135,8 @@ osg::ref_ptr<osg::Node> SceneManager::loadScene(variables_map vm) {
 	} else {
 		cubeEmitter(spheres, asteroids, random);
 	}
+
+	_keyboardHandler = new SimulationKeyboardHandler(_spaceObjects);
 
 
 	return _scene;
@@ -154,8 +162,24 @@ osg::ref_ptr<osg::Node> SceneManager::loadScene(json j) {
 
 	std::vector<json> objects = j["objects"].get<std::vector<json>>();
 	std::cout << "with " << objects.size() << " objects." << std::endl;
+
+	std::cout << j["gameplay"];
+	if (j["gameplay"].is_boolean() && j["gameplay"].get<bool>() == true) {
+		std::cout << "YEAH, gaming!" << std::endl;
+		_isGame = true;
+
+		_player = new SpaceShip(j["player"]);
+		_spaceObjects.push_back(_player);
+		planets->addChild(_player->getModel());
+	
+		_keyboardHandler = new GameKeyboardHandler(_spaceObjects, _player);
+	} else {
+		_keyboardHandler = new SimulationKeyboardHandler(_spaceObjects);
+	}
+
 	for (json d : objects) {
 		SpaceObject* so;
+
 		if (d["type"].get<std::string>() == "planet") {
 			so = new Planet(d);
 		} else if (d["type"].get<std::string>() == "asteroid") {
@@ -163,6 +187,7 @@ osg::ref_ptr<osg::Node> SceneManager::loadScene(json j) {
 		} else {
 			std::cout << "Type (" + d["type"].get<std::string>() + ") not supported!" << std::endl;
 		}
+
 		_spaceObjects.push_back(so);
 		planets->addChild(so->getModel());
 	}
@@ -376,7 +401,7 @@ osg::ref_ptr<osgViewer::Viewer> SceneManager::initViewer(osg::ref_ptr<osg::Node>
 	//viewer->setUpViewOnSingleScreen(0);
 	viewer->setUpViewInWindow(80, 80, 1000, 600, 0);
 	viewer->setSceneData(scene);
-	viewer->addEventHandler(new KeyboardHandler(_spaceObjects));
+	viewer->addEventHandler(_keyboardHandler);
 
 	osg::ref_ptr<osgGA::TrackballManipulator> manipulator = new osgGA::TrackballManipulator;
 	viewer->setCameraManipulator(manipulator);
