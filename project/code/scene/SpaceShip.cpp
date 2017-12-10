@@ -18,7 +18,18 @@ using namespace pbs17;
 * \brief Constructor of SpaceShip.
 */
 SpaceShip::SpaceShip()
-	: SpaceObject("starfighter.obj", 0) {}
+    : SpaceObject("starfighter.obj", 0) {
+    Eigen::Vector3d pos = Eigen::Vector3d(0.0, 0.0, 0.0);
+    initOsg(pos, 1.0, 1.0);
+
+    Eigen::Vector3d linearVelocity = Eigen::Vector3d(1.0, 0.0, 0.0);
+    Eigen::Vector3d angularVelocity = Eigen::Vector3d(0.0, 0.0, 0.0);
+    Eigen::Vector3d force = Eigen::Vector3d(0.0, 0.0, 0.0);;
+    Eigen::Vector3d torque = Eigen::Vector3d(0.0, 0.0, 0.0);;
+
+    initPhysics(1.0, linearVelocity, angularVelocity, force, torque);
+
+}
 
 
 /**
