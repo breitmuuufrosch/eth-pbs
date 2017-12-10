@@ -59,7 +59,8 @@ int main(int argc, const char *argv[]) {
 			("spheres,s", value<int>()->default_value(10), "Spheres")
 			("asteroids,a", value<int>()->default_value(0), "Asteroids")
 			("emitter,e", value<std::string>()->default_value("sphere"), "Emitter")
-			("rand,r", value<bool>()->default_value(true), "Random")
+            ("rand,r", value<bool>()->default_value(true), "Random")
+            ("gameplay,g", value<bool>()->default_value(false), "Gameplay")
             ("saveFrames,f", value<bool>()->default_value(false), "Save frame sto image files")
 			("sceneJson,j", value<std::string>(), "Json file containing the scene");
 

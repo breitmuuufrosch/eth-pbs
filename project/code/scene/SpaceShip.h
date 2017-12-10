@@ -74,7 +74,9 @@ namespace pbs17 {
 		void decelerate();
 
 	private:
-		double _velocity = 0;
+        double _acceleration = 1.2;
+        double _decelerate = 0.8;
+        double _rotationAngle = 0.1; // randians ~ 5.7 degrees
 	};
 
 }

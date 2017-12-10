@@ -129,6 +129,19 @@ osg::ref_ptr<osg::Node> SceneManager::loadScene(variables_map vm) {
 	bool random = vm["rand"].as<bool>();
 	int spheres = vm["spheres"].as<int>();
 	int asteroids = vm["asteroids"].as<int>();
+    bool gameplay = vm["gameplay"].as<bool>();
+    if (gameplay) {
+        std::cout << "YEAH, gaming!" << std::endl;
+        _isGame = true;
+
+        _player = new SpaceShip();
+        _spaceObjects.push_back(_player);
+        _scene->addChild(_player->getModel());
+
+        _keyboardHandler = new GameKeyboardHandler(_spaceObjects, _player);
+    } else {
+        _keyboardHandler = new SimulationKeyboardHandler(_spaceObjects);
+    }
 
 	if (useSphereEmitter) {
 		sphereEmitter(spheres, asteroids, random);

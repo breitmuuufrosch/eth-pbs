@@ -134,6 +134,22 @@ void SpaceObject::updatePositionOrientation(Eigen::Vector3d p, osg::Quat newOrie
 	calculateAABB();
 }
 
+void SpaceObject::updateDirectionOrientation(Eigen::Vector3d v, osg::Quat newOrientation) {
+
+
+    _orientation = newOrientation;
+
+    osg::Matrixd rotMat;
+    newOrientation.get(rotMat);
+    _rotation->setMatrix(rotMat);
+
+    Eigen::Vector4d lv(v.x(), v.y(), v.z(), 1.0);
+    lv = fromOsg(rotMat) * lv;
+    _linearVelocity = Eigen::Vector3d(lv.x(), lv.y(), lv.z());
+
+    calculateAABB();
+}
+
 
 void SpaceObject::calculateAABB() {
 	osg::Matrix scaling = osg::Matrix::scale(_scaling, _scaling, _scaling);

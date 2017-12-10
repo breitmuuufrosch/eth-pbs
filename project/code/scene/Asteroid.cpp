@@ -87,7 +87,7 @@ void Asteroid::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 
 	double minX = DBL_MAX, maxX = -DBL_MAX, minY = DBL_MAX, maxY = -DBL_MAX, minZ = DBL_MAX, maxZ = -DBL_MAX;
 
-	for (int i = 0; i < vertices->size(); i++) {
+    for (unsigned int i = 0; i < vertices->size(); i++) {
 		if (vertices->at(i).x() < minX) {
 			minX = vertices->at(i).x();
 		}
