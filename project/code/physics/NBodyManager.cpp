@@ -1,7 +1,9 @@
 #include "NBodyManager.h"
 
 #include <math.h>
+#if defined(_OPENMP)
 #include <omp.h>
+#endif
 
 using namespace pbs17;
 using namespace Eigen;
@@ -26,8 +28,9 @@ void NBodyManager::simulateStep(double dt, std::vector<SpaceObject *> &spaceObje
     for (int i = 0; i < cntSpaceObj; ++i) {
         forces[i] = Vector3d(0.0, 0.0, 0.0);
     }
-
+#if defined(_OPENMP)
 #pragma omp parallel for
+#endif
     for (int i = 0; i < cntSpaceObj; ++i) {
         SpaceObject* curObject = spaceObjects[i];
         // Calculate a rotation around the rotation-center of the object
@@ -55,7 +58,9 @@ void NBodyManager::simulateStep(double dt, std::vector<SpaceObject *> &spaceObje
             forces[i] += f * d.normalized();
         }
     }
+#if defined(_OPENMP)
 #pragma omp parallel for
+#endif
     // update positions
     for (int i = 0; i < cntSpaceObj; ++i) {
         SpaceObject* spaceObject = spaceObjects[i];
