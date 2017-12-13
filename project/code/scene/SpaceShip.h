@@ -13,7 +13,7 @@ namespace pbs17 {
 		/**
 		 * \brief Constructor of SpaceShip.
 		 */
-        explicit SpaceShip();
+		explicit SpaceShip();
 
 
 		/**
@@ -22,7 +22,7 @@ namespace pbs17 {
 		 * \param j
 		 *      JSON-configuration for the spaceship.
 		 */
-        explicit SpaceShip(json j);
+		explicit SpaceShip(json j);
 
 
 		/**
@@ -33,7 +33,7 @@ namespace pbs17 {
 
 		/**
 		 * \brief Initialize the space-object for OSG.
-		 * 
+		 *
 		 * \param position
 		 *      Initial position of the object.
 		 * \param ratio
@@ -61,6 +61,14 @@ namespace pbs17 {
 		void initPhysics(double mass, Eigen::Vector3d linearVelocity, Eigen::Vector3d angularVelocity, Eigen::Vector3d force, Eigen::Vector3d torque) override;
 
 
+		osg::ref_ptr<osg::Node> getTrackingNode() const {
+			return _modelFile;
+		}
+
+		void updatePositionOrientation(Eigen::Vector3d p, osg::Quat newOrientation) override;
+
+		void updateDirectionOrientation(Eigen::Vector3d v, osg::Quat newOrientation);
+
 		void turnUp();
 
 		void turnDown();
@@ -74,9 +82,10 @@ namespace pbs17 {
 		void decelerate();
 
 	private:
-        double _acceleration = 1.2;
-        double _decelerate = 0.8;
-        double _rotationAngle = 0.1; // randians ~ 5.7 degrees
+		osg::ref_ptr<osg::MatrixTransform> _particleRoot;
+		double _acceleration = 1.2;
+		double _decelerate = 0.8;
+		double _rotationAngle = 0.1; // randians ~ 5.7 degrees
 		double intensity = 1.0;
 	};
 

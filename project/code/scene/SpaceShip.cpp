@@ -98,15 +98,19 @@ void SpaceShip::initOsg(Eigen::Vector3d position, double ratio, double scaling) 
 	_transformation->setMatrix(osg::Matrix::translate(toOsg(position)));
 	_transformation->addChild(_convexRenderSwitch);
 
+	_particleRoot = new osg::MatrixTransform;
+	_particleRoot->setMatrix(osg::Matrix::translate(toOsg(position)));
+
 	calculateAABB();
 
 	// Particle system
-	osg::ref_ptr<SmokeParticleSystem> smoke = new SmokeParticleSystem(_transformation, _transformation.get());
+	osg::ref_ptr<SmokeParticleSystem> smoke = new SmokeParticleSystem(_particleRoot, _particleRoot.get());
 
 	_modelRoot = new osg::Switch;
 	_modelRoot->addChild(_transformation, true);
 	_modelRoot->addChild(_aabbRendering, true);
 	_modelRoot->addChild(smoke, true);
+	_modelRoot->addChild(_particleRoot, true);
 
 	initTexturing();
 }
@@ -131,6 +135,39 @@ void SpaceShip::initPhysics(double mass, Eigen::Vector3d linearVelocity, Eigen::
 	_momentOfInertia = Eigen::Matrix3d();
 	_momentOfInertia.setIdentity();
 }
+
+void SpaceShip::updatePositionOrientation(Eigen::Vector3d p, osg::Quat newOrientation) {
+	_position = p;
+	_orientation = newOrientation;
+
+	osg::Matrixd rotation;
+	newOrientation.get(rotation);
+	osg::Matrixd translation = osg::Matrix::translate(toOsg(p));
+	osg::Matrixd localRotation = osg::Matrix::rotate(-90, osg::Y_AXIS);
+
+	_transformation->setMatrix(rotation * translation);
+	_particleRoot->setMatrix(localRotation * rotation * translation);
+
+	calculateAABB();
+}
+
+
+void SpaceShip::updateDirectionOrientation(Eigen::Vector3d v, osg::Quat newOrientation) {
+	_orientation = newOrientation;
+
+	osg::Matrixd rotation;
+	newOrientation.get(rotation);
+	osg::Matrixd translation = osg::Matrix::translate(toOsg(_position));
+	osg::Matrixd localRotation = osg::Matrix::rotate(90, osg::Y_AXIS);
+
+	_transformation->setMatrix(rotation * translation);
+	_particleRoot->setMatrix(localRotation * rotation * translation);
+
+	_linearVelocity = fromOsg(rotation).block(0, 0, 3, 3) * v;
+
+	calculateAABB();
+}
+
 
 void SpaceShip::turnUp() {
     Eigen::Vector3d p = getPosition();

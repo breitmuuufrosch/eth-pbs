@@ -29,12 +29,12 @@ namespace pbs17 {
 
 			// Define the Particle template
 			osgParticle::Particle smokeParticle;
-			smokeParticle.setSizeRange(osgParticle::rangef(0.1f, 0.5f)); // meters
+			smokeParticle.setSizeRange(osgParticle::rangef(0.2f, 0.4f)); // meters
 			smokeParticle.setLifeTime(15); // seconds
 			smokeParticle.setMass(0.4f);
 			smokeParticle.setColorRange(osgParticle::rangev4(
 				osg::Vec4(1.0, 1.0, 1.0, 1.0),
-				osg::Vec4(0, 0, 0, 0.3f)));
+				osg::Vec4(0.0, 0.0, 0.0, 0.3f)));
 			dustParticleSystem->setDefaultParticleTemplate(smokeParticle);
 
 			// Add a ParticleSystemUpdater to the ParticleSystem
@@ -49,7 +49,7 @@ namespace pbs17 {
 
 			osgParticle::RandomRateCounter *dustRate =
 				static_cast<osgParticle::RandomRateCounter *>(emitter->getCounter());
-			dustRate->setRateRange(40, 100);
+			dustRate->setRateRange(100, 400);
 
 			//osgParticle::PointPlacer* placer =
 			//	static_cast<osgParticle::PointPlacer *>(emitter->getPlacer());
@@ -57,8 +57,8 @@ namespace pbs17 {
 
 			osgParticle::RadialShooter* shooter =
 				static_cast<osgParticle::RadialShooter *>(emitter->getShooter());
-			shooter->setThetaRange(0, 3.15149 / 4.0f); // radians, relative to Z axis.
-			shooter->setInitialSpeedRange(0.4, 0.6); // meters/second
+			shooter->setThetaRange(0, 3.15149 / 20.0f); // radians, relative to Z axis.
+			shooter->setInitialSpeedRange(1.4, 1.6); // meters/second
 			emitter->setShooter(shooter);
 		}
 

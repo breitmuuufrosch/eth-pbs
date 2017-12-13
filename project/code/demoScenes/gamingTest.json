@@ -5,7 +5,7 @@
     "player": {
         "id": "9999",
         "type": "spaceship",
-        "obj": "sphere.obj",
+        "obj": "starfighter.obj",
         "texture": "earthmap1k.jpg",
         "mass": 0.01,
         "position": {
@@ -21,7 +21,7 @@
             "z": 0.0
         },
         "angularVelocity": {
-            "x": 1.0,
+            "x": 0.0,
             "y": 0.0,
             "z": 0.0
         },
