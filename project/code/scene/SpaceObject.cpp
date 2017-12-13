@@ -135,20 +135,6 @@ void SpaceObject::updatePositionOrientation(Eigen::Vector3d p, osg::Quat newOrie
 	calculateAABB();
 }
 
-void SpaceObject::updateDirectionOrientation(Eigen::Vector3d v, osg::Quat newOrientation) {
-    _orientation = newOrientation;
-
-    osg::Matrixd rotation;
-    newOrientation.get(rotation);
-	osg::Matrixd translation = osg::Matrix::translate(toOsg(_position));
-
-	_transformation->setMatrix(rotation * translation);
-
-	_linearVelocity = fromOsg(rotation).block(0,0,3,3) * v;
-
-    calculateAABB();
-}
-
 
 void SpaceObject::calculateAABB() {
 	osg::Matrix scaling = osg::Matrix::scale(_scaling, _scaling, _scaling);
@@ -186,7 +172,7 @@ void SpaceObject::setCollisionState(int c) {
 
 void SpaceObject::initTexturing() {
 	bool useBumpmap = _bumpmapName != "";
-	osg::ref_ptr<osg::StateSet> stateset = _modelFile->getOrCreateStateSet();
+	osg::ref_ptr<osg::StateSet> stateset = _convexRenderSwitch->getOrCreateStateSet();
 
 	// Apply bumpmap-shaders
 	ComputeTangentVisitor ctv;
@@ -198,16 +184,15 @@ void SpaceObject::initTexturing() {
 		std::string texturePath = DATA_PATH + "/texture/" + _textureName;
 		std::cout << texturePath << std::endl;
 		osg::ref_ptr<osg::Texture2D> colorTex = ImageManager::Instance()->loadTexture(texturePath);
-		
+
 		if (useBumpmap) {
 			std::string bumpmapPath = DATA_PATH + "/texture/" + _bumpmapName;
 			std::cout << bumpmapPath << std::endl;
 			osg::ref_ptr<osg::Texture2D> normalTex = ImageManager::Instance()->loadTexture(bumpmapPath);
 
 			BumpmapShader bumpmapShader(colorTex, normalTex);
-			bumpmapShader.apply(_modelFile);
-		} else
-		{
+			bumpmapShader.apply(_convexRenderSwitch);
+		} else {
 			stateset->setTextureAttributeAndModes(0, colorTex.get(), osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE);
 		}
 	}

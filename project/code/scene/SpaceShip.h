@@ -65,6 +65,9 @@ namespace pbs17 {
 			return _modelFile;
 		}
 
+		void updatePositionOrientation(Eigen::Vector3d p, osg::Quat newOrientation) override;
+
+		void updateDirectionOrientation(Eigen::Vector3d v, osg::Quat newOrientation);
 
 		void turnUp();
 
@@ -79,6 +82,7 @@ namespace pbs17 {
 		void decelerate();
 
 	private:
+		osg::ref_ptr<osg::MatrixTransform> _particleRoot;
 		double _acceleration = 1.2;
 		double _decelerate = 0.8;
 		double _rotationAngle = 0.1; // randians ~ 5.7 degrees
