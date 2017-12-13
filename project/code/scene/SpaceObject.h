@@ -213,7 +213,7 @@ namespace pbs17 {
 			return fromOsg(toOsg(v) * transform);
 		}
 
-		void initTexturing();
+		virtual void initTexturing();
 
 
 	protected:

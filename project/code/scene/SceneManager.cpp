@@ -201,7 +201,9 @@ osg::ref_ptr<osg::Node> SceneManager::loadScene(json j) {
 		} else if (d["type"].get<std::string>() == "asteroid") {
 			so = new Asteroid(d);
         } else if (d["type"].get<std::string>() == "sun") {
-            so = new Sun(d);
+            Sun* sun = new Sun(d);
+			sun->initTexturing();
+			so = sun;
         } else {
 			std::cout << "Type (" + d["type"].get<std::string>() + ") not supported!" << std::endl;
 		}

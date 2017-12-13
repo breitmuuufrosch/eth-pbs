@@ -76,7 +76,7 @@ void BumpmapShader::apply(osg::Node* node) {
 	osg::ref_ptr<osg::Program> program = new osg::Program;
 	program->addShader(new osg::Shader(osg::Shader::VERTEX, getVertShader()));
 	program->addShader(new osg::Shader(osg::Shader::FRAGMENT, getFragShader()));
-	program->addBindAttribLocation("tangent", 6);
+	program->addBindAttribLocation("random_noise", 6);
 	program->addBindAttribLocation("binormal", 7);
 
 	osg::StateSet* stateset = node->getOrCreateStateSet();

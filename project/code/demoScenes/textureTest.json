@@ -1,13 +1,13 @@
 {
     "name": "my first scene",
     "id": "someID",
-    "gameplay": true,
+    "gameplay": false,
     "player": {
         "id": "9999",
         "type": "spaceship",
         "obj": "starfighter.obj",
         "texture": "earthmap1k.jpg",
-        "mass": 0.01,
+        "mass": 0.00,
         "position": {
             "x": 0.0,
             "y": 0.0,
@@ -40,8 +40,9 @@
         {
             "id": "0",
             "size": 2.0,
-            "type": "planet",
+            "type": "sun",
             "texture": "sunmap.jpg",
+            "bumpmap": "sun_noise.png",
             "mass": 40.0,
             "position": {
                 "x": 0.0,

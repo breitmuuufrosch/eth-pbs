@@ -26,6 +26,8 @@ namespace pbs17 {
          */
         Sun(json j);
 
+		void initTexturing() override;
+
 
     private:
 
