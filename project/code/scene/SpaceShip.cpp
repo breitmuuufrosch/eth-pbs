@@ -145,7 +145,7 @@ void SpaceShip::turnUp() {
     osg::Quat newQ = q * getOrientation();
 
     updatePositionOrientation(p, newQ);
-    updateDirectionOrientation(getLinearVelocity(), newQ);
+	updateDirectionOrientation(Eigen::Vector3d(intensity, 0, 0), newQ);
 }
 
 void SpaceShip::turnDown() {
@@ -161,7 +161,7 @@ void SpaceShip::turnDown() {
     osg::Quat newQ = q * getOrientation();
 
     updatePositionOrientation(p, newQ);
-    updateDirectionOrientation(getLinearVelocity(), newQ);
+	updateDirectionOrientation(Eigen::Vector3d(intensity, 0, 0), newQ);
 }
 
 void SpaceShip::turnLeft() {
@@ -177,7 +177,7 @@ void SpaceShip::turnLeft() {
     osg::Quat newQ = q * getOrientation();
 
     updatePositionOrientation(p, newQ);
-    updateDirectionOrientation(getLinearVelocity(), newQ);
+	updateDirectionOrientation(Eigen::Vector3d(intensity, 0, 0), newQ);
 }
 
 void SpaceShip::turnRight() {
@@ -193,19 +193,22 @@ void SpaceShip::turnRight() {
     osg::Quat newQ = q * getOrientation();
 
     updatePositionOrientation(p, newQ);
-    updateDirectionOrientation(getLinearVelocity(), newQ);
+    updateDirectionOrientation(Eigen::Vector3d(intensity,0,0), newQ);
 }
 
 void SpaceShip::accelerate() {
-    Eigen::Vector3d v = getLinearVelocity() * _acceleration;
-    if(v.norm() < 0.0001) {
-        v = Eigen::Vector3d (1.0, 0.0, 0.0);
+	intensity = intensity * _acceleration;
+    if (intensity > 10.0) {
+        intensity = 10.0;
     }
 
-    setLinearVelocity(v);
+	updateDirectionOrientation(Eigen::Vector3d(intensity, 0, 0), _orientation);
 }
 
 void SpaceShip::decelerate() {
-    Eigen::Vector3d v = getLinearVelocity() * _decelerate;
-    setLinearVelocity(v);
+	intensity = intensity * _decelerate;
+	if (intensity < 1.0) {
+		intensity = 1.0;
+	}
+	updateDirectionOrientation(Eigen::Vector3d(intensity, 0, 0), _orientation);
 }

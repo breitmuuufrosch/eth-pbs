@@ -144,9 +144,7 @@ void SpaceObject::updateDirectionOrientation(Eigen::Vector3d v, osg::Quat newOri
 
 	_transformation->setMatrix(rotation * translation);
 
-    Eigen::Vector4d lv(v.x(), v.y(), v.z(), 1.0);
-    lv = fromOsg(rotation) * lv;
-    _linearVelocity = Eigen::Vector3d(lv.x(), lv.y(), lv.z());
+	_linearVelocity = fromOsg(rotation).block(0,0,3,3) * v;
 
     calculateAABB();
 }

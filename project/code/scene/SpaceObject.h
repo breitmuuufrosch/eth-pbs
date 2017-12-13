@@ -168,8 +168,8 @@ namespace pbs17 {
 		//}
 
         void updatePositionOrientation(Eigen::Vector3d p, osg::Quat newOrientation);
-        
-		void updateDirectionOrientation(Eigen::Vector3d v, osg::Quat newOrientation);
+
+        void updateDirectionOrientation(Eigen::Vector3d v, osg::Quat newOrientation);
 
 		void calculateAABB();
 
