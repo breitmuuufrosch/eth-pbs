@@ -1,5 +1,4 @@
 #include "Asteroid.h"
-#include "../osg/visitors/VertexListVisitor.h"
 
 #include <osgDB/ReadFile>
 #include <osg/Switch>
@@ -9,7 +8,7 @@
 #include "../osg/OsgEigenConversions.h"
 #include "../osg/JsonEigenConversions.h"
 #include "../osg/visitors/ConvexHullVisitor.h"
-#include "../osg/ImageManager.h"
+#include "../osg/visitors/VertexListVisitor.h"
 
 using namespace pbs17;
 
@@ -79,23 +78,16 @@ void Asteroid::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 
 	// Switch to decide if the convex hull or the model has to be rendered.
 	_convexRenderSwitch = new osg::Switch;
-	_convexRenderSwitch->addChild(_modelFile, false);
-	_convexRenderSwitch->addChild(geodeConvexHull, true);
+	_convexRenderSwitch->addChild(_modelFile, true);
+	_convexRenderSwitch->addChild(geodeConvexHull, false);
 
-	// Load the texture
-	if (_textureName != "") {
-		std::string texturePath = DATA_PATH + "/texture/" + _textureName;
-		std::cout << texturePath << std::endl;
-		osg::ref_ptr<osg::Texture2D> myTex = ImageManager::Instance()->loadTexture(texturePath);
-		_convexRenderSwitch->getOrCreateStateSet()->setTextureAttributeAndModes(0, myTex.get());
-	}
     VertexListVisitor vListVisitor;
     _modelFile->accept(vListVisitor);
 	const osg::Vec3Array* vertices = dynamic_cast<const osg::Vec3Array*>(vListVisitor.getVertices());
 
 	double minX = DBL_MAX, maxX = -DBL_MAX, minY = DBL_MAX, maxY = -DBL_MAX, minZ = DBL_MAX, maxZ = -DBL_MAX;
 
-	for (int i = 0; i < vertices->size(); i++) {
+    for (unsigned int i = 0; i < vertices->size(); i++) {
 		if (vertices->at(i).x() < minX) {
 			minX = vertices->at(i).x();
 		}
@@ -133,20 +125,18 @@ void Asteroid::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 	_momentOfInertia(1, 1) = Iyy;
 	_momentOfInertia(2, 2) = Izz;
 
-	// First transformation-node to handle locale-rotations easier
-	_rotation = new osg::MatrixTransform;
-	_rotation->addChild(_convexRenderSwitch);
-
-	// Second transformation-node for global rotations and translations
-	_translation = new osg::MatrixTransform;
-	_translation->setMatrix(osg::Matrix::translate(toOsg(position)));
-	_translation->addChild(_rotation);
+	// Transformation-node for position and rotation updates.
+	_transformation = new osg::MatrixTransform;
+	_transformation->setMatrix(osg::Matrix::translate(toOsg(position)));
+	_transformation->addChild(_convexRenderSwitch);
 
 	calculateAABB();
 
 	_modelRoot = new osg::Switch;
-	_modelRoot->addChild(_translation, true);
+	_modelRoot->addChild(_transformation, true);
 	_modelRoot->addChild(_aabbRendering, true);
+
+	initTexturing();
 }
 
 /**

@@ -91,12 +91,8 @@ namespace pbs17 {
 			return _convexRenderSwitch;
 		}
 
-		osg::ref_ptr<osg::MatrixTransform> getTranslation() const {
-			return _translation;
-		}
-
-		osg::ref_ptr<osg::MatrixTransform> getRotation() const {
-			return _rotation;
+		osg::ref_ptr<osg::MatrixTransform> getTransformation() const {
+			return _transformation;
 		}
 
 
@@ -127,7 +123,11 @@ namespace pbs17 {
 
 		void setPosition(Eigen::Vector3d p) {
 			_position = p;
-			_translation->setMatrix(osg::Matrix::translate(toOsg(p)));
+			
+			osg::Matrixd rotation;
+			_orientation.get(rotation);
+
+			_transformation->setMatrix(rotation * osg::Matrix::translate(toOsg(p)));
 			calculateAABB();
 		}
 
@@ -159,16 +159,16 @@ namespace pbs17 {
 			return _orientation;
 		}
 
-		void setOrientation(osg::Quat o) {
-			_orientation = o;
-            osg::Matrixd rotMat;
-			o.get(rotMat);
-			_rotation->setMatrix(rotMat);
-			calculateAABB();
-		}
+		//void setOrientation(osg::Quat o) {
+		//	_orientation = o;
+		//	osg::Matrixd rotMat;
+		//	o.get(rotMat);
+		//	_rotation->setMatrix(rotMat);
+		//	calculateAABB();
+		//}
 
-        void updatePositionOrientation(Eigen::Vector3d p, Eigen::Vector3d dtv, osg::Quat newOrientation);
-
+        virtual void updatePositionOrientation(Eigen::Vector3d p, osg::Quat newOrientation);
+        
 		void calculateAABB();
 
 		void resetCollisionState();
@@ -213,6 +213,8 @@ namespace pbs17 {
 			return fromOsg(toOsg(v) * transform);
 		}
 
+		virtual void initTexturing();
+
 
 	protected:
 
@@ -220,6 +222,9 @@ namespace pbs17 {
 		std::string _filename;
 		//! Filename of the loaded texture
 		std::string _textureName = "";
+		//! Filename of the loaded bumpmap
+		std::string _bumpmapName = "";
+
 		//! Unique identifier for the object
 		long _id;
 
@@ -231,11 +236,12 @@ namespace pbs17 {
 		osg::ref_ptr<osg::MatrixTransform> _aabbRendering;
 		osg::ref_ptr<osg::ShapeDrawable> _aabbShape;
 		//! Local-rotation-node for the object
-		osg::ref_ptr<osg::MatrixTransform> _translation;
-		osg::ref_ptr<osg::MatrixTransform> _rotation;
+		osg::ref_ptr<osg::MatrixTransform> _transformation;
+		//osg::ref_ptr<osg::MatrixTransform> _translation;
+		//osg::ref_ptr<osg::MatrixTransform> _rotation;
 
 		//! Scaling ratio
-		double _scaling;
+		double _scaling = 1.0;
 		//! Position
 		Eigen::Vector3d _position;
 		//! Orientation
@@ -244,10 +250,10 @@ namespace pbs17 {
 		osg::BoundingBox _aabbLocal;
 		osg::BoundingBox _aabbGlobal;
 		//! ConvexHull of the object
-		ConvexHull3D* _convexHull;
+		ConvexHull3D* _convexHull = nullptr;
 
 		//! Mass: unit = kg
-		double _mass;
+		double _mass = 1.0;
 		//! Linear velocity : unit = m / s
 		Eigen::Vector3d _linearVelocity;
 		//! Angular velocity : unit = rad / s
@@ -259,7 +265,7 @@ namespace pbs17 {
 		//! Global torque : unit = vector with norm equals to N*m(newton metre)
 		Eigen::Vector3d _torque;
 
-		int _collisionState;
+		int _collisionState = 0;
 
 
 	private:

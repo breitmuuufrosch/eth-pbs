@@ -1,0 +1,40 @@
+{
+    "name": "my first scene",
+    "id": "someID",
+    "gameplay": true,
+    "player": {
+        "id": "9999",
+        "type": "spaceship",
+        "obj": "starfighter.obj",
+        "texture": "earthmap1k.jpg",
+        "mass": 0.01,
+        "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "ratio": 1.0,
+        "scaling": 1.0,
+        "linearVelocity": {
+            "x": 0.1,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "angularVelocity": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "force": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
+        "torque": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        }
+    },
+    "objects": []
+}

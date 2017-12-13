@@ -35,6 +35,10 @@
 
 # Windows Visual Studio
 /**/.vs/*
+.vscode/
 Debug
 *.vcxproj
 *.vcxproj.*
+
+# Screenshots
+/project/code/screenshots/*.png

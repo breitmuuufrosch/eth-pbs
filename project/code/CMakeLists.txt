@@ -76,14 +76,6 @@ FIND_PATH(OPENSCENEGRAPH_LIB_DIR libso.so osg.lib
 INCLUDE_DIRECTORIES(${OPENSCENEGRAPH_INCLUDE_DIR})
 LINK_DIRECTORIES(${OPENSCENEGRAPH_LIB_DIR})
 
-# find boost_1_65_1
-FIND_PACKAGE(Boost COMPONENTS program_options REQUIRED)
-IF (Boost_FOUND)
-    MESSAGE(STATUS "Boost_FOUND=true.")
-    INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIRS} )
-    LINK_DIRECTORIES( ${Boost_LIBRARY_DIRS} )
-ENDIF()
-
 # CGAL
 FIND_PACKAGE(CGAL QUIET COMPONENTS Core)
 
@@ -97,6 +89,14 @@ ENDIF()
 
 INCLUDE_DIRECTORIES(${CGAL_INCLUDE_DIR})
 LINK_DIRECTORIES(${CGAL_INCLUDE_DIR})
+
+# find boost_1_65_1
+FIND_PACKAGE(Boost COMPONENTS program_options REQUIRED)
+IF (Boost_FOUND)
+    MESSAGE(STATUS "Boost_FOUND=true.")
+    INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIRS} )
+    LINK_DIRECTORIES( ${Boost_LIBRARY_DIRS} )
+ENDIF()
 
 MACRO(START_PROJECT)
 
@@ -134,6 +134,8 @@ SET(SOURCES "")
 
 SET(DATA_MODEL_PATH ${CMAKE_CURRENT_LIST_DIR}/data)
 SET(SCENES_PATH ${CMAKE_CURRENT_LIST_DIR}/demoScenes)
+SET(SCREENSHOT_PATH ${CMAKE_CURRENT_LIST_DIR}/screenshots)
+SET(VERSION "0.9.1")
 CONFIGURE_FILE(precompile/config.h.in ${CMAKE_CURRENT_LIST_DIR}/config.h)
 
 FILE(GLOB main_SRCS "./*.cpp")
@@ -155,6 +157,21 @@ FILE(GLOB osg_visitors_SRCS "./osg/visitors/*.cpp")
 FILE(GLOB osg_visitors_HDRS "./osg/visitors/*.h")
 SOURCE_GROUP(Osg\\Visitors FILES ${osg_visitors_SRCS} ${osg_visitors_HDRS})
 LIST(APPEND SOURCES ${osg_visitors_SRCS} ${osg_visitors_HDRS})
+
+FILE(GLOB osg_shaders_SRCS "./osg/shaders/*.cpp")
+FILE(GLOB osg_shaders_HDRS "./osg/shaders/*.h")
+SOURCE_GROUP(Osg\\Shaders FILES ${osg_shaders_SRCS} ${osg_shaders_HDRS})
+LIST(APPEND SOURCES ${osg_shaders_SRCS} ${osg_shaders_HDRS})
+
+FILE(GLOB osg_events_SRCS "./osg/events/*.cpp")
+FILE(GLOB osg_events_HDRS "./osg/events/*.h")
+SOURCE_GROUP(Osg\\Events FILES ${osg_events_SRCS} ${osg_events_HDRS})
+LIST(APPEND SOURCES ${osg_events_SRCS} ${osg_events_HDRS})
+
+FILE(GLOB osg_particles_SRCS "./osg/particles/*.cpp")
+FILE(GLOB osg_particles_HDRS "./osg/particles/*.h")
+SOURCE_GROUP(Osg\\Particles FILES ${osg_particles_SRCS} ${osg_particles_HDRS})
+LIST(APPEND SOURCES ${osg_particles_SRCS} ${osg_particles_HDRS})
 
 FILE(GLOB physics_SRCS "./physics/*.cpp")
 FILE(GLOB physics_HDRS "./physics/*.h")

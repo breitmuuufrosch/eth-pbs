@@ -1,0 +1,29 @@
+#pragma once
+
+#include "osgGA/GUIEventHandler"
+
+
+// Forward declarations
+namespace pbs17 {
+	class SpaceObject;
+}
+
+
+namespace pbs17 {
+
+	class KeyboardHandler : public osgGA::GUIEventHandler {
+	public:
+		KeyboardHandler(const std::vector<SpaceObject*> &objects, bool showBoundingBox, bool showConvexHull, bool isPaused)
+			: _objects(objects), _showBoundingBox(showBoundingBox), _showConvexHull(showConvexHull), _isPaused(isPaused) {}
+
+		bool handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter&) override = 0;
+
+	protected:
+
+		std::vector<SpaceObject*> _objects;
+
+		bool _showBoundingBox;
+		bool _showConvexHull;
+		bool _isPaused;
+	};
+}

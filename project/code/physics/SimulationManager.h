@@ -11,8 +11,7 @@ namespace pbs17 {
 	/**
 	 * \brief The manager to handle the simulation (within all needed calculations) to simulate one frame.
 	 */
-	class SimulationManager
-	{
+	class SimulationManager {
 	public:
 		/**
 		 * \brief Constructor of the simulation-manager.
@@ -35,13 +34,35 @@ namespace pbs17 {
 			IS_PAUSED = isPaused;
 		}
 
+		static bool getIsPaused() {
+			return IS_PAUSED;
+		}
+
+		static void setSimulationDt(const double dt) {
+			SIMULATION_DT = std::max(dt, 0.0);
+			SIMULATION_DT = std::min(SIMULATION_DT, 1.0);
+		}
+
+		static void increaseSimulationDt(const double dt) {
+			setSimulationDt(SIMULATION_DT + dt);
+		}
+
+		static void decreaseSimulationDt(const double dt) {
+			setSimulationDt(SIMULATION_DT - dt);
+		}
+
+		static double getSimulationDt() {
+			return SIMULATION_DT;
+		}
+
 	private:
 		//! All space-objects in the scene
 		std::vector<SpaceObject*> _spaceObjects;
-        CollisionManager* _cManager;
-        NBodyManager* _nManager;
+		CollisionManager* _cManager;
+		NBodyManager* _nManager;
 
 		static bool IS_PAUSED;
-	};
 
+		static double SIMULATION_DT;
+	};
 }

@@ -1,13 +1,11 @@
 #include "Planet.h"
 
-#include <osg/Texture2D>
 #include <osg/Switch>
 #include <osgDB/ReadFile>
 
 #include "../config.h"
 #include "../osg/JsonEigenConversions.h"
 #include "../osg/OsgEigenConversions.h"
-#include "../osg/ImageManager.h"
 #include "../osg/ModelManager.h"
 #include "../osg/visitors/ConvexHullVisitor.h"
 
@@ -98,28 +96,18 @@ void Planet::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 	_convexRenderSwitch->addChild(_modelFile, true);
 	_convexRenderSwitch->addChild(geodeConvexHull, false);
 
-	// Load the texture
-	if (_textureName != "") {
-		std::string texturePath = DATA_PATH + "/texture/" + _textureName;
-        std::cout << texturePath << std::endl;
-		osg::ref_ptr<osg::Texture2D> myTex = ImageManager::Instance()->loadTexture(texturePath);
-		_convexRenderSwitch->getOrCreateStateSet()->setTextureAttributeAndModes(0, myTex.get());
-	}
-
-	// First transformation-node to handle locale-rotations easier
-	_rotation = new osg::MatrixTransform;
-	_rotation->addChild(_convexRenderSwitch);
-
-	// Second transformation-node for global rotations and translations
-	_translation = new osg::MatrixTransform;
-	_translation->setMatrix(osg::Matrix::translate(toOsg(position)));
-	_translation->addChild(_rotation);
+	// Transformation-node for position and rotation updates.
+	_transformation = new osg::MatrixTransform;
+	_transformation->setMatrix(osg::Matrix::translate(toOsg(position)));
+	_transformation->addChild(_convexRenderSwitch);
 
 	calculateAABB();
 
 	_modelRoot = new osg::Switch;
-	_modelRoot->addChild(_translation, true);
-	_modelRoot->addChild(_aabbRendering, true);
+	_modelRoot->addChild(_transformation, true);
+    _modelRoot->addChild(_aabbRendering, false);
+
+	initTexturing();
 }
 
 

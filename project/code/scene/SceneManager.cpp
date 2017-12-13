@@ -5,14 +5,20 @@
 #include <osg/TexGen>
 #include <osg/ShapeDrawable>
 #include <osgGA/TrackballManipulator>
+#include <osgGA/NodeTrackerManipulator>
+#include <osgGA/KeySwitchMatrixManipulator>
 #include <osgViewer/Viewer>
 #include <osgUtil/Optimizer>
 
 #include "Asteroid.h"
 #include "Planet.h"
+#include "Sun.h"
 #include "../osg/SkyBox.h"
 #include "../config.h"
-#include "../osg/KeyboardHandler.h"
+#include "SpaceShip.h"
+
+#include "../osg/events/SimulationKeyboardHandler.h"
+#include "../osg/events/GameKeyboardHandler.h"
 
 using namespace pbs17;
 
@@ -103,6 +109,8 @@ osg::ref_ptr<osg::Node> SceneManager::loadScene() {
 		planets->addChild(planet2->getModel());
 	}
 
+	_keyboardHandler = new SimulationKeyboardHandler(_spaceObjects);
+
 	return _scene;
 }
 
@@ -115,6 +123,7 @@ osg::ref_ptr<osg::Node> SceneManager::loadScene() {
  */
 osg::ref_ptr<osg::Node> SceneManager::loadScene(variables_map vm) {
 	_scene = new osg::Group();
+
 	// add the skybox
 	addSkybox();
 
@@ -123,12 +132,27 @@ osg::ref_ptr<osg::Node> SceneManager::loadScene(variables_map vm) {
 	bool random = vm["rand"].as<bool>();
 	int spheres = vm["spheres"].as<int>();
 	int asteroids = vm["asteroids"].as<int>();
+    bool gameplay = vm["gameplay"].as<bool>();
+    if (gameplay) {
+        std::cout << "YEAH, gaming!" << std::endl;
+        _isGame = true;
+
+        _player = new SpaceShip();
+        _spaceObjects.push_back(_player);
+        _scene->addChild(_player->getModel());
+
+        _keyboardHandler = new GameKeyboardHandler(_spaceObjects, _player);
+    } else {
+        _keyboardHandler = new SimulationKeyboardHandler(_spaceObjects);
+    }
 
 	if (useSphereEmitter) {
 		sphereEmitter(spheres, asteroids, random);
 	} else {
 		cubeEmitter(spheres, asteroids, random);
 	}
+
+	_keyboardHandler = new SimulationKeyboardHandler(_spaceObjects);
 
 
 	return _scene;
@@ -154,15 +178,37 @@ osg::ref_ptr<osg::Node> SceneManager::loadScene(json j) {
 
 	std::vector<json> objects = j["objects"].get<std::vector<json>>();
 	std::cout << "with " << objects.size() << " objects." << std::endl;
+
+	std::cout << j["gameplay"];
+	if (j["gameplay"].is_boolean() && j["gameplay"].get<bool>() == true) {
+		std::cout << "YEAH, gaming!" << std::endl;
+		_isGame = true;
+
+		_player = new SpaceShip(j["player"]);
+		_spaceObjects.push_back(_player);
+		planets->addChild(_player->getModel());
+	
+		_keyboardHandler = new GameKeyboardHandler(_spaceObjects, _player);
+	} else {
+		_keyboardHandler = new SimulationKeyboardHandler(_spaceObjects);
+	}
+
 	for (json d : objects) {
 		SpaceObject* so;
+
 		if (d["type"].get<std::string>() == "planet") {
 			so = new Planet(d);
 		} else if (d["type"].get<std::string>() == "asteroid") {
 			so = new Asteroid(d);
-		} else {
+        } else if (d["type"].get<std::string>() == "sun") {
+            Sun* sun = new Sun(d);
+			sun->initTexturing();
+			sun->addLight(osg::Vec4(1.0, 1.0, 1.0, 1.0));
+			so = sun;
+        } else {
 			std::cout << "Type (" + d["type"].get<std::string>() + ") not supported!" << std::endl;
 		}
+
 		_spaceObjects.push_back(so);
 		planets->addChild(so->getModel());
 	}
@@ -362,6 +408,7 @@ void SceneManager::addSkybox() const {
 }
 
 
+
 /**
  * \brief Init the viewer for the rendering window and set up the camera.
  * IMPORTANT: Camera can be animated in a later step! Or it can follow also some objects (not yet tested)
@@ -375,17 +422,38 @@ osg::ref_ptr<osgViewer::Viewer> SceneManager::initViewer(osg::ref_ptr<osg::Node>
 	osg::ref_ptr<osgViewer::Viewer> viewer = new osgViewer::Viewer;
 	//viewer->setUpViewOnSingleScreen(0);
 	viewer->setUpViewInWindow(80, 80, 1000, 600, 0);
+	viewer->addEventHandler(_keyboardHandler);
+
+	if (_isGame) {
+		osg::Matrix rotation = osg::Matrix::rotate(-osg::PI / .6, osg::X_AXIS);
+		osg::Matrix translation = osg::Matrix::translate(0.0f, 0.0f, 5.0f);
+		osg::Matrix transformation = _player->getTransformation()->getMatrix();
+		osg::Matrix transformationInv = _player->getTransformation()->getInverseMatrix();
+
+		osg::ref_ptr<osgGA::NodeTrackerManipulator> nodeTracker = new osgGA::NodeTrackerManipulator;
+		nodeTracker->setHomePosition(osg::Vec3(-5, -5, 0) * transformation, osg::Vec3(0, 0, 0), osg::Z_AXIS, false);
+		//nodeTracker->setByMatrix(rotation * translation);
+		nodeTracker->setTrackerMode(osgGA::NodeTrackerManipulator::NODE_CENTER_AND_ROTATION);
+		nodeTracker->setRotationMode(osgGA::NodeTrackerManipulator::TRACKBALL);
+		nodeTracker->setTrackNode(_player->getTrackingNode());
+
+		osg::ref_ptr<osgGA::KeySwitchMatrixManipulator> keySwitch = new osgGA::KeySwitchMatrixManipulator;
+		keySwitch->addMatrixManipulator('1', "Trackball", new osgGA::TrackballManipulator);
+		keySwitch->addMatrixManipulator('2', "NodeTracker", nodeTracker.get());
+
+		viewer->setCameraManipulator(keySwitch.get());
+	} else {
+		osg::ref_ptr<osgGA::TrackballManipulator> manipulator = new osgGA::TrackballManipulator;
+		viewer->setCameraManipulator(manipulator);
+
+		//osg::Matrix rotation = osg::Matrix::rotate(-osg::PI / .6, osg::X_AXIS);
+		//osg::Matrix translation = osg::Matrix::translate(0.0f, 0.0f, 15.0f);
+
+		//manipulator->setByMatrix(translation * rotation);
+		//manipulator->setByMatrix(translation);
+	}
+
 	viewer->setSceneData(scene);
-	viewer->addEventHandler(new KeyHandler(_spaceObjects));
-
-	osg::ref_ptr<osgGA::TrackballManipulator> manipulator = new osgGA::TrackballManipulator;
-	viewer->setCameraManipulator(manipulator);
-
-	osg::Matrix rotation = osg::Matrix::rotate(-osg::PI / .6, osg::X_AXIS);
-	osg::Matrix translation = osg::Matrix::translate(0.0f, 0.0f, 15.0f);
-
-	//manipulator->setByMatrix(translation * rotation);
-	manipulator->setByMatrix(translation);
 
 	return viewer;
 }
