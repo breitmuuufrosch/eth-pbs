@@ -101,6 +101,8 @@ namespace pbs17 {
 		osg::ref_ptr<osgViewer::Viewer> initViewer(osg::ref_ptr<osg::Node> scene) const;
 
 
+
+
 		/**
 		 * \brief Get the loaded space-objects.
 		 *

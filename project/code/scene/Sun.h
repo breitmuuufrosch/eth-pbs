@@ -26,10 +26,18 @@ namespace pbs17 {
          */
         Sun(json j);
 
+
+		osg::ref_ptr<osg::LightSource> addLight(osg::Vec4 color);
+
 		void initTexturing() override;
 
 
     private:
+		
+		int _lightId;
+		osg::ref_ptr<osg::LightSource> _light;
+
+		static int LIGHT_ID;
 
     };
 

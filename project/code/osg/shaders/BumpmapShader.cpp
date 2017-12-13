@@ -54,12 +54,12 @@ BumpmapShader::BumpmapShader(osg::ref_ptr<osg::Texture2D> texture, osg::ref_ptr<
 		"	 gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);\n"
 		"	 vec4 diffuse = vec4(0.0, 0.0, 0.0, 0.0);\n"
 		"	 vec4 specular = vec4(0.0, 0.0, 0.0, 0.0);\n"
-		"	 vec4 ambient = gl_FrontMaterial.ambient * gl_LightSource[0].ambient;\n"
+		"	 vec4 ambient = base * gl_FrontMaterial.ambient * gl_LightSource[0].ambient;\n"
 
 		"    if (lambert > 0.0)\n"
 		"    {\n"
 		"        diffuse = gl_FrontMaterial.diffuse * base * gl_LightSource[0].diffuse * lambert;\n"
-		"        specular = gl_FrontMaterial.specular * gl_LightSource[0].specular * pow(lambert, gl_FrontMaterial.shininess);\n"
+		"        //specular = gl_FrontMaterial.specular * gl_LightSource[0].specular * pow(lambert, gl_FrontMaterial.shininess);\n"
 		"    }\n"
 		"    gl_FragColor += ambient + diffuse + specular;\n"
 		"}\n"
@@ -76,7 +76,7 @@ void BumpmapShader::apply(osg::Node* node) {
 	osg::ref_ptr<osg::Program> program = new osg::Program;
 	program->addShader(new osg::Shader(osg::Shader::VERTEX, getVertShader()));
 	program->addShader(new osg::Shader(osg::Shader::FRAGMENT, getFragShader()));
-	program->addBindAttribLocation("random_noise", 6);
+	program->addBindAttribLocation("tangent", 6);
 	program->addBindAttribLocation("binormal", 7);
 
 	osg::StateSet* stateset = node->getOrCreateStateSet();

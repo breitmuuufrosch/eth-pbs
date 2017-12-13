@@ -2,6 +2,7 @@
 
 #include <osg/Texture2D>
 #include <osg/Material>
+#include <osg/LightSource>
 
 #include "../osg/visitors/ComputeTangentVisitor.h"
 #include "../config.h"
@@ -12,6 +13,9 @@
 using namespace pbs17;
 
 
+int Sun::LIGHT_ID = 0;
+
+
 /**
  * \brief Constructor of Sun.
  *
@@ -20,14 +24,42 @@ using namespace pbs17;
  */
 Sun::Sun(double size)
     : Planet(size) {
+	_lightId = LIGHT_ID;
+	++LIGHT_ID;
 }
 
 
 Sun::Sun(json j)
     : Planet(j) {
-
+	_lightId = LIGHT_ID;
+	++LIGHT_ID;
 }
 
+
+osg::ref_ptr<osg::LightSource> Sun::addLight(osg::Vec4 color) {
+	osg::Light *light = new osg::Light();
+
+	// each light must have a unique number
+	light->setLightNum(_lightId);
+
+	// we set the light's position via a PositionAttitudeTransform object
+	light->setPosition(osg::Vec4(0.0, 0.0, 0.0, 1.0));
+	light->setDiffuse(color);
+	light->setSpecular(osg::Vec4(1.0, 1.0, 1.0, 1.0));
+	light->setAmbient(osg::Vec4(255.0, 234.0, 160.0, 0.0) / 255.0);
+
+	osg::StateSet *lightStateSet = _modelRoot->getOrCreateStateSet();
+	osg::ref_ptr<osg::LightSource> lightSource = new osg::LightSource;
+	lightSource->setLight(light);
+	lightSource->setLocalStateSetModes(osg::StateAttribute::ON);
+	lightSource->setStateSetModes(*lightStateSet, osg::StateAttribute::ON);
+
+	_modelRoot->addChild(lightSource);
+
+	_light = lightSource;
+
+	return lightSource;
+}
 
 
 void Sun::initTexturing() {

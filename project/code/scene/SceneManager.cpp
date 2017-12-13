@@ -203,6 +203,7 @@ osg::ref_ptr<osg::Node> SceneManager::loadScene(json j) {
         } else if (d["type"].get<std::string>() == "sun") {
             Sun* sun = new Sun(d);
 			sun->initTexturing();
+			sun->addLight(osg::Vec4(1.0, 1.0, 1.0, 1.0));
 			so = sun;
         } else {
 			std::cout << "Type (" + d["type"].get<std::string>() + ") not supported!" << std::endl;
@@ -405,6 +406,7 @@ void SceneManager::addSkybox() const {
 
 	_scene->addChild(skyTransform);
 }
+
 
 
 /**

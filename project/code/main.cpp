@@ -29,21 +29,6 @@ using namespace boost::program_options;
 // for convenience
 using json = nlohmann::json;
 
-osg::Light *createLight(osg::Vec4 color)
-{
-	osg::Light *light = new osg::Light();
-
-	// each light must have a unique number
-	light->setLightNum(0);
-
-	// we set the light's position via a PositionAttitudeTransform object
-	light->setPosition(osg::Vec4(0.0, 0.0, 5.0, 1.0));
-	light->setDiffuse(color);
-	light->setSpecular(osg::Vec4(1.0, 1.0, 1.0, 1.0));
-	light->setAmbient(osg::Vec4(255.0, 234.0, 160.0, 0.0) / 10255.0);
-
-	return light;
-}
 
 int main(int argc, const char *argv[]) {
     pbs17::SceneManager* sceneManager = new pbs17::SceneManager;
@@ -113,13 +98,7 @@ int main(int argc, const char *argv[]) {
 	state->setMode(GL_LIGHTING, osg::StateAttribute::ON);
 	state->setMode(GL_LIGHT0, osg::StateAttribute::ON);
 
-	osg::StateSet *lightStateSet = scene->getOrCreateStateSet();
-	osg::LightSource *lightSource = new osg::LightSource();
-	lightSource->setLight(createLight(osg::Vec4(255.0, 234.0, 100.0, 255.0) / 255.0));
-	lightSource->setLocalStateSetModes(osg::StateAttribute::ON);
-	lightSource->setStateSetModes(*lightStateSet, osg::StateAttribute::ON);
-	scene->asGroup()->addChild(lightSource);
-	
+
 	// Set-up the screenshot functionality
 	osg::ref_ptr<pbs17::SnapImageDrawCallback> screenshotCallback = new pbs17::SnapImageDrawCallback();
 	viewer->getCamera()->setPostDrawCallback(screenshotCallback.get());
