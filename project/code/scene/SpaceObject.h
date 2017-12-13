@@ -215,6 +215,7 @@ namespace pbs17 {
 
 		virtual void initTexturing();
 
+		void initFollowingRibbon(osg::Vec3 color, unsigned int numPoints, float halfWidth);
 
 	protected:
 

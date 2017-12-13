@@ -133,7 +133,8 @@ osg::ref_ptr<osg::Node> SceneManager::loadScene(variables_map vm) {
 	int spheres = vm["spheres"].as<int>();
 	int asteroids = vm["asteroids"].as<int>();
     bool gameplay = vm["gameplay"].as<bool>();
-    if (gameplay) {
+    
+	if (gameplay) {
         std::cout << "YEAH, gaming!" << std::endl;
         _isGame = true;
 
@@ -179,7 +180,6 @@ osg::ref_ptr<osg::Node> SceneManager::loadScene(json j) {
 	std::vector<json> objects = j["objects"].get<std::vector<json>>();
 	std::cout << "with " << objects.size() << " objects." << std::endl;
 
-	std::cout << j["gameplay"];
 	if (j["gameplay"].is_boolean() && j["gameplay"].get<bool>() == true) {
 		std::cout << "YEAH, gaming!" << std::endl;
 		_isGame = true;

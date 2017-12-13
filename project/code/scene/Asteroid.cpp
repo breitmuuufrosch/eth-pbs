@@ -39,6 +39,14 @@ Asteroid::Asteroid(json j) :
     Eigen::Vector3d torque = fromJson(j["torque"]);
 
     initPhysics(j["mass"].get<double>(),linearVelocity,angularVelocity,force, torque);
+
+	if (j["useFollowingRibbon"].is_boolean() && j["useFollowingRibbon"].get<bool>() == true) {
+		json ribbonInfo = j["followingRibbon"];
+
+		initFollowingRibbon(toOsg(fromJson(ribbonInfo["color"])),
+			ribbonInfo["numPoints"].get<unsigned int>(),
+			ribbonInfo["halfWidth"].get<float>());
+	}
 }
 
 

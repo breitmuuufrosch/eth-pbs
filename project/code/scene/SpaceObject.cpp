@@ -9,6 +9,8 @@
 #include "../osg/visitors/ComputeTangentVisitor.h"
 #include "../osg/shaders/BumpmapShader.h"
 #include "../config.h"
+#include "../osg/FollowingRibbon.h"
+#include "../osg/visitors/TrailerCallback.h"
 
 using namespace pbs17;
 
@@ -164,9 +166,7 @@ void SpaceObject::resetCollisionState() {
 void SpaceObject::setCollisionState(int c) {
 	_collisionState = std::max(_collisionState, c);
 
-	//ColorVisitor colorVisitor(c == 1 ? osg::Vec4(0, 1, 0, 1) : osg::Vec4(1, 0, 0, 1));
 	_aabbShape->setColor(c == 1 ? osg::Vec4(0, 1, 0, 1) : osg::Vec4(1, 0, 0, 1));
-	//_aabbRendering->accept(colorVisitor);
 }
 
 
@@ -200,7 +200,7 @@ void SpaceObject::initTexturing() {
 	osg::ref_ptr<osg::Material> material = new osg::Material();
 	material->setDiffuse(osg::Material::FRONT, osg::Vec4(1.0, 1.0, 1.0, 1.0));
 	material->setSpecular(osg::Material::FRONT, osg::Vec4(0.0, 0.0, 0.0, 1.0));
-	material->setAmbient(osg::Material::FRONT, osg::Vec4f(0.1, 0.1, 0.1, 1.0));
+	material->setAmbient(osg::Material::FRONT, osg::Vec4f(0.1f, 0.1f, 0.1f, 1.0f));
 	material->setEmission(osg::Material::FRONT, osg::Vec4(0.0, 0.0, 0.0, 1.0));
 	material->setShininess(osg::Material::FRONT, 100);
 	stateset->setAttribute(material);
@@ -208,3 +208,18 @@ void SpaceObject::initTexturing() {
 	//CartoonShader cs(osg::Vec4(1.0, 0.0, 0.0, 1.0));
 	//cs.apply(_modelFile);
 }
+
+void SpaceObject::initFollowingRibbon(osg::Vec3 color, unsigned int numPoints, float halfWidth) {
+	FollowingRibbon* ribbon = new FollowingRibbon();
+	osg::Geometry* geometry = ribbon->init(toOsg(_position), color, numPoints, halfWidth);
+
+	osg::ref_ptr<osg::Geode> geode = new osg::Geode;
+	geode->addDrawable(geometry);
+	geode->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+	geode->getOrCreateStateSet()->setMode(GL_BLEND, osg::StateAttribute::ON);
+	geode->getOrCreateStateSet()->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
+
+	_transformation->addUpdateCallback(new TrailerCallback(ribbon, geometry));
+	_modelRoot->addChild(geode);
+}
+

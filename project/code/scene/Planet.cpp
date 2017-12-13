@@ -19,8 +19,7 @@ using namespace pbs17;
  *      Size of the planet.
  */
 Planet::Planet(double size)
-    : SpaceObject("", 0), _radius(size) {
-}
+	: SpaceObject("", 0), _radius(size) {}
 
 
 /**
@@ -29,18 +28,26 @@ Planet::Planet(double size)
  * \param j
  *      JSON-configuration for the planet.
  */
-Planet::Planet(json j) : SpaceObject(j){
-    std::cout << "json=" << j << std::endl;
-    _radius = j["size"].get<double>();
+Planet::Planet(json j) : SpaceObject(j) {
+	std::cout << "json=" << j << std::endl;
+	_radius = j["size"].get<double>();
 	Eigen::Vector3d pos = fromJson(j["position"]);
-    initOsg(pos, j["ratio"].get<double>(), j["scaling"].get<double>());
+	initOsg(pos, j["ratio"].get<double>(), j["scaling"].get<double>());
 
 	Eigen::Vector3d linearVelocity = fromJson(j["linearVelocity"]);
 	Eigen::Vector3d angularVelocity = fromJson(j["angularVelocity"]);
 	Eigen::Vector3d force = fromJson(j["force"]);
 	Eigen::Vector3d torque = fromJson(j["torque"]);
 
-    initPhysics(j["mass"].get<double>(),linearVelocity,angularVelocity,force, torque);
+	initPhysics(j["mass"].get<double>(), linearVelocity, angularVelocity, force, torque);
+
+	if (j["useFollowingRibbon"].is_boolean() && j["useFollowingRibbon"].get<bool>() == true) {
+		json ribbonInfo = j["followingRibbon"];
+
+		initFollowingRibbon(toOsg(fromJson(ribbonInfo["color"])),
+			ribbonInfo["numPoints"].get<unsigned int>(),
+			ribbonInfo["halfWidth"].get<float>());
+	}
 }
 
 
@@ -53,8 +60,7 @@ Planet::Planet(json j) : SpaceObject(j){
  *      Relative location to the texture-file. (Relative from the data-directory in the source).
  */
 Planet::Planet(double size, std::string textureName)
-    : SpaceObject("", textureName), _radius(size) {
-}
+	: SpaceObject("", textureName), _radius(size) {}
 
 
 /**
@@ -105,7 +111,7 @@ void Planet::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 
 	_modelRoot = new osg::Switch;
 	_modelRoot->addChild(_transformation, true);
-    _modelRoot->addChild(_aabbRendering, false);
+	_modelRoot->addChild(_aabbRendering, false);
 
 	initTexturing();
 }
