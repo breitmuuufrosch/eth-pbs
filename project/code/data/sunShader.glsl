@@ -3,10 +3,11 @@
 // License Creative Commons Attribution-NonCommercial-ShareAlike 3.0
 
 //#define ULTRAVIOLET
-#define DITHERING
+//#define DITHERING
 
 
-attribute vec3 random_noise;
+uniform vec3 random_noise;
+uniform float iTime;
 varying vec3 lightDir;
 
 
@@ -20,7 +21,7 @@ float pn( in vec3 p )
     p = fract(p);
     p *= p*(3.0-2.0*p);
     vec2 uv = (ip.xy+vec2(37.0,17.0)*ip.z) + p.xy;
-    uv = textureLod( random_noise, (uv+ 0.5)/256.0, 0.0 ).yx;
+    uv = vec2(0.5, 0.5); //textureLod( random_noise, (uv+ 0.5)/256.0, 0.0 ).yx;
     return mix( uv.x, uv.y, p.z );
 }
 
@@ -85,8 +86,8 @@ float SunSurface( in vec3 pos )
 
 float map(vec3 p) {
    p.z += 1.;
-   R(p.yz, -25.5);// -1.0+iMouse.y*0.003);
-   R(p.xz, iMouse.x*0.008*pi+iTime*0.1);
+   R(p.yz, -25.5);
+   R(p.xz, 250.0*0.008*pi+iTime*0.1);
    return SunSurface(p) +  fpn(p*50.+iTime*25.) * 0.45;
 }
 
@@ -103,6 +104,8 @@ vec3 firePalette(float i){
 
 void main( void )
 {  
+	vec2 iResolution = vec2(600.0, 600.0);
+   gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
    // p: position on the ray
    // rd: direction of the ray
    vec3 rd = normalize(vec3((gl_FragCoord.xy-0.5*iResolution.xy)/iResolution.y, 1.));
@@ -182,5 +185,4 @@ void main( void )
    #endif
     
    gl_FragColor = vec4(tc, 1.0);
-   gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 }

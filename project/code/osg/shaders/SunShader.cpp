@@ -45,6 +45,12 @@ void SunShader::apply(osg::Node* node) {
 	stateset->setAttributeAndModes(program.get());
 	stateset->addUniform(new osg::Uniform("colorTex", 0));
 	stateset->addUniform(new osg::Uniform("random_noise", 7));
+
+	osg::Uniform* uniform = stateset->getOrCreateUniform("iTime", osg::Uniform::FLOAT);
+	uniform->set(static_cast<float>(5.0));
+
+	uniform = stateset->getOrCreateUniform("iMouse", osg::Uniform::FLOAT_VEC2);
+	uniform->set(osg::Vec2(0.5, 0.5));
 	//stateset->addUniform(new osg::Uniform("normalTex", 1));
 
 	osg::StateAttribute::GLModeValue value = osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE;

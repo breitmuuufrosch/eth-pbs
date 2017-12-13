@@ -1,12 +1,12 @@
 #include "Sun.h"
 
 #include <osg/Texture2D>
+#include <osg/Material>
 
 #include "../osg/visitors/ComputeTangentVisitor.h"
 #include "../config.h"
 #include "../osg/ImageManager.h"
 #include "../osg/shaders/SunShader.h"
-#include <osg/Material>
 
 
 using namespace pbs17;
