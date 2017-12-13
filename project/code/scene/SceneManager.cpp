@@ -5,6 +5,8 @@
 #include <osg/TexGen>
 #include <osg/ShapeDrawable>
 #include <osgGA/TrackballManipulator>
+#include <osgGA/NodeTrackerManipulator>
+#include <osgGA/KeySwitchMatrixManipulator>
 #include <osgViewer/Viewer>
 #include <osgUtil/Optimizer>
 
@@ -413,17 +415,38 @@ osg::ref_ptr<osgViewer::Viewer> SceneManager::initViewer(osg::ref_ptr<osg::Node>
 	osg::ref_ptr<osgViewer::Viewer> viewer = new osgViewer::Viewer;
 	//viewer->setUpViewOnSingleScreen(0);
 	viewer->setUpViewInWindow(80, 80, 1000, 600, 0);
-	viewer->setSceneData(scene);
 	viewer->addEventHandler(_keyboardHandler);
 
-	osg::ref_ptr<osgGA::TrackballManipulator> manipulator = new osgGA::TrackballManipulator;
-	viewer->setCameraManipulator(manipulator);
+	if (_isGame) {
+		osg::Matrix rotation = osg::Matrix::rotate(-osg::PI / .6, osg::X_AXIS);
+		osg::Matrix translation = osg::Matrix::translate(0.0f, 0.0f, 5.0f);
+		osg::Matrix transformation = _player->getTransformation()->getMatrix();
+		osg::Matrix transformationInv = _player->getTransformation()->getInverseMatrix();
 
-	osg::Matrix rotation = osg::Matrix::rotate(-osg::PI / .6, osg::X_AXIS);
-	osg::Matrix translation = osg::Matrix::translate(0.0f, 0.0f, 15.0f);
+		osg::ref_ptr<osgGA::NodeTrackerManipulator> nodeTracker = new osgGA::NodeTrackerManipulator;
+		nodeTracker->setHomePosition(osg::Vec3(-5, -5, 0) * transformation, osg::Vec3(0, 0, 0), osg::Z_AXIS, false);
+		//nodeTracker->setByMatrix(rotation * translation);
+		nodeTracker->setTrackerMode(osgGA::NodeTrackerManipulator::NODE_CENTER_AND_ROTATION);
+		nodeTracker->setRotationMode(osgGA::NodeTrackerManipulator::TRACKBALL);
+		nodeTracker->setTrackNode(_player->getTrackingNode());
 
-	//manipulator->setByMatrix(translation * rotation);
-	manipulator->setByMatrix(translation);
+		osg::ref_ptr<osgGA::KeySwitchMatrixManipulator> keySwitch = new osgGA::KeySwitchMatrixManipulator;
+		keySwitch->addMatrixManipulator('1', "Trackball", new osgGA::TrackballManipulator);
+		keySwitch->addMatrixManipulator('2', "NodeTracker", nodeTracker.get());
+
+		viewer->setCameraManipulator(keySwitch.get());
+	} else {
+		osg::ref_ptr<osgGA::TrackballManipulator> manipulator = new osgGA::TrackballManipulator;
+		viewer->setCameraManipulator(manipulator);
+
+		//osg::Matrix rotation = osg::Matrix::rotate(-osg::PI / .6, osg::X_AXIS);
+		//osg::Matrix translation = osg::Matrix::translate(0.0f, 0.0f, 15.0f);
+
+		//manipulator->setByMatrix(translation * rotation);
+		//manipulator->setByMatrix(translation);
+	}
+
+	viewer->setSceneData(scene);
 
 	return viewer;
 }
