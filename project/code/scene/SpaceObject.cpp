@@ -31,7 +31,8 @@ SpaceObject::SpaceObject(json j) {
     ++RunningId;
 
     _position = Eigen::Vector3d(0, 0, 0);
-    _orientation = Eigen::Vector3d(0, 0, 0);
+    _orientation = osg::Quat(0, osg::X_AXIS);
+;
 
     // For visually debuggin => Make bounding-box visible
     osg::ref_ptr<osg::Geode> geode = new osg::Geode;
@@ -63,7 +64,8 @@ SpaceObject::SpaceObject(std::string filename, std::string textureName)
 	++RunningId;
 
 	_position = Eigen::Vector3d(0, 0, 0);
-	_orientation = Eigen::Vector3d(0, 0, 0);
+	_orientation = osg::Quat(0, osg::X_AXIS);
+
 
 	// For visually debuggin => Make bounding-box visible
 	osg::ref_ptr<osg::Geode> geode = new osg::Geode;
@@ -114,12 +116,14 @@ void SpaceObject::initPhysics(double mass, Eigen::Vector3d linearVelocity, Eigen
 }
 
 
-void SpaceObject::updatePositionOrientation(Eigen::Vector3d p, Eigen::Vector3d dtv, Eigen::Vector3d o, Eigen::Vector3d dto) {
+void SpaceObject::updatePositionOrientation(Eigen::Vector3d p, Eigen::Vector3d dtv, osg::Quat newOrientation) {
 	_position = p;
-	_orientation = o;
+    _orientation = newOrientation;
 
 	_translation->setMatrix(osg::Matrix::translate(toOsg(p)));
-	_rotation->setMatrix(osg::Matrixd::rotate(osg::Quat(o[0], osg::X_AXIS, o[1], osg::Y_AXIS, o[2], osg::Z_AXIS)));
+	osg::Matrixd rotMat;
+    newOrientation.get(rotMat);
+    _rotation->setMatrix(rotMat);
 
 	calculateAABB();
 }
@@ -128,7 +132,8 @@ void SpaceObject::updatePositionOrientation(Eigen::Vector3d p, Eigen::Vector3d d
 void SpaceObject::calculateAABB() {
 	osg::Matrix scaling = osg::Matrix::scale(_scaling, _scaling, _scaling);
 	osg::Matrix translation = osg::Matrix::translate(toOsg(_position));
-	osg::Matrix rotation = osg::Matrixd::rotate(osg::Quat(_orientation[0], osg::X_AXIS, _orientation[1], osg::Y_AXIS, _orientation[2], osg::Z_AXIS));
+	osg::Matrix rotation;
+	_orientation.get(rotation);
 
 	CalculateBoundingBox bbox(scaling * rotation * translation, scaling * rotation);
 	_modelFile->accept(bbox);

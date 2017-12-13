@@ -1,6 +1,9 @@
 #include "NBodyManager.h"
 
 #include <math.h>
+#if defined(_OPENMP)
+#include <omp.h>
+#endif
 
 using namespace pbs17;
 using namespace Eigen;
@@ -25,8 +28,9 @@ void NBodyManager::simulateStep(double dt, std::vector<SpaceObject *> &spaceObje
     for (int i = 0; i < cntSpaceObj; ++i) {
         forces[i] = Vector3d(0.0, 0.0, 0.0);
     }
-
-
+#if defined(_OPENMP)
+#pragma omp parallel for
+#endif
     for (int i = 0; i < cntSpaceObj; ++i) {
         SpaceObject* curObject = spaceObjects[i];
         // Calculate a rotation around the rotation-center of the object
@@ -54,7 +58,9 @@ void NBodyManager::simulateStep(double dt, std::vector<SpaceObject *> &spaceObje
             forces[i] += f * d.normalized();
         }
     }
-
+#if defined(_OPENMP)
+#pragma omp parallel for
+#endif
     // update positions
     for (int i = 0; i < cntSpaceObj; ++i) {
         SpaceObject* spaceObject = spaceObjects[i];
@@ -66,9 +72,18 @@ void NBodyManager::simulateStep(double dt, std::vector<SpaceObject *> &spaceObje
         Vector3d p = spaceObject->getPosition() + dtv;
 
 		Vector3d dto = dt * spaceObject->getAngularVelocity();
-		Vector3d o = spaceObject->getOrientation() + dto;
+		osg::Quat q;
+        double sinQuat = sin(dto.norm() / 2);
+        double cosQuat = cos(dto.norm() / 2);
+        if(dto.norm() > 0) {
+            q.set(sinQuat*dto(0) / dto.norm(), sinQuat*dto(1) / dto.norm(), sinQuat*dto(2) / dto.norm(), cosQuat);
+        } else {
+            q.set(0.0, 0.0, 0.0, 1.0);
+        }
+        osg::Quat newQ = q*spaceObject->getOrientation();
 
-		spaceObject->updatePositionOrientation(p, dtv, o, dto);
+
+		spaceObject->updatePositionOrientation(p, dtv, newQ);
     }
     /*
     for (std::vector<SpaceObject*>::iterator it = _spaceObjects.begin(); it != _spaceObjects.end(); ++it) {
