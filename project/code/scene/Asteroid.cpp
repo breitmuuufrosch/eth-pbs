@@ -125,19 +125,15 @@ void Asteroid::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 	_momentOfInertia(1, 1) = Iyy;
 	_momentOfInertia(2, 2) = Izz;
 
-	// First transformation-node to handle locale-rotations easier
-	_rotation = new osg::MatrixTransform;
-	_rotation->addChild(_convexRenderSwitch);
-
-	// Second transformation-node for global rotations and translations
-	_translation = new osg::MatrixTransform;
-	_translation->setMatrix(osg::Matrix::translate(toOsg(position)));
-	_translation->addChild(_rotation);
+	// Transformation-node for position and rotation updates.
+	_transformation = new osg::MatrixTransform;
+	_transformation->setMatrix(osg::Matrix::translate(toOsg(position)));
+	_transformation->addChild(_convexRenderSwitch);
 
 	calculateAABB();
 
 	_modelRoot = new osg::Switch;
-	_modelRoot->addChild(_translation, true);
+	_modelRoot->addChild(_transformation, true);
 	_modelRoot->addChild(_aabbRendering, true);
 
 	initTexturing();

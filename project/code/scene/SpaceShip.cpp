@@ -93,24 +93,20 @@ void SpaceShip::initOsg(Eigen::Vector3d position, double ratio, double scaling) 
 	_convexRenderSwitch->addChild(_modelFile, true);
 	_convexRenderSwitch->addChild(geodeConvexHull, false);
 
-	// First transformation-node to handle locale-rotations easier
-	_rotation = new osg::MatrixTransform;
-	_rotation->addChild(_convexRenderSwitch);
-
-	// Second transformation-node for global rotations and translations
-	_translation = new osg::MatrixTransform;
-	_translation->setMatrix(osg::Matrix::translate(toOsg(position)));
-	_translation->addChild(_rotation);
+	// Transformation-node for position and rotation updates.
+	_transformation = new osg::MatrixTransform;
+	_transformation->setMatrix(osg::Matrix::translate(toOsg(position)));
+	_transformation->addChild(_convexRenderSwitch);
 
 	calculateAABB();
 
 	// Particle system
-	osg::ref_ptr<SmokeParticleSystem> smoke = new SmokeParticleSystem(_convexRenderSwitch, _translation.get());
+	osg::ref_ptr<SmokeParticleSystem> smoke = new SmokeParticleSystem(_transformation, _transformation.get());
 
 	_modelRoot = new osg::Switch;
-	_modelRoot->addChild(_translation, true);
+	_modelRoot->addChild(_transformation, true);
 	_modelRoot->addChild(_aabbRendering, true);
-	_convexRenderSwitch->addChild(smoke, true);
+	_modelRoot->addChild(smoke, true);
 
 	initTexturing();
 }

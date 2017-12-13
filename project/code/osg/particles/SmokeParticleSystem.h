@@ -25,7 +25,7 @@ namespace pbs17 {
 			this->addChild(geode);
 
 			// Set particle system state
-			dustParticleSystem->setDefaultAttributes(DATA_PATH + "/texture/dust.png", false, false);
+			dustParticleSystem->setDefaultAttributes(DATA_PATH + "/texture/dust.png", true, false);
 
 			// Define the Particle template
 			osgParticle::Particle smokeParticle;
@@ -49,11 +49,11 @@ namespace pbs17 {
 
 			osgParticle::RandomRateCounter *dustRate =
 				static_cast<osgParticle::RandomRateCounter *>(emitter->getCounter());
-			dustRate->setRateRange(40, 80);
+			dustRate->setRateRange(40, 100);
 
-			osgParticle::PointPlacer* placer =
-				static_cast<osgParticle::PointPlacer *>(emitter->getPlacer());
-			this->setUpdateCallback(new EmitterUpdateCallback(placer, mt));
+			//osgParticle::PointPlacer* placer =
+			//	static_cast<osgParticle::PointPlacer *>(emitter->getPlacer());
+			//this->setUpdateCallback(new EmitterUpdateCallback(placer, mt));
 
 			osgParticle::RadialShooter* shooter =
 				static_cast<osgParticle::RadialShooter *>(emitter->getShooter());

@@ -16,7 +16,7 @@ namespace pbs17 {
 		}
 
 		void operator() (osg::Node* node, osg::NodeVisitor* nv) {
-			_placer->setCenter(_trans->getMatrix().getTrans());
+			//_placer->setCenter(_trans->getMatrix().getTrans());
 			traverse(node, nv);
 		}
 

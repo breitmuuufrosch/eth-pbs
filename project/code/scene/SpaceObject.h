@@ -91,12 +91,8 @@ namespace pbs17 {
 			return _convexRenderSwitch;
 		}
 
-		osg::ref_ptr<osg::MatrixTransform> getTranslation() const {
-			return _translation;
-		}
-
-		osg::ref_ptr<osg::MatrixTransform> getRotation() const {
-			return _rotation;
+		osg::ref_ptr<osg::MatrixTransform> getTransformation() const {
+			return _transformation;
 		}
 
 
@@ -127,7 +123,11 @@ namespace pbs17 {
 
 		void setPosition(Eigen::Vector3d p) {
 			_position = p;
-			_translation->setMatrix(osg::Matrix::translate(toOsg(p)));
+			
+			osg::Matrixd rotation;
+			_orientation.get(rotation);
+
+			_transformation->setMatrix(rotation * osg::Matrix::translate(toOsg(p)));
 			calculateAABB();
 		}
 
@@ -159,13 +159,13 @@ namespace pbs17 {
 			return _orientation;
 		}
 
-		void setOrientation(osg::Quat o) {
-			_orientation = o;
-            osg::Matrixd rotMat;
-			o.get(rotMat);
-			_rotation->setMatrix(rotMat);
-			calculateAABB();
-		}
+		//void setOrientation(osg::Quat o) {
+		//	_orientation = o;
+		//	osg::Matrixd rotMat;
+		//	o.get(rotMat);
+		//	_rotation->setMatrix(rotMat);
+		//	calculateAABB();
+		//}
 
         void updatePositionOrientation(Eigen::Vector3d p, osg::Quat newOrientation);
         
@@ -238,8 +238,9 @@ namespace pbs17 {
 		osg::ref_ptr<osg::MatrixTransform> _aabbRendering;
 		osg::ref_ptr<osg::ShapeDrawable> _aabbShape;
 		//! Local-rotation-node for the object
-		osg::ref_ptr<osg::MatrixTransform> _translation;
-		osg::ref_ptr<osg::MatrixTransform> _rotation;
+		osg::ref_ptr<osg::MatrixTransform> _transformation;
+		//osg::ref_ptr<osg::MatrixTransform> _translation;
+		//osg::ref_ptr<osg::MatrixTransform> _rotation;
 
 		//! Scaling ratio
 		double _scaling = 1.0;
