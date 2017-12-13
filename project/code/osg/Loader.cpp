@@ -101,7 +101,6 @@ osg::ref_ptr<osg::MatrixTransform> Loader::scaleNode(osg::ref_ptr<osg::Node> nod
 osg::ref_ptr<osg::Texture2D> Loader::loadTexture(std::string filename) {
 	// Set up the texture for the walls and don't optimise this texture by OSG.
 	osg::ref_ptr<osg::Texture2D> texture = new osg::Texture2D;
-	texture->setDataVariance(osg::Object::DYNAMIC);
 
 	// load the image
 	osg::Image* image = osgDB::readImageFile(filename);
@@ -112,6 +111,10 @@ osg::ref_ptr<osg::Texture2D> Loader::loadTexture(std::string filename) {
 	}
 
 	texture->setImage(image);
+	texture->setDataVariance(osg::Object::STATIC);
+	texture->setWrap(osg::Texture2D::WRAP_S, osg::Texture2D::WrapMode::REPEAT);
+	texture->setWrap(osg::Texture2D::WRAP_R, osg::Texture2D::WrapMode::REPEAT);
+
 	return texture;
 }
 
