@@ -10,6 +10,7 @@
 
 #include "Asteroid.h"
 #include "Planet.h"
+#include "Sun.h"
 #include "../osg/SkyBox.h"
 #include "../config.h"
 #include "SpaceShip.h"
@@ -197,7 +198,9 @@ osg::ref_ptr<osg::Node> SceneManager::loadScene(json j) {
 			so = new Planet(d);
 		} else if (d["type"].get<std::string>() == "asteroid") {
 			so = new Asteroid(d);
-		} else {
+        } else if (d["type"].get<std::string>() == "sun") {
+            so = new Sun(d);
+        } else {
 			std::cout << "Type (" + d["type"].get<std::string>() + ") not supported!" << std::endl;
 		}
 
