@@ -1,11 +1,9 @@
-/*!
-\file
-* \brief Header file for the class Shader.
-*
-* $Author: emcha1/pfafd1 $
-* $Date: 2013-01-12 $
-* $Revision: 1 $
-*/
+﻿/**
+ * \brief Functionality for applying the shader to the object.
+ *
+ * \Author: Alexander Lelidis (14-907-562), Andreas Emch (08-631-384), Uroš Tešić (17-950-346)
+ * \Date:   2017-12-12
+ */
 
 #pragma once
 
@@ -13,60 +11,71 @@
 
 
 namespace pbs17 {
-	//! The Shader is an interface for using shaders on a node.
-	/*!
-	First the shader-programms needs to be initialized before it can be applied to the node.
-	*/
+	/**
+	 * \brief Interface for the shader.
+	 */
 	class Shader {
 
 	public:
 
-		//! Constructor.
+		/**
+		 * \brief Constructor.
+		 */
 		Shader();
 
 
-		//! Destructor.
+		/**
+		 * \brief Destructor.
+		 */
 		virtual ~Shader();
 
 
-		//! Apply the shader-programm to the given node.
-		/*!
-		\param node The node which will contain the shader.
-		*/
+		/**
+		 * \brief Apply the shader-programm to the given node.
+		 * 
+		 * \param node
+		 *      The node which will contain the shader.
+		 */
 		virtual void apply(osg::Node* node) = 0;
 
 
-		//! Get the vertex-shader-programm.
-		/*!
-		\return The vertex-shader-programm.
-		*/
-		const char* getVertShader() {
+		/**
+		 * \brief Get the vertex-shader-programm.
+		 * 
+		 * \return The vertex-shader-programm.
+		 */
+		const char* getVertShader() const {
 			return _vertSource;
 		}
 
 
-		//! Set the vertex-shader-programm.
-		/*!
-		\param shader The vertex-shader-programm.
-		*/
+		/**
+		 * \brief Set the vertex-shader-programm.
+		 * 
+		 * \param shader
+		 *      The vertex-shader-programm.
+		 */
 		void setVertShader(char* shader) {
 			_vertSource = shader;
 		}
 
 
-		//! Get the fragment-shader-programm.
-		/*!
-		\return The fragment-shader-programm.
+		/**
+		 * \brief Get the fragment-shader-programm.
+		 * 
+		 * \return The fragment-shader-programm.
 		*/
 		const char* getFragShader() {
 			return _fragSource;
 		}
 
 
-		//! Set the fragment-shader-programm.
-		/*!
-		\param shader The fragment-shader-programm.
-		*/
+		/**
+		 * \brief Set the fragment-shader-programm.
+		 * 
+		 * \param shader
+		 *      The fragment-shader-programm.
+		 */
 		void setFragShader(char* shader) {
 			_fragSource = shader;
 		}

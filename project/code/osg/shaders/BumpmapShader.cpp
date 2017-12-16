@@ -1,11 +1,9 @@
-/*!
-\file
-* \brief Source file for the class BumpmapShader.
-*
-* $Author: emcha1/pfafd1 $
-* $Date: 2013-01-12 $
-* $Revision: 1 $
-*/
+﻿/**
+ * \brief Functionality for bumpmap-shading.
+ *
+ * \Author: Alexander Lelidis (14-907-562), Andreas Emch (08-631-384), Uroš Tešić (17-950-346)
+ * \Date:   2017-12-14
+ */
 
 #include "BumpmapShader.h"
 
@@ -16,7 +14,14 @@
 using namespace pbs17;
 
 
-
+/**
+ * \brief Constructor. Initializes the shader-programms.
+ *
+ * \param texture
+ *      The image-texture to apply.
+ * \param normals
+ *      The normal-texture to apply.
+ */
 BumpmapShader::BumpmapShader(osg::ref_ptr<osg::Texture2D> texture, osg::ref_ptr<osg::Texture2D> normals)
 	: _texture(texture), _normals(normals) {
 	setVertShader(
@@ -67,18 +72,27 @@ BumpmapShader::BumpmapShader(osg::ref_ptr<osg::Texture2D> texture, osg::ref_ptr<
 }
 
 
-
+/**
+ * \brief Destructor.
+ */
 BumpmapShader::~BumpmapShader() {}
 
 
-
+/**
+ * \brief Apply the shader to the given node.
+ *
+ * \param node
+ *      The node to which the shader should be applied.
+ */
 void BumpmapShader::apply(osg::Node* node) {
+	// Initialise the vertex and fragment shader and load the correct parameters.
 	osg::ref_ptr<osg::Program> program = new osg::Program;
 	program->addShader(new osg::Shader(osg::Shader::VERTEX, getVertShader()));
 	program->addShader(new osg::Shader(osg::Shader::FRAGMENT, getFragShader()));
 	program->addBindAttribLocation("tangent", 6);
 	program->addBindAttribLocation("binormal", 7);
 
+	// Apply the textures to the state-set.
 	osg::StateSet* stateset = node->getOrCreateStateSet();
 	stateset->setAttributeAndModes(program.get());
 	stateset->addUniform(new osg::Uniform("colorTex", 0));
@@ -87,5 +101,4 @@ void BumpmapShader::apply(osg::Node* node) {
 	osg::StateAttribute::GLModeValue value = osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE;
 	stateset->setTextureAttributeAndModes(0, _texture.get(), value);
 	stateset->setTextureAttributeAndModes(1, _normals.get(), value);
-
 }

@@ -6,6 +6,7 @@
 #include "../config.h"
 #include "../osg/JsonEigenConversions.h"
 #include "../osg/OsgEigenConversions.h"
+#include "../osg/Loader.h"
 #include "../osg/ModelManager.h"
 #include "../osg/visitors/ConvexHullVisitor.h"
 
@@ -29,10 +30,9 @@ Planet::Planet(double size)
  *      JSON-configuration for the planet.
  */
 Planet::Planet(json j) : SpaceObject(j) {
-	std::cout << "json=" << j << std::endl;
 	_radius = j["size"].get<double>();
 	Eigen::Vector3d pos = fromJson(j["position"]);
-	initOsg(pos, j["ratio"].get<double>(), j["scaling"].get<double>());
+	initOsg(pos, j["ratio"].get<double>(), _radius);
 
 	Eigen::Vector3d linearVelocity = fromJson(j["linearVelocity"]);
 	Eigen::Vector3d angularVelocity = fromJson(j["angularVelocity"]);
@@ -86,10 +86,15 @@ void Planet::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 
 	// Load the model
 	std::string modelPath = DATA_PATH + "/sphere.obj";
-	_modelFile = ModelManager::Instance()->loadModel(modelPath, ratio, _radius);
+	_modelFile = ModelManager::Instance()->loadModel(modelPath, false);
+
+	// Scale the model if needed
+	if (_radius != 1.0) {
+		_modelFile = Loader::scaleNode(_modelFile, _radius);
+	}
 
 	// Compute convex hull
-	osg::Matrix scalingMatrix = osg::Matrix::scale(_scaling, _scaling, _scaling);
+	osg::Matrix scalingMatrix = osg::Matrix::scale(_radius, _radius, _radius);
 	ConvexHullVisitor convexHull(scalingMatrix);
 	_modelFile->accept(convexHull);
 	_convexHull = convexHull.getConvexHull();
@@ -110,8 +115,8 @@ void Planet::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 	calculateAABB();
 
 	_modelRoot = new osg::Switch;
-	_modelRoot->addChild(_transformation, true);
-	_modelRoot->addChild(_aabbRendering, false);
+	_modelRoot->insertChild(0, _transformation, true);
+	_modelRoot->insertChild(1, _aabbRendering, true);
 
 	initTexturing();
 }

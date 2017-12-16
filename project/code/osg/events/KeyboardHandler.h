@@ -18,6 +18,10 @@ namespace pbs17 {
 
 		bool handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter&) override = 0;
 
+		void setObjects(const std::vector<SpaceObject*> &objects) {
+			_objects = objects;
+		}
+
 	protected:
 
 		std::vector<SpaceObject*> _objects;

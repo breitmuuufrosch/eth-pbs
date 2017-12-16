@@ -31,18 +31,23 @@ using namespace pbs17;
  * \return Node which can be added to the scene graph.
  */
 osg::ref_ptr<osg::Node> Loader::loadModel(std::string filePath, float ratio, float scaling) {
-	std::cout << "Starting to load the model: \"" << filePath << "\"..." << std::endl;
+	//std::cout << "Starting to load the model: \"" << filePath << "\"..." << std::endl;
 	
 	osg::ref_ptr<osg::Node> model = osgDB::readNodeFile(filePath);
 
 	if (!model) {
-		std::cout << "File not found! Aborting..." << std::endl;
+		//std::cout << "File not found! Aborting..." << std::endl;
 		exit(0);
 	}
 
 	model->setName(filePath);
 
-	std::cout << "Loaded: OK!" << std::endl;
+	// Only simplify the node if desired.
+	if (ratio != 1.0) {
+		model = simplifyNode(model, ratio);
+	}
+
+	//std::cout << "Loaded: OK!" << std::endl;
 
 	return model;
 }
@@ -59,7 +64,7 @@ osg::ref_ptr<osg::Node> Loader::loadModel(std::string filePath, float ratio, flo
  * \return New simplified node which can be added to the scene graph.
  */
 osg::ref_ptr<osg::Node> Loader::simplifyNode(osg::ref_ptr<osg::Node> node, float ratio) {
-	std::cout << "Simplifing node \"" << node->getName() << "\" with the ratio " << ratio << std::endl;
+	//std::cout << "Simplifing node \"" << node->getName() << "\" with the ratio " << ratio << std::endl;
 
 	osgUtil::Simplifier simplifier;
 	simplifier.setSampleRatio(ratio);

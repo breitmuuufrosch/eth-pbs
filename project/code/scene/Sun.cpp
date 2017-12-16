@@ -29,6 +29,12 @@ Sun::Sun(double size)
 }
 
 
+/**
+ * \brief Constructor of Planet with JSON-configuration.
+ *
+ * \param j
+ *      JSON-configuration for the planet.
+ */
 Sun::Sun(json j)
     : Planet(j) {
 	_lightId = LIGHT_ID;
@@ -36,6 +42,14 @@ Sun::Sun(json j)
 }
 
 
+/**
+ * \brief Add a lightsource to the scene.
+ *
+ * \param color
+ *      Color of the light.
+ *
+ * \return Lightsource which can be added to the osg.
+ */
 osg::ref_ptr<osg::LightSource> Sun::addLight(osg::Vec4 color) {
 	osg::Light *light = new osg::Light();
 
@@ -48,20 +62,22 @@ osg::ref_ptr<osg::LightSource> Sun::addLight(osg::Vec4 color) {
 	light->setSpecular(osg::Vec4(1.0, 1.0, 1.0, 1.0));
 	light->setAmbient(osg::Vec4(255.0, 234.0, 160.0, 0.0) / 255.0);
 
-	osg::StateSet *lightStateSet = _modelRoot->getOrCreateStateSet();
+	osg::StateSet *lightStateSet = _transformation->getOrCreateStateSet();
 	osg::ref_ptr<osg::LightSource> lightSource = new osg::LightSource;
 	lightSource->setLight(light);
 	lightSource->setLocalStateSetModes(osg::StateAttribute::ON);
 	lightSource->setStateSetModes(*lightStateSet, osg::StateAttribute::ON);
 
-	_modelRoot->addChild(lightSource);
-
+	_transformation->addChild(lightSource);
 	_light = lightSource;
 
 	return lightSource;
 }
 
 
+/**
+ * \brief Initialize the texture-properties and shader.
+ */
 void Sun::initTexturing() {
 	bool useBumpmap = _bumpmapName != "";
 	osg::ref_ptr<osg::StateSet> stateset = _convexRenderSwitch->getOrCreateStateSet();
@@ -74,12 +90,10 @@ void Sun::initTexturing() {
 	// Load the texture
 	if (_textureName != "") {
 		std::string texturePath = DATA_PATH + "/texture/" + _textureName;
-		std::cout << texturePath << std::endl;
 		osg::ref_ptr<osg::Texture2D> colorTex = ImageManager::Instance()->loadTexture(texturePath);
 
 		if (useBumpmap) {
 			std::string bumpmapPath = DATA_PATH + "/texture/" + _bumpmapName;
-			std::cout << bumpmapPath << std::endl;
 			osg::ref_ptr<osg::Texture2D> normalTex = ImageManager::Instance()->loadTexture(bumpmapPath);
 
 			SunShader bumpmapShader(colorTex, normalTex);
@@ -89,11 +103,12 @@ void Sun::initTexturing() {
 		}
 	}
 
+	// Define material-properties
 	osg::ref_ptr<osg::Material> material = new osg::Material();
-	material->setDiffuse(osg::Material::FRONT, osg::Vec4(1.0, 1.0, 1.0, 1.0));
-	material->setSpecular(osg::Material::FRONT, osg::Vec4(0.0, 0.0, 0.0, 1.0));
-	material->setAmbient(osg::Material::FRONT, osg::Vec4(0.1, 0.1, 0.1, 1.0));
-	material->setEmission(osg::Material::FRONT, osg::Vec4(0.0, 0.0, 0.0, 1.0));
+	material->setDiffuse(osg::Material::FRONT, osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f));
+	material->setSpecular(osg::Material::FRONT, osg::Vec4(0.0f, 0.0f, 0.0f, 1.0f));
+	material->setAmbient(osg::Material::FRONT, osg::Vec4(0.1f, 0.1f, 0.1f, 1.0f));
+	material->setEmission(osg::Material::FRONT, osg::Vec4(0.0f, 0.0f, 0.0f, 1.0f));
 	material->setShininess(osg::Material::FRONT, 100);
 	stateset->setAttribute(material);
 }

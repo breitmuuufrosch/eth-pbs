@@ -3,10 +3,13 @@
 #include <vector>
 #include <queue>
 
-#include "../scene/SpaceObject.h"
-#include "../scene/Planet.h"
 #include "Collision.h"
 #include <Eigen/Core>
+
+// Forward declarations
+namespace pbs17 {
+	class Planet;
+}
 
 namespace pbs17 {
 

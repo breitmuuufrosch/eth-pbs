@@ -33,8 +33,8 @@ SpaceObject::SpaceObject(std::string filename, int i)
 SpaceObject::SpaceObject(json j) {
 	_textureName = j["texture"].is_string() ? j["texture"].get<std::string>() : "";
 	_bumpmapName = j["bumpmap"].is_string() ? j["bumpmap"].get<std::string>() : "";
-    std::cout << "_textureName = "<< _textureName << std::endl;
-    _filename = j["obj"].is_string()? j["obj"].get<std::string>(): "";
+    
+	_filename = j["obj"].is_string()? j["obj"].get<std::string>(): "";
     _id = RunningId;
     ++RunningId;
 
@@ -134,7 +134,7 @@ void SpaceObject::updatePositionOrientation(Eigen::Vector3d p, osg::Quat newOrie
 
     _transformation->setMatrix(rotation * translation);
 
-	calculateAABB();
+	updateAABB();
 }
 
 
@@ -144,11 +144,29 @@ void SpaceObject::calculateAABB() {
 	osg::Matrix rotation;
 	_orientation.get(rotation);
 
-	CalculateBoundingBox bbox(scaling * rotation * translation, scaling * rotation);
+	CalculateBoundingBox bbox(scaling * rotation * translation, scaling);
 	_modelFile->accept(bbox);
 	_aabbLocal = bbox.getLocalBoundBox();
 	_aabbGlobal = bbox.getGlobalBoundBox();
+	_aabbLocalOrig = bbox.getLocalBoundBox();
+	_aabbGlobalOrig = bbox.getGlobalBoundBox();
 
+	_aabbRendering->setMatrix(osg::Matrix::scale(_aabbGlobal._max - _aabbGlobal._min) * osg::Matrix::translate(toOsg(_position)));
+}
+
+void SpaceObject::updateAABB() {
+	osg::Matrix translation = osg::Matrix::translate(toOsg(_position));
+	osg::Matrix rotation;
+	_orientation.get(rotation);
+
+	osg::Matrix localToWorld = rotation * translation;
+
+	osg::BoundingBox newGlobal;
+
+	for (unsigned int i = 0; i < 8; ++i)
+		newGlobal.expandBy(_aabbLocal.corner(i) * localToWorld);
+
+	_aabbGlobal = newGlobal;
 	_aabbRendering->setMatrix(osg::Matrix::scale(_aabbGlobal._max - _aabbGlobal._min) * osg::Matrix::translate(toOsg(_position)));
 }
 
@@ -170,6 +188,9 @@ void SpaceObject::setCollisionState(int c) {
 }
 
 
+/**
+ * \brief Initialize the texture-properties and shader.
+ */
 void SpaceObject::initTexturing() {
 	bool useBumpmap = _bumpmapName != "";
 	osg::ref_ptr<osg::StateSet> stateset = _convexRenderSwitch->getOrCreateStateSet();
@@ -182,12 +203,10 @@ void SpaceObject::initTexturing() {
 	// Load the texture
 	if (_textureName != "") {
 		std::string texturePath = DATA_PATH + "/texture/" + _textureName;
-		std::cout << texturePath << std::endl;
 		osg::ref_ptr<osg::Texture2D> colorTex = ImageManager::Instance()->loadTexture(texturePath);
 
 		if (useBumpmap) {
 			std::string bumpmapPath = DATA_PATH + "/texture/" + _bumpmapName;
-			std::cout << bumpmapPath << std::endl;
 			osg::ref_ptr<osg::Texture2D> normalTex = ImageManager::Instance()->loadTexture(bumpmapPath);
 
 			BumpmapShader bumpmapShader(colorTex, normalTex);
@@ -197,6 +216,7 @@ void SpaceObject::initTexturing() {
 		}
 	}
 
+	// Define material-properties
 	osg::ref_ptr<osg::Material> material = new osg::Material();
 	material->setDiffuse(osg::Material::FRONT, osg::Vec4(1.0, 1.0, 1.0, 1.0));
 	material->setSpecular(osg::Material::FRONT, osg::Vec4(0.0, 0.0, 0.0, 1.0));
@@ -204,9 +224,6 @@ void SpaceObject::initTexturing() {
 	material->setEmission(osg::Material::FRONT, osg::Vec4(0.0, 0.0, 0.0, 1.0));
 	material->setShininess(osg::Material::FRONT, 100);
 	stateset->setAttribute(material);
-
-	//CartoonShader cs(osg::Vec4(1.0, 0.0, 0.0, 1.0));
-	//cs.apply(_modelFile);
 }
 
 void SpaceObject::initFollowingRibbon(osg::Vec3 color, unsigned int numPoints, float halfWidth) {

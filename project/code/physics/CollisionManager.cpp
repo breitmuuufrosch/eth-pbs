@@ -8,11 +8,11 @@
 #include <Eigen/Dense>
 // ReSharper restore CppUnusedIncludeDirective
 
+#include "../scene/Planet.h"
 #include "../graphics/GjkAlgorithm.h"
 
-
 using namespace pbs17;
-using namespace Eigen;
+
 
 void print(std::string name, Eigen::Vector3d &v) {
 	std::cout << name << "= [" << v.x() << " " << v.y() << " " << v.z() << "]; " << std::endl;
@@ -143,38 +143,34 @@ void CollisionManager::broadPhase(std::vector<std::pair<SpaceObject *, SpaceObje
 
 	std::set_intersection(resXY.begin(), resXY.end(), resZ.begin(), resZ.end(),
 		std::back_inserter(res));
-
-	if (res.size() > 0) {
-		//std::cout << "Possible collisions: " << res.size() << std::endl;
-	}
 }
 
 bool CollisionManager::checkIntersection(Planet *p1, Planet *p2) {
 	double d = (p1->getPosition() - p2->getPosition()).norm();
-	//std::cout << d << " " << p1->getRadius() << " " << p2->getRadius() << std::endl;
+
 	return d < p1->getRadius() + p2->getRadius();
 }
 
 void CollisionManager::response(Planet *p1, Planet *p2) {
-	Vector3d pos1 = p1->getPosition();
-	Vector3d pos2 = p2->getPosition();
+	Eigen::Vector3d pos1 = p1->getPosition();
+	Eigen::Vector3d pos2 = p2->getPosition();
 
 	// First, find the vector which will serve as a basis vector (x-axis),
 	// in an arbitrary direction. It has to be normalized to get realistic results.
-	Vector3d x = (pos1 - pos2).normalized();
+	Eigen::Vector3d x = (pos1 - pos2).normalized();
 
 	// Then we calculate the x-direction velocity vector and the perpendicular y-vector.
-	Vector3d v1 = p1->getLinearVelocity();
+	Eigen::Vector3d v1 = p1->getLinearVelocity();
 	double x1 = x.dot(v1);
-	Vector3d v1x = x * x1;
-	Vector3d v1y = v1 - v1x;
+	Eigen::Vector3d v1x = x * x1;
+	Eigen::Vector3d v1y = v1 - v1x;
 	double m1 = p1->getMass();
 
 	// Same procedure for the other sphere.
-	Vector3d v2 = p2->getLinearVelocity();
+	Eigen::Vector3d v2 = p2->getLinearVelocity();
 	double x2 = x.dot(v2);
-	Vector3d v2x = x * x2;
-	Vector3d v2y = v1 - v2x;
+	Eigen::Vector3d v2x = x * x2;
+	Eigen::Vector3d v2y = v1 - v2x;
 	double m2 = p2->getMass();
 
 	p1->setLinearVelocity(v1x * (m1 - m2) / (m1 + m2) + v2x * (2. * m2) / (m1 + m2) + v1y);
@@ -217,7 +213,6 @@ void CollisionManager::narrowPhase(std::vector<std::pair<SpaceObject *, SpaceObj
 			if (GjkAlgorithm::intersect(convexHullP1, convexHullP2, sphereCollision)) {
 				//sphereCollision.setUnitNormal((o1->getPosition() - o2->getPosition()).normalized());
 				_collisionQueue.push(sphereCollision);
-				std::cout << "INTERSECTION DETECTED" << std::endl;
 
 				o1->setCollisionState(2);
 				o2->setCollisionState(2);
@@ -230,9 +225,9 @@ void CollisionManager::narrowPhase(std::vector<std::pair<SpaceObject *, SpaceObj
 }
 
 
-Matrix3d CollisionManager::getOrthonormalBasis(Vector3d v) {
-	Vector3d firstTangent;
-	Vector3d secondTangent;
+Eigen::Matrix3d CollisionManager::getOrthonormalBasis(Eigen::Vector3d v) {
+	Eigen::Vector3d firstTangent;
+	Eigen::Vector3d secondTangent;
 
 	if (fabs(v[0]) > fabs(v[1])) {
 		firstTangent[0] = v[2];
@@ -256,7 +251,7 @@ Matrix3d CollisionManager::getOrthonormalBasis(Vector3d v) {
 		secondTangent[2] = v[0] * firstTangent[1];
 	}
 
-	Matrix3d result;
+	Eigen::Matrix3d result;
 	result << v[0], firstTangent[0], secondTangent[0],
 		v[1], firstTangent[1], secondTangent[1],
 		v[2], firstTangent[2], secondTangent[2];
@@ -273,37 +268,10 @@ void CollisionManager::respondToCollisions() {
 		SpaceObject* object1 = currentCollision.getFirstObject();
 		SpaceObject* object2 = currentCollision.getSecondObject();
 
-		Matrix3d contactBasis = getOrthonormalBasis(currentCollision.getUnitNormal());
-
-		Matrix3d foOrientationX, foOrientationY, foOrientationZ;
-		Matrix3d soOrientationX, soOrientationY, soOrientationZ;
+		Eigen::Matrix3d contactBasis = getOrthonormalBasis(currentCollision.getUnitNormal());
 
 		osg::Quat orientation1 = object1->getOrientation();
 		osg::Quat orientation2 = object2->getOrientation();
-
-		/*foOrientationX << 1., 0., 0.,
-			0., cos(orientation1[0]), -sin(orientation1[0]),
-			0., sin(orientation1[0]), cos(orientation1[0]);
-
-		foOrientationY << cos(orientation1[1]), 0, sin(orientation1[1]),
-			0, 1, 0,
-			-sin(orientation1[1]), 0, cos(orientation1[1]);
-
-		foOrientationZ << cos(orientation1[2]), -sin(orientation1[2]), 0,
-			sin(orientation1[2]), cos(orientation1[2]), 0,
-			0, 0, 1;
-
-		soOrientationX << 1., 0., 0.,
-			0., cos(orientation2[0]), -sin(orientation2[0]),
-			0., sin(orientation2[0]), cos(orientation2[0]);
-
-		soOrientationY << cos(orientation2[1]), 0, sin(orientation2[1]),
-			0, 1, 0,
-			-sin(orientation2[1]), 0, cos(orientation2[1]);
-
-		soOrientationZ << cos(orientation2[2]), -sin(orientation2[2]), 0,
-			sin(orientation2[2]), cos(orientation2[2]), 0,
-			0, 0, 1;*/
 
 		Eigen::Matrix3d foRotationMatrix = fromOsg(osg::Matrix::rotate(orientation1)).block(0,0,3,3);
 		Eigen::Matrix3d soRotationMatrix = fromOsg(osg::Matrix::rotate(orientation2)).block(0,0,3,3);
@@ -315,26 +283,26 @@ void CollisionManager::respondToCollisions() {
 		Eigen::Vector3d velocitySecond = object2->getLinearVelocity() + object2->getAngularVelocity().cross(currentCollision.getSecondPOC() - object2->getPosition());
 
 		double closingVelocity = (velocityFirst - velocitySecond).dot(currentCollision.getUnitNormal());
-		Vector3d contactVelocity = velocityFirst - velocitySecond;
+		Eigen::Vector3d contactVelocity = velocityFirst - velocitySecond;
 
 		double finalVelocity = -COEF_RESTITUTION * closingVelocity;
 
 		double deltaVelocity = finalVelocity - closingVelocity;
 
-		Vector3d velocityToKill;
+		Eigen::Vector3d velocityToKill;
 		velocityToKill << deltaVelocity, -contactVelocity[1], -contactVelocity[2];
 
-		Matrix3d linearResponsePerUnitImpulse = (1. / object1->getMass())*Matrix3d::Identity();
-		linearResponsePerUnitImpulse += (1. / object2->getMass())*Matrix3d::Identity();
+		Eigen::Matrix3d linearResponsePerUnitImpulse = (1. / object1->getMass())* Eigen::Matrix3d::Identity();
+		linearResponsePerUnitImpulse += (1. / object2->getMass())* Eigen::Matrix3d::Identity();
 
-		Vector3d skewOriginMatrix1 = (currentCollision.getFirstPOC() - object1->getPosition());
-		Matrix3d skewSymmetricMatrix1;
+		Eigen::Vector3d skewOriginMatrix1 = (currentCollision.getFirstPOC() - object1->getPosition());
+		Eigen::Matrix3d skewSymmetricMatrix1;
 		skewSymmetricMatrix1 << 0, -skewOriginMatrix1(2), skewOriginMatrix1(1),
 			skewOriginMatrix1(2), 0, -skewOriginMatrix1(0),
 			-skewOriginMatrix1(1), skewOriginMatrix1(0), 0;
 
-		Vector3d skewOriginMatrix2 = (currentCollision.getSecondPOC() - object2->getPosition());
-		Matrix3d skewSymmetricMatrix2;
+		Eigen::Vector3d skewOriginMatrix2 = (currentCollision.getSecondPOC() - object2->getPosition());
+		Eigen::Matrix3d skewSymmetricMatrix2;
 		skewSymmetricMatrix2 << 0, -skewOriginMatrix2(2), skewOriginMatrix2(1),
 			skewOriginMatrix2(2), 0, -skewOriginMatrix2(0),
 			-skewOriginMatrix2(1), skewOriginMatrix2(0), 0;
@@ -344,7 +312,7 @@ void CollisionManager::respondToCollisions() {
 		Eigen::Matrix3d deltaVelocityMatrix = (linearResponsePerUnitImpulse + contactBasis.transpose() * rotationalResponsePerUnitImpulse * contactBasis);
 		Eigen::Vector3d impulseResponse = (deltaVelocityMatrix.inverse() * velocityToKill);
 
-		Vector3d contactImpulseResponse = contactBasis * impulseResponse;
+		Eigen::Vector3d contactImpulseResponse = contactBasis * impulseResponse;
 		double planarImpulse = sqrt(contactImpulseResponse.y()*contactImpulseResponse.y() + contactImpulseResponse.z()*contactImpulseResponse.z());
 		if (planarImpulse > contactImpulseResponse.x() * COEF_FRICTION) {
 			// We need to use dynamic friction.

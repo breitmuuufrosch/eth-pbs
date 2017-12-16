@@ -11,7 +11,11 @@
 #include <osg/NodeVisitor>
 #include <osg/Billboard>
 #include <osg/Geometry>
-#include "../../graphics/ConvexHull3D.h"
+
+// Forward declarations
+namespace pbs17 {
+	class ConvexHull3D;
+}
 
 namespace pbs17 {
 
@@ -24,14 +28,11 @@ namespace pbs17 {
 
 		/**
 		 * \brief Constructor. Initialize the visitor to traverse all children.
+		 * 
+		 * \param globalTransform
+		 *      Global-transformation matrix (local to world).
 		 */
-		ConvexHullVisitor(osg::Matrix globalTransform) : NodeVisitor(TRAVERSE_ALL_CHILDREN) {
-			_globalTransform = globalTransform;
-
-			_vertices = new osg::Vec3Array;
-			_convexHull = nullptr;;
-			_isCalculated = false;
-		}
+		ConvexHullVisitor(osg::Matrix globalTransform);
 
 
 		/**
@@ -59,6 +60,11 @@ namespace pbs17 {
 		void apply(osg::Billboard &node) override;
 		
 
+		/**
+		 * \brief Calculate the convex-hull based on all collected vertices.
+		 *
+		 * \return Convex-hull object of the object (with rendering-geometry and vertice/face-arrays)
+		 */
 		ConvexHull3D* getConvexHull();
 
 

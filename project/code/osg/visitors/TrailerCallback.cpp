@@ -1,6 +1,6 @@
 ﻿/**
-* \brief Functionality for managing loaded models to prevent loading multiple times the same model.
-* The code is copied from http://www.vis-sim.com/osg/code/osgcode_bbox1.htm and adapted to our use.
+* \brief Functionality to show the trace of the space-objects. This code is implemented with the help
+* of "Openscenegraph - cookbook".
 *
 * \Author: Alexander Lelidis (14-907-562), Andreas Emch (08-631-384), Uroš Tešić (17-950-346)
 * \Date:   2017-11-11
@@ -10,17 +10,20 @@
 
 #include <osg/MatrixTransform>
 #include <osg/Geometry>
-#include <iostream>
+
+#include "../FollowingRibbon.h"
 
 using namespace pbs17;
 
 
 /**
-* \brief Calculate the bounding-box for the type osg::Geode.
-*
-* \param geode
-*      Current geode-child.
-*/
+ * \brief Calculate the bounding-box for the type osg::Geode.
+ *
+ * \param node
+ *      Current geode-child.
+ * \param nv
+ *	    Visitor of the tree.
+ */
 void TrailerCallback::operator()(osg::Node* node, osg::NodeVisitor* nv) {
 	osg::MatrixTransform* trans = static_cast<osg::MatrixTransform*>(node);
 	

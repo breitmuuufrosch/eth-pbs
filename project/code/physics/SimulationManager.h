@@ -1,10 +1,16 @@
 #pragma once
 
 #include <vector>
+#include <algorithm>
 
-#include "../scene/SpaceObject.h"
-#include "CollisionManager.h"
-#include "NBodyManager.h"
+
+// forward declarations
+namespace pbs17 {
+	class NBodyManager;
+	class CollisionManager;
+	class SpaceObject;
+}
+
 
 namespace pbs17 {
 

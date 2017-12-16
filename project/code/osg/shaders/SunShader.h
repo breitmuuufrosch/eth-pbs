@@ -1,11 +1,9 @@
-/*!
-\file
-* \brief Header file for the class BumpmapShader.
-*
-* $Author: emcha1/pfafd1 $
-* $Date: 2013-01-12 $
-* $Revision: 1 $
-*/
+﻿/**
+ * \brief Functionality for sun-shading.
+ *
+ * \Author: Alexander Lelidis (14-907-562), Andreas Emch (08-631-384), Uroš Tešić (17-950-346)
+ * \Date:   2017-12-12
+ */
 
 #pragma once
 
@@ -13,34 +11,46 @@
 #include <osg/Texture2D>
 
 namespace pbs17 {
-	//! The BumpmapShader is used to simulate a simple cartoon-effect.
+	/**
+	 * \brief The SunShader is used to simulate the sun.
+	 */
 	class SunShader : public Shader {
 
 	public:
 
-		//! Constructor
-		/*!
-		Initializes the shader-programms.
-		\param color The color for which the effect should be applied.
-		*/
+		/**
+		 * \brief Constructor. Initializes the shader-programms.
+		 *
+		 * \param texture
+		 *      The image-texture to apply.
+		 * \param normals
+		 *      The normal-texture to apply.
+		 */
 		SunShader(osg::ref_ptr<osg::Texture2D> texture, osg::ref_ptr<osg::Texture2D> normals);
 
 
-		//! Destructor.
+		/**
+		 * \brief Destructor.
+		 */
 		virtual ~SunShader();
 
 
-		//! Apply the shader to the given node.
-		/*!
-		\param node The node to which the shader should be applied.
-		*/
+		/**
+		 * \brief Apply the shader to the given node.
+		 * 
+		 * \param node
+		 *      The node to which the shader should be applied.
+		 */
 		void apply(osg::Node* node) override;
 
 
 	private:
 
+		//! The image-texture to apply.
 		osg::ref_ptr<osg::Texture2D> _texture;
+		//! The normal-texture to apply.
 		osg::ref_ptr<osg::Texture2D> _normals;
+
 	};
 }
 

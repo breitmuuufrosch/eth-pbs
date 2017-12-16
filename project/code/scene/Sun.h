@@ -27,8 +27,20 @@ namespace pbs17 {
         Sun(json j);
 
 
+		/**
+		 * \brief Add a lightsource to the scene.
+		 * 
+		 * \param color
+		 *      Color of the light.
+		 * 
+		 * \return Lightsource which can be added to the osg.
+		 */
 		osg::ref_ptr<osg::LightSource> addLight(osg::Vec4 color);
 
+
+		/**
+		 * \brief Initialize the texture-properties and shader.
+		 */
 		void initTexturing() override;
 
 

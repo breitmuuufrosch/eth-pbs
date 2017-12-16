@@ -6,6 +6,8 @@
             "id": "1",
             "size": 1,
             "type": "planet",
+            "texture": "earthmap1k.jpg",
+            "bumpmap": "earth_normalmap_1024x512.jpg",
             "mass": 1.0,
             "position": {
                 "x": 10.0,
@@ -33,13 +35,14 @@
                 "x": 0.0,
                 "y": 0.0,
                 "z": 0.0
-            },
-            "texture": "earthmap1k.jpg"
+            }
         },
         {
-            "id": "1",
+            "id": "2",
             "size": 1,
             "type": "planet",
+            "texture": "earthmap1k.jpg",
+            "bumpmap": "earth_normalmap_1024x512.jpg",
             "mass": 1.0,
             "position": {
                 "x": 10.0,
@@ -67,13 +70,14 @@
                 "x": 0.0,
                 "y": 0.0,
                 "z": 0.0
-            },
-            "texture": "earthmap1k.jpg"
+            }
         },
         {
             "id": "2",
             "size": 5.0,
-            "type": "planet",
+            "type": "sun",
+            "texture": "sunmap.jpg",
+            "bumpmap": "sunmap_normal.jpg",
             "mass": 1000.0,
             "position": {
                 "x": 0.0,
@@ -101,8 +105,7 @@
                 "x": 0.0,
                 "y": 0.0,
                 "z": 0.0
-            },
-            "texture": "sunmap.jpg"
+            }
         }
     ]
 }

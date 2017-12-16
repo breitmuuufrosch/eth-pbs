@@ -1,6 +1,7 @@
 #include "SimulationKeyboardHandler.h"
 
 #include "../../physics/SimulationManager.h"
+#include "../../scene/SpaceObject.h"
 
 using namespace pbs17;
 	
@@ -14,7 +15,8 @@ bool SimulationKeyboardHandler::handle(const osgGA::GUIEventAdapter& ea, osgGA::
 			_showBoundingBox = !_showBoundingBox;
 
 			for (auto it = _objects.begin(); it != _objects.end(); ++it) {
-				(*it)->getModel()->setValue(1, _showBoundingBox);
+				osg::ref_ptr<osg::Switch> bbSwitch = (*it)->getModel();
+				bbSwitch->setValue(1, _showBoundingBox);
 			}
 
 			return true;
@@ -25,8 +27,9 @@ bool SimulationKeyboardHandler::handle(const osgGA::GUIEventAdapter& ea, osgGA::
 			_showConvexHull = !_showConvexHull;
 
 			for (auto it = _objects.begin(); it != _objects.end(); ++it) {
-				(*it)->getConvexSwitch()->setValue(0, !_showConvexHull);
-				(*it)->getConvexSwitch()->setValue(1, _showConvexHull);
+				osg::ref_ptr<osg::Switch> bbSwitch = (*it)->getConvexSwitch();
+				bbSwitch->setValue(0, !_showConvexHull);
+				bbSwitch->setValue(1, _showConvexHull);
 			}
 
 			return true;

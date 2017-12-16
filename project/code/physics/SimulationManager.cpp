@@ -1,5 +1,9 @@
 #include "SimulationManager.h"
 
+#include "../scene/SpaceObject.h"
+#include "CollisionManager.h"
+#include "NBodyManager.h"
+
 using namespace pbs17;
 
 bool SimulationManager::IS_PAUSED = false;
@@ -14,6 +18,7 @@ double SimulationManager::SIMULATION_DT = 0.01;;
 SimulationManager::SimulationManager(std::vector<SpaceObject*> spaceObjects)
 	: _spaceObjects(spaceObjects) {
     _nManager = new NBodyManager();
+	//_nManager->initSpatialGrid(spaceObjects, Eigen::Vector3i(30, 30, 30));
     _cManager = new CollisionManager(spaceObjects);
 }
 

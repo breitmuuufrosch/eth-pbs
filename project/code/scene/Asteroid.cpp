@@ -4,9 +4,10 @@
 #include <osg/Switch>
 
 #include "../config.h"
-#include "../osg/ModelManager.h"
-#include "../osg/OsgEigenConversions.h"
 #include "../osg/JsonEigenConversions.h"
+#include "../osg/OsgEigenConversions.h"
+#include "../osg/Loader.h"
+#include "../osg/ModelManager.h"
 #include "../osg/visitors/ConvexHullVisitor.h"
 #include "../osg/visitors/VertexListVisitor.h"
 
@@ -29,9 +30,11 @@ Asteroid::Asteroid()
  */
 Asteroid::Asteroid(json j) :
     SpaceObject(j) {
+	_filename = "A2.obj";
 
     Eigen::Vector3d pos = fromJson(j["position"]);
-    initOsg(pos, j["ratio"].get<double>(), j["scaling"].get<double>());
+    //initOsg(pos, j["ratio"].get<double>(), j["scaling"].get<double>());
+    initOsg(pos, j["ratio"].get<double>(), 0.1);
 
 	Eigen::Vector3d linearVelocity = fromJson(j["linearVelocity"]);
     Eigen::Vector3d angularVelocity = fromJson(j["angularVelocity"]);
@@ -57,15 +60,15 @@ Asteroid::~Asteroid() {}
 
 
 /**
-* \brief Initialize the space-object for OSG.
-*
-* \param position
-*      Initial position of the object.
+ * \brief Initialize the space-object for OSG.
+ *
+ * \param position
+ *      Initial position of the object.
  * \param ratio
  *      Ratio of the simplifier. (Supported values: [0..1])
-* \param scaling
-*      Scaling of the model. (1.0 => not scaled, < 1.0 => smaller, > 1.0 => larger)
-*/
+ * \param scaling
+ *      Scaling of the model. (1.0 => not scaled, < 1.0 => smaller, > 1.0 => larger)
+ */
 void Asteroid::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 	// Set the position to the space-object
 	_position = position;
@@ -73,7 +76,12 @@ void Asteroid::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 
 	// Load the model
 	std::string modelPath = DATA_PATH + "/" + _filename;
-	_modelFile = ModelManager::Instance()->loadModel(modelPath, ratio, scaling);
+	_modelFile = ModelManager::Instance()->loadModel(modelPath, true);
+
+	// Scale the model if needed
+	if (scaling != 1.0) {
+		_modelFile = Loader::scaleNode(_modelFile, scaling);
+	}
 
 	// Compute convex hull
 	osg::Matrix scalingMatrix = osg::Matrix::scale(_scaling, _scaling, _scaling);
@@ -96,30 +104,15 @@ void Asteroid::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 	double minX = DBL_MAX, maxX = -DBL_MAX, minY = DBL_MAX, maxY = -DBL_MAX, minZ = DBL_MAX, maxZ = -DBL_MAX;
 
     for (unsigned int i = 0; i < vertices->size(); i++) {
-		if (vertices->at(i).x() < minX) {
-			minX = vertices->at(i).x();
-		}
+		minX = std::min(minX, static_cast<double>(vertices->at(i).x()));
+		minY = std::min(minY, static_cast<double>(vertices->at(i).y()));
+		minZ = std::min(minZ, static_cast<double>(vertices->at(i).z()));
 
-		if (vertices->at(i).x() > maxX) {
-			maxX = vertices->at(i).x();
-		}
-
-		if (vertices->at(i).y() < minY) {
-			minY = vertices->at(i).y();
-		}
-
-		if (vertices->at(i).y() > maxY) {
-			maxY = vertices->at(i).y();
-		}
-
-		if (vertices->at(i).z() < minZ) {
-			minZ = vertices->at(i).z();
-		}
-
-		if (vertices->at(i).z() > maxZ) {
-			maxZ = vertices->at(i).z();
-		}
+		maxX = std::max(maxX, static_cast<double>(vertices->at(i).x()));
+		maxY = std::max(maxY, static_cast<double>(vertices->at(i).y()));
+		maxZ = std::max(maxZ, static_cast<double>(vertices->at(i).z()));
 	}
+
 	double a = maxX - minX;
 	double b = maxY - minY;
 	double c = maxZ - minZ;
@@ -141,8 +134,8 @@ void Asteroid::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 	calculateAABB();
 
 	_modelRoot = new osg::Switch;
-	_modelRoot->addChild(_transformation, true);
-	_modelRoot->addChild(_aabbRendering, true);
+	_modelRoot->insertChild(0, _transformation, true);
+	_modelRoot->insertChild(1, _aabbRendering, true);
 
 	initTexturing();
 }
