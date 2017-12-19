@@ -8,6 +8,7 @@
 #pragma once
 
 #include <osg/Transform>
+#include <osg/Geometry>
 
 
 namespace pbs17 {
