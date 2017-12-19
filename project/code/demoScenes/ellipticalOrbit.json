@@ -79,7 +79,7 @@
                     "z": 1.0
                 },
                 "numPoints": 800,
-                "halfWidth": 0.5
+                "halfWidth": 0.2
             }
         }
     ]

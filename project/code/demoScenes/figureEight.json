@@ -34,7 +34,17 @@
                 "y": 0.0,
                 "z": 0.0
             },
-            "texture": "earthmap1k.jpg"
+            "texture": "earthmap1k.jpg",
+            "useFollowingRibbon": true,
+            "followingRibbon": {
+                "color": {
+                    "x": 1.0,
+                    "y": 0.0,
+                    "z": 1.0
+                },
+                "numPoints": 400,
+                "halfWidth": 0.01
+            }
         },
         {
             "id": "1",
@@ -68,7 +78,17 @@
                 "y": 0.0,
                 "z": 0.0
             },
-            "texture": "earthmap1k.jpg"
+            "texture": "earthmap1k.jpg",
+            "useFollowingRibbon": true,
+            "followingRibbon": {
+                "color": {
+                    "x": 1.0,
+                    "y": 0.0,
+                    "z": 1.0
+                },
+                "numPoints": 400,
+                "halfWidth": 0.01
+            }
         },
         {
             "id": "2",
@@ -102,7 +122,17 @@
                 "y": 0.0,
                 "z": 0.0
             },
-            "texture": "sunmap.jpg"
+            "texture": "sunmap.jpg",
+            "useFollowingRibbon": true,
+            "followingRibbon": {
+                "color": {
+                    "x": 1.0,
+                    "y": 0.0,
+                    "z": 1.0
+                },
+                "numPoints": 400,
+                "halfWidth": 0.01
+            }
         }
     ]
 }

@@ -5,7 +5,7 @@
         {
             "id": "0",
             "size": 2.0,
-            "type": "planet",
+            "type": "sun",
             "mass": 20.0,
             "position": {
                 "x": 0.0,
@@ -34,7 +34,8 @@
                 "y": 0.0,
                 "z": 0.0
             },
-            "texture": "sunmap.jpg"
+            "texture": "sunmap.jpg",
+            "bumpmap": "sunmap_normal.jpg"
         },
         {
             "id": "1",
@@ -69,7 +70,17 @@
                 "z": 0.0
             },
             "texture": "earthmap1k.jpg",
-            "bumpmap": "earth_normalmap_1024x512.jpg"
+            "bumpmap": "earth_normalmap_1024x512.jpg",
+            "useFollowingRibbon": true,
+            "followingRibbon": {
+                "color": {
+                    "x": 1.0,
+                    "y": 0.0,
+                    "z": 1.0
+                },
+                "numPoints": 1800,
+                "halfWidth": 0.1
+            }
         }
     ]
 }
