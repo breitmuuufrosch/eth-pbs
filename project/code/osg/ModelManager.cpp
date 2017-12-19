@@ -1,9 +1,9 @@
 ﻿/**
-* \brief Functionality for managing loaded models to prevent loading multiple times the same model.
-*
-* \Author: Alexander Lelidis (14-907-562), Andreas Emch (08-631-384), Uroš Tešić (17-950-346)
-* \Date:   2017-11-11
-*/
+ * \brief Functionality for managing loaded models to prevent loading multiple times the same model.
+ *
+ * \Author: Alexander Lelidis (14-907-562), Andreas Emch (08-631-384), Uroš Tešić (17-950-346)
+ * \Date:   2017-11-11
+ */
 
 #include "ModelManager.h"
 

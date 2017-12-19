@@ -1,10 +1,10 @@
 ﻿/**
-* \brief Functionality to show the trace of the space-objects. This code is implemented with the help
-* of "Openscenegraph - cookbook".
-*
-* \Author: Alexander Lelidis (14-907-562), Andreas Emch (08-631-384), Uroš Tešić (17-950-346)
-* \Date:   2017-11-11
-*/
+ * \brief Functionality to show the trace of the space-objects. This code is implemented with the help
+ * of "Openscenegraph - cookbook".
+ *
+ * \Author: Alexander Lelidis (14-907-562), Andreas Emch (08-631-384), Uroš Tešić (17-950-346)
+ * \Date:   2017-12-16
+ */
 
 #include "TrailerCallback.h"
 

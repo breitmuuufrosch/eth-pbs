@@ -1,3 +1,10 @@
+/**
+ * \brief Implementation of the sun.
+ *
+ * \Author: Alexander Lelidis (14-907-562), Andreas Emch (08-631-384), Uroš Teši? (17-950-346)
+ * \Date:   2017-12-12
+ */
+
 #ifndef SUN_H
 #define SUN_H
 
