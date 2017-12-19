@@ -63,7 +63,7 @@ namespace pbs17 {
 
 		std::priority_queue<Collision, std::vector<Collision>, CollisionCompareLess> _collisionQueue;
 
-        const double COEF_RESTITUTION = 2.0;
+        const double COEF_RESTITUTION = 0.5;
 		const double COEF_FRICTION = 0.2;
     };
 

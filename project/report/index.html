@@ -137,7 +137,7 @@ while(true) {
         <h4 class="section-heading">Collision manager</h4>
         <p class="section-description">
             The collision detection consists of 3 main phases. The broad phase, the narrow phase and the collision response. 
-            The first phase implentents the prune and sweep algorithm, which objective it is to reduce number of number of computational expensiv narrow collision checks. TBD explain them a bit more.
+            The first phase implentents the prune and sweep algorithm, which objective it is to reduce number of number of computational expensiv narrow collision checks. We start by computing a axis aligned bounding box for each model we are simulating. This can be done is quite fast and the check for intersection is also easy to implement. Now we are sorting the element intervals for each axis x,y and z and chec if there are overlaps of object itnervals. If there is an overlap in all 3 axis we know that the two AABB are intersecting and we can continue with the narrow phase checks. Due to the fact that we are storing the lists for each axis and exploiting temporal coherence the resorting can be done in a few computational steps. Since it is unlikely that the objects move significatly between two steps. 
         </p>
         <p class="section-description">
             In the narrow phase we imple the GJK and EPA algorithm. TBD explain them a bit more.
