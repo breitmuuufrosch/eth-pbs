@@ -6,13 +6,13 @@
             "id": "0",
             "size": 0.05,
             "type": "asteroid",
-            "obj": "sphere.obj",
+            "obj": "A2.obj",
             "texture": "earthmap1k.jpg",
             "mass": 1.0,
             "position": {
-                "x": -2.0,
-                "y": 0.0,
-                "z": 0.0
+                "x": 8.0,
+                "y": 10.0,
+                "z": 10.0
             },
             "ratio": 1.0,
             "scaling": 1.0,
@@ -41,13 +41,13 @@
             "id": "1",
             "size": 0.05,
             "type": "asteroid",
-            "obj": "starfighter.obj",
+            "obj": "A2.obj",
             "texture": "earthmap1k.jpg",
             "mass": 1.0,
             "position": {
-                "x": 2.0,
-                "y": 0.0,
-                "z": 0.0
+                "x": 12.0,
+                "y": 10.0,
+                "z": 10.0
             },
             "ratio": 1.0,
             "scaling": 1.0,

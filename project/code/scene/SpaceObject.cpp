@@ -227,7 +227,7 @@ void SpaceObject::initTexturing() {
 	osg::ref_ptr<osg::Material> material = new osg::Material();
 	material->setDiffuse(osg::Material::FRONT, osg::Vec4(1.0, 1.0, 1.0, 1.0));
 	material->setSpecular(osg::Material::FRONT, osg::Vec4(0.0, 0.0, 0.0, 1.0));
-	material->setAmbient(osg::Material::FRONT, osg::Vec4f(0.1f, 0.1f, 0.1f, 1.0f));
+	material->setAmbient(osg::Material::FRONT, osg::Vec4f(0.4f, 0.4f, 0.4f, 1.0f));
 	material->setEmission(osg::Material::FRONT, osg::Vec4(0.0, 0.0, 0.0, 1.0));
 	material->setShininess(osg::Material::FRONT, 100);
 	stateset->setAttribute(material);

@@ -37,11 +37,11 @@ Asteroid::Asteroid()
  */
 Asteroid::Asteroid(json j) :
     SpaceObject(j) {
-	_filename = "A2.obj";
+	//_filename = "A2.obj";
 
     Eigen::Vector3d pos = fromJson(j["position"]);
-    //initOsg(pos, j["ratio"].get<double>(), j["scaling"].get<double>());
-    initOsg(pos, j["ratio"].get<double>(), 0.1);
+    initOsg(pos, j["ratio"].get<double>(), j["scaling"].get<double>());
+    //initOsg(pos, j["ratio"].get<double>(), 0.1);
 
 	Eigen::Vector3d linearVelocity = fromJson(j["linearVelocity"]);
     Eigen::Vector3d angularVelocity = fromJson(j["angularVelocity"]);
