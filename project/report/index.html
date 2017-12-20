@@ -69,16 +69,16 @@ html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:1
 <div class="container">
     <section class="header" id="intro">
         <p> 
-            Simulating planets and astroids in space is an intersesting multi dimensional challange. Due to the nature of the set up, we have to solve a few hard challanges to achieve a real time engine. The first part of the problem is the numerical computation of gravitational forces. This problem is today only solved analytically for 2 bodies. Since our objective is to have an asteroid field we using numerical methodes to approximated these forces. Once the bodies start to move around the second challange is to handle collisions and compute phyiscally correct responses. Again this needs to be done in rather fast fasion to be able to run in real time. 
+            Simulating planets and asteroids in space is an intersecting multi dimensional challenge. Due to the nature of the set up, we have to solve a few hard challenges to achieve a real time engine. The first part of the problem is the numerical computation of gravitational forces. This problem is today only solved analytically for 2 bodies. Since our objective is to have an asteroid field we using numerical methods to approximated these forces. Once the bodies start to move around the second challenge is to handle collisions and compute physically correct responses. Again this needs to be done in rather fast fashion to be able to run in real time. 
         </p>
     </section>
     <div class="docs-section" id="overview">
         <h3 class="section-heading">Overview</h3>
         <p class="section-description">
-            To achieve the objective of having a real time n-body engine with collision detection, we are going to use a few libaries to not reinvent the wheel. Starting with the render engine openSceneGraph [<a href="#osg">1</a>], which we are using to visualize our simulation. This is a reasonable trade of due to the objective is to create the simulation engine and not to learn openGL. For our arithmetic opertations we rely on the fast linear algebra libary Eigen [<a href="#eigen">2</a>], which we are using for matrix and vector opertations. We included the computational geometry algorithms libary (CGAL)[<a href="#cgal">3</a>] into our project to compute the convex hull of our models. Each rendered object in our implementation has two meshes, one detailed mesh for rendering purpose and the simpler mesh of the convex hull for simulation purpose. To not recompile our code every time we want to run a new the engine with a different set of parameters, we include the json libary [<a href="#json">4</a>]. Now we are able to define our parameters in scene json files and load them everytime we run the program. Finally, we are using boost [<a href="#boost">5</a>] to read input parameters from the user.
+            To achieve the objective of having a real time n-body engine with collision detection, we are going to use a few libraries to not reinvent the wheel. Starting with the render engine openSceneGraph [<a href="#osg">1</a>], which we are using to visualize our simulation. This is a reasonable trade of due to the objective is to create the simulation engine and not to learn openGL. For our arithmetic operations we rely on the fast linear algebra library Eigen [<a href="#eigen">2</a>], which we are using for matrix and vector operations. We included the computational geometry algorithms library (CGAL)[<a href="#cgal">3</a>] into our project to compute the convex hull of our models. Each rendered object in our implementation has two meshes, one detailed mesh for rendering purpose and the simpler mesh of the convex hull for simulation purpose. To not recompile our code every time we want to run a new the engine with a different set of parameters, we include the json libary [<a href="#json">4</a>]. Now we are able to define our parameters in scene json files and load them everytime we run the program. Finally, we are using boost [<a href="#boost">5</a>] to read input parameters from the user.
         </p>
         <p class="section-description">
-            With a high-level persective our code has the following pipeline. The first step before entering the simulation loop is to load all the obj models, textures and bump maps specified in the scene.json and create objects with the specified physical properties like angular rotation or linear velocity. The next step is to compute the convex hull for every mesh to speed up the simulation. Now we enter the simulation loop:
+            With a high-level perspective our code has the following pipeline. The first step before entering the simulation loop is to load all the obj models, textures and bump maps specified in the scene.json and create objects with the specified physical properties like angular rotation or linear velocity. The next step is to compute the convex hull for every mesh to speed up the simulation. Now we enter the simulation loop:
             <pre>
             <code>
 while(true) {
@@ -112,7 +112,7 @@ while(true) {
                         <li>Events: Keyboard handling</li>
                         <li>Particles: Particle-shader for the space-ship</li>
                         <li>Shaders: Shaders for the bumpmap, sun-lightning</li>
-                        <li>Visitors: Visitors needed for OSG to extract some information (vertice-list, convex-hull, ...)</li>
+                        <li>Visitors: Visitors needed for OSG to extract some information (vertex-list, convex-hull, ...)</li>
                     </ul>
                 </li>
                 <li>Physics: Simulation-, N-Body- and Collision-manager.</li>
@@ -138,7 +138,7 @@ while(true) {
         </p>
         <h4 class="section-heading">N-Body manager</h4>
         <p class="section-description">
-            To be able to simmulate movement in space we need to implement Newtons first law of gravity, which gives us pairwise forces between two masses. 
+            To be able to simulate movement in space we need to implement Newtons first law of gravity, which gives us pairwise forces between two masses. 
             $$
                 \vec{F} = G \cdot \frac{m_1 \cdot m_1}{|\vec{r}|^3} \vec{r}
             $$
@@ -175,7 +175,7 @@ while(true) {
                 However, for many objects, this might become a problem. Therefore we tried out two different acceleration-methods:
                 <ul>
                     <li>We used Open-MP for parallel-loops in C++: This already significantly improved the running speed (by a factor of 4), even thought it is still \(O(n^2)\)</li>
-                    <li>A uniform spatial grid is generated (3 times as big as the scene => imrpovement could be to let the user define it in the scene). Then in the first step, for each object it's radius of affect is used to decide with a treshold how many neighboring cells are affected. During simulation time, the cells are updated with a list of which objects are affecting this cell. In this way, only the objects with a high enough influence are used for the calculations. The runtime for this case is \(O(n + k)\), with \(n\) being the number of objects and \(k\) being the number of influencers in the cells.</li>
+                    <li>A uniform spatial grid is generated (3 times as big as the scene => improvement could be to let the user define it in the scene). Then in the first step, for each object it's radius of affect is used to decide with a threshold how many neighboring cells are affected. During simulation time, the cells are updated with a list of which objects are affecting this cell. In this way, only the objects with a high enough influence are used for the calculations. The runtime for this case is \(O(n + k)\), with \(n\) being the number of objects and \(k\) being the number of influencers in the cells.</li>
                 </ul>
             </p>
         </p>
@@ -186,13 +186,13 @@ while(true) {
             <h5 class="section-heading">Broad phase (prune and sweep algorithm)</h5>
             <img src="images/collision_broad.png" height="300" alt="Broad phase" class="img-responsive">
             <p class="section-description">
-                The first phase implentents the prune and sweep algorithm, which objective it is to reduce number of number of computational expensiv narrow collision checks. We start by computing a axis aligned bounding box for each model we are simulating. This can be done is quite fast and the check for intersection is also easy to implement. Now we are sorting the element intervals for each axis x,y and z and chec if there are overlaps of object itnervals. If there is an overlap in all 3 axis we know that the two AABB are intersecting and we can continue with the narrow phase checks. Due to the fact that we are storing the lists for each axis and exploiting temporal coherence the resorting can be done in a few computational steps. Since it is unlikely that the objects move significatly between two steps.
-                (Quick sidenote: first, we defined all heavy scenes on the XY-plane, resulting to have this algorithm in the worst time complexitz of \(O(n^2)\), because on z-axis each object is a possible collision with each other. Without hierarchically solving this, we simply rotated the scenes to be not aligned with an axis) 
+                The first phase implements the prune and sweep algorithm, which objective it is to reduce number of number of computational expensive narrow collision checks. We start by computing a axis aligned bounding box for each model we are simulating. This can be done is quite fast and the check for intersection is also easy to implement. Now we are sorting the element intervals for each axis x,y and z and check if there are overlaps of object intervals. If there is an overlap in all 3 axis we know that the two AABB are intersecting and we can continue with the narrow phase checks. Due to the fact that we are storing the lists for each axis and exploiting temporal coherence the resorting can be done in a few computational steps. Since it is unlikely that the objects move significatly between two steps.
+                (Quick sidenote: first, we defined all heavy scenes on the XY-plane, resulting to have this algorithm in the worst time complexity of \(O(n^2)\), because on z-axis each object is a possible collision with each other. Without hierarchically solving this, we simply rotated the scenes to be not aligned with an axis) 
             </p>
             <h5 class="section-heading">Narrow phase (GJK and EPA)</h5>
             <p class="section-description">
                 For the narrow phase in the collision detection, we implemented the GJK (Gilbert–Johnson–Keerthi distance algorithm) algorithm with the EPA (Expanding Polytope Algorithm).
-                GJK is used to build up iteratively the minkowski-sum, without the need to calculate the whole. In the first draft we've been using the miknowski-sum from CGAL, which is calculating the whole sum. This resulted in a drastically bad runtime. We could significantly reduce the runtime by the iterative implementation, since this algorithm is being said to be with a constant running time.
+                GJK is used to build up iteratively the Minkowski-sum, without the need to calculate the whole. In the first draft we've been using the Minkowski-sum from CGAL, which is calculating the whole sum. This resulted in a drastically bad runtime. We could significantly reduce the runtime by the iterative implementation, since this algorithm is being said to be with a constant running time.
                 A good property of the algorithm is that
             </p>
             <img src="images/collision_gjk.png" alt="GJK-Algorithm" class="img-responsive">
@@ -211,7 +211,7 @@ while(true) {
                 </ul>
             </p>
             <p class="section-description">
-                When  GJK has detected a collision, EPA needs to be run to find the correct intersection vector. Because EPA works now on a realy polytope instead of only a simplex, we need to convert this first. In the normal case, our simplex has four points. In this case it can be easily created a tetrahedron with the four faces and the correct orientation of the normal.
+                When  GJK has detected a collision, EPA needs to be run to find the correct intersection vector. Because EPA works now on a real polytope instead of only a simplex, we need to convert this first. In the normal case, our simplex has four points. In this case it can be easily created a tetrahedron with the four faces and the correct orientation of the normal.
             </p>
             <img src="images/collision_epa.png" alt="EPA" class="img-responsive">
             <p class="section-description">
@@ -224,10 +224,10 @@ while(true) {
                             <li>Get closest face to the origin</li>
                             <li>Get the support-function into the direction of the faces normal</li>
                             <li>Expand the polytope with point from support-function and remove redundant faces</li>
-                            <li>If the expansion is below a given treshold or the point has already been added, it converged and can go to the final step</li>
+                            <li>If the expansion is below a given threshold or the point has already been added, it converged and can go to the final step</li>
                         </ul>
                     </li>
-                    <li>Calculate the intersection point on each object with the barycentric point from the interseciton-polytype</li>
+                    <li>Calculate the intersection point on each object with the barycentric point from the intersecton-polytype</li>
                 </ul>
 
                 For expanding the polytope with a new support-point, following steps need to be done in order to still have a convex polytope:
@@ -242,8 +242,39 @@ while(true) {
             
             <h5 class="section-heading">Collision-response</h5>
             <p class="section-description">
-                HERE we describe our collision response methode and add a two gif comparission for the different parameters.
-                @uros look at this example to see how to include them
+                <p class="section-description">
+            <p>Narrow phase creates a collision object with the colliding objects, intersection points, contact normal and a intersection vector. This is all data that we need to calculate collision response for arbitrary geometry.
+			First, we must calculate impact speed of the colliding points on the bodies. It is the sum of four different velocities projected to the contact normal:
+				<ul>
+				<li> First body's linear velocity
+				<li> Second body's linear velocity
+				<li> Velocity of first body's intersection point due to rotation
+				<li> Velocity of second body's intersection point due to rotation
+				</ul>
+			We use this speed to calculate outgoing velocity, which is usually only a fraction of it (coefficient of restitution).
+			We also record velocities perpendicular to the contact normal. They will be important later when we add friction.</p>
+			
+            
+			<p>Considering that we know the needed difference in velocities that we want to attain, we can estimate the change in linear and angular velocities of bodies. For that we calculate the moment of inertia in global frame for both bodies.
+			By combining this with the distance of contact points from the centroid point, we determine how easy the body is to rotate. We can combine this with masses (which determine linear inertness - how easy bodies are to move), to calculate total response per unit of impulse.
+			Because we know the difference in velocities, we can calculate the total change of impulse needed, and distribute it among the four components (translation and rotation of both bodies).</p>
+			
+			<p>Friction complicates things a bit, but by recording projections of the closing velocity along the other two axes of the contact base, we can try to kill them too using a change in impulse. However, there is a limitation. Friction is a reactive force. It cannot make velocities point in the opposite direction. If we detect that case, we set the corresponding component to 0.</p>
+			
+			<p>Now we have a change in linear and angular velocity. Linear velocity is easy to convert to actual coordinates by integration in the update step. However, for rotation, we must integrate angular velocity to obtain the change of angle in the time span, and then calculate and apply a rotation quaternion.</p>
+			
+			<p>The last step involves intersection resolution. We must move objects apart so they don't intersect each other anymore at the end of the frame. We do that by distributing the translational and rotational movement based on objects' inertness. Objects which rotate easily will have a higher rotational response, while light objects will be moved further apart. In the end, both intersection points are moved by a length of intersection vector from each other. The only thing that objects' inertia determines is the ratio of both bodies' movement.</p>
+			
+            <div class="row">
+                <div class="twentytwenty-container">
+                    <img src="videos/fric.gif" height="300" width="500" alt="With friction" class="img-responsive">
+                    <img src="videos/no_fric.gif" height="300" width="500" alt="No friction" class="img-responsive">
+                </div> <br>      
+                           
+                <p>
+					This image compares the collision response of two planets with and without friction. Note that friction takes into consideration velocity components which aren't along the collision normal. These components are responsible for rotation.
+                </p>
+            </div>
                 <div class="row">
                     <div class="twentytwenty-container">
                         <img src="images/friction.gif" height="300" width="500" alt="With friction" class="img-responsive">
@@ -264,7 +295,7 @@ while(true) {
         </p>
         <h4 class="section-heading">Circular orbit (2 bodies)</h4>
         <p class="section-description">
-            The goal of this experiment is to get a planet circuling another planet in a circular way. Therefor we create a scene file (circularOrbit.json) with a sun (m = 20.0) and a earth (m = 0.1). The sun has zero linear an angular velocity and the earth 
+            The goal of this experiment is to get a planet orbiting another planet in a circular way. Therefor we create a scene file (circularOrbit.json) with a sun (m = 20.0) and a earth (m = 0.1). The sun has zero linear an angular velocity and the earth 
             $$
                 \vec{p} = \begin{pmatrix}
                   -5.0  \\ 0 \\ 0
@@ -281,9 +312,9 @@ while(true) {
             </video>
         </div>
         <hr>
-        <h4 class="section-heading">Ellipical orbit (2 bodies)</h4>
+        <h4 class="section-heading">Elliptical orbit (2 bodies)</h4>
         <p class="section-description">
-            The goal of this experiment is to get a planet circuling another planet in a elliptic way. Therefor we create a scene file (ellipticalOrbit.json) with a sun (m = 1000.0) and a earth (m = 0.1). The sun has zero linear an angular velocity and the earth 
+            The goal of this experiment is to get a planet orbiting another planet in a elliptic way. Therefore we create a scene file (ellipticalOrbit.json) with a sun (m = 1000.0) and a earth (m = 0.1). The sun has zero linear an angular velocity and the earth 
             $$
                 \vec{p} = \begin{pmatrix}
                   -5.0  \\ 0 \\ 0
@@ -341,11 +372,7 @@ while(true) {
         <p class="section-description">
             To see that all our parts of the collision detect are correctly working we created a scene rendered with debug informations. The first thing we add is a visualization of the AABB and color coding, where green means that we have an intersection in the broad phase, but not the narrow one. Red defines a real collision. 
         </p>
-        <div class="row">
-            <video autoplay loop width="1000">
-                <source src="videos/pruneandsweep.mp4" type="video/mp4" />
-            </video>
-        </div>
+
         <hr>
         <p class="section-description">
             The following video show the collision of two asteroids in space.
@@ -361,7 +388,7 @@ while(true) {
     <div class="docs-section" id="finalResults">
         <h3 class="section-heading">Final results</h3>
         <p class="section-description">
-            We want to split this section in to two parts. First we tried our implementation in a big scale, by creating a asteroid field with a spiral pattern and a planet with astroid belt. To test our collision detect and handling we create a asteroid field colliding with a planet. 
+            We want to split this section in to two parts. First we tried our implementation in a big scale, by creating a asteroid field with a spiral pattern and a planet with asteroid belt. To test our collision detect and handling we create a asteroid field colliding with a planet. 
         </p>
         <div class="row">
             <video autoplay loop width="1000" muted>
@@ -375,14 +402,9 @@ while(true) {
             </video>
         </div>
         <hr>
-        <div class="row">
-            <video autoplay loop width="1000" muted>
-                <source src="videos/figureEight.mp4" type="video/mp4" />
-            </video>
-        </div>
         <hr>
         <p class="section-description">
-            For the second part we implement a small space game, where the user flies in a aircraft through a metor field and tries to survive.
+            For the second part we implement a small space game, where the user flies in a aircraft through a meteor field and tries to survive.
         </p>
         <div class="row">
             <video autoplay loop muted width="1000">
