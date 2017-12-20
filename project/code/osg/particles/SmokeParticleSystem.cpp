@@ -1,7 +1,7 @@
 ﻿/**
  * \brief Implementation for the particle system to simulate smoke.
  *
- * \Author: Alexander Lelidis (14-907-562), Andreas Emch (08-631-384), Uroš Tešić (17-950-346)
+ * \Author: Alexander Lelidis, Andreas Emch, Uroš Tešić
  * \Date:   2017-12-12
  */
 

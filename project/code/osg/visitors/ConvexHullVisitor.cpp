@@ -2,7 +2,7 @@
  * \brief Functionality for managing loaded models to prevent loading multiple times the same model.
  * The code is copied from http://www.vis-sim.com/osg/code/osgcode_bbox1.htm and adapted to our use.
  *
- * \Author: Alexander Lelidis (14-907-562), Andreas Emch (08-631-384), Uroš Tešić (17-950-346)
+ * \Author: Alexander Lelidis, Andreas Emch, Uroš Tešić
  * \Date:   2017-11-23
  */
 

@@ -1,7 +1,7 @@
 ﻿/**
  * \brief Functionality for managing loaded images to prevent loading multiple times the same image.
  *
- * \Author: Alexander Lelidis (14-907-562), Andreas Emch (08-631-384), Uroš Tešić (17-950-346)
+ * \Author: Alexander Lelidis, Andreas Emch, Uroš Tešić
  * \Date:   2017-11-12
  */
 
