@@ -121,7 +121,7 @@ void SpaceShip::initOsg(Eigen::Vector3d position, double ratio, double scaling) 
 
 	_modelRoot = new osg::Switch;
 	_modelRoot->addChild(_transformation, true);
-	_modelRoot->addChild(_aabbRendering, true);
+	_modelRoot->addChild(_aabbRendering, false);
 	_modelRoot->addChild(smoke, true);
 	_modelRoot->addChild(_particleRoot, true);
 

@@ -123,7 +123,7 @@ void Planet::initOsg(Eigen::Vector3d position, double ratio, double scaling) {
 
 	_modelRoot = new osg::Switch;
 	_modelRoot->insertChild(0, _transformation, true);
-	_modelRoot->insertChild(1, _aabbRendering, true);
+	_modelRoot->insertChild(1, _aabbRendering, false);
 
 	initTexturing();
 }

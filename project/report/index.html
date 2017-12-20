@@ -58,7 +58,7 @@ html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:1
           </video>
           
           <div class="headerTitle">
-            <h1 class="title">Astroidfield Simulation</h1>
+            <h1 class="title">Asteroidfield Simulation</h1>
             <p>
                 by Alexander Lelidis, Andreas Emch and Uros Tesic 
             </p>
@@ -97,6 +97,45 @@ while(true) {
     </div>
     <div class="docs-section" id="Implementation">
         <h3 class="section-heading">Implementation</h3>
+        <h4 class="section-heading">Basic-Setup</h4>
+        <p class="section-description">
+            For seeing how to setup the project, please read the instructions and needed frameworks in our README in the code-location. We have developed with Windows and Ubuntu, for both systems the corresponding libraries are mentioned in the README.
+        </p>
+        <p class="section-description">
+            In principal, the most important methods are commented. For most of the classes or function it is rather obvious what should be done, since we structured it granularely with the size of this project.
+            Here is a very quick overview of the structure of our project:
+            <ul>
+                <li>Core (main-folder): Main files with the main-entry point for the program</li>
+                <li>Graphics: All graphic implementation. For example GJK, EPA, convex-hull, and helper functions.</li>
+                <li>OSG: All rendering-relevant implementations for OpenSceneGraph
+                    <ul>
+                        <li>Events: Keyboard handling</li>
+                        <li>Particles: Particle-shader for the space-ship</li>
+                        <li>Shaders: Shaders for the bumpmap, sun-lightning</li>
+                        <li>Visitors: Visitors needed for OSG to extract some information (vertice-list, convex-hull, ...)</li>
+                    </ul>
+                </li>
+                <li>Physics: Simulation-, N-Body- and Collision-manager.</li>
+                <li>Scene: Needed objects to create a simulation scene.</li>
+            </ul>
+            The demo-scenes can be found in the code-directory.
+        </p>
+        <p class="section-description">
+            The paths to load the models etc is written dynamically with CMake into the config.h file. The paths point to the directory "data" in the code repository.
+        </p>
+        <p class="section-description">
+            Once compiled, our program can be started with several parameters. These can be looked up via "asteroid_field.exe --help".
+            <ul>
+                <li>-h [ --help ]: Help screen</li>
+                <li>-s [ --spheres ] arg (=10): Spheres</li>
+                <li>-a [ --asteroids ] arg (=0): Asteroids</li>
+                <li>-e [ --emitter ] arg (=sphere): Emitter</li>
+                <li>-r [ --rand ] arg (=1): Random</li>
+                <li>-g [ --gameplay ] arg (=0): Gameplay</li>
+                <li>-f [ --saveFrames ] arg (=0): Save frame sto image files</li>
+                <li>-j [ --sceneJson ] arg: Json file containing the scene</li>
+            </ul>
+        </p>
         <h4 class="section-heading">N-Body manager</h4>
         <p class="section-description">
             To be able to simmulate movement in space we need to implement Newtons first law of gravity, which gives us pairwise forces between two masses. 
@@ -127,29 +166,95 @@ while(true) {
                     i.setPosition(p)
             </code>
             </pre>
+
+            
+            <h5 class="section-heading">Accelerations</h4>
+            <img src="images/spatial_grid.jpg" height="100" width="100" alt="Spatial Grid" class="img-responsive">
+            <p class="section-description">
+                The easy and naive way uses a \(O(n^2)\) runtime. For smaller scenes this might suit absolutely and will effect the running time not significantly, but the result is still more accurate.
+                However, for many objects, this might become a problem. Therefore we tried out two different acceleration-methods:
+                <ul>
+                    <li>We used Open-MP for parallel-loops in C++: This already significantly improved the running speed (by a factor of 4), even thought it is still \(O(n^2)\)</li>
+                    <li>A uniform spatial grid is generated (3 times as big as the scene => imrpovement could be to let the user define it in the scene). Then in the first step, for each object it's radius of affect is used to decide with a treshold how many neighboring cells are affected. During simulation time, the cells are updated with a list of which objects are affecting this cell. In this way, only the objects with a high enough influence are used for the calculations. The runtime for this case is \(O(n + k)\), with \(n\) being the number of objects and \(k\) being the number of influencers in the cells.</li>
+                </ul>
+            </p>
         </p>
         <h4 class="section-heading">Collision manager</h4>
         <p class="section-description">
-            The collision detection consists of 3 main phases. The broad phase, the narrow phase and the collision response. 
-            The first phase implentents the prune and sweep algorithm, which objective it is to reduce number of number of computational expensiv narrow collision checks. We start by computing a axis aligned bounding box for each model we are simulating. This can be done is quite fast and the check for intersection is also easy to implement. Now we are sorting the element intervals for each axis x,y and z and chec if there are overlaps of object itnervals. If there is an overlap in all 3 axis we know that the two AABB are intersecting and we can continue with the narrow phase checks. Due to the fact that we are storing the lists for each axis and exploiting temporal coherence the resorting can be done in a few computational steps. Since it is unlikely that the objects move significatly between two steps. 
-        </p>
-        <p class="section-description">
-            In the narrow phase we imple the GJK and EPA algorithm. TBD @Andy explain them a bit more.
-        </p>
-        <p class="section-description">
-            HERE we describe our collision response methode and add a two gif comparission for the different parameters.
-            @uros look at this example to see how to include them
-            <div class="row">
-                <div class="twentytwenty-container">
-                    <img src="images/friction.gif" height="300" width="500" alt="With friction" class="img-responsive">
-                    <img src="images/nofriction.gif" height="300" width="500" alt="No friction" class="img-responsive">
-                </div> <br>      
-                           
-                <p>
-                    This image compares for each RGB channel the scattering materices as a result of the adding equations. The matrices represent a combined material, composed of gold and coating. The animation cycle trough the first 30 fourier levels.
-                </p>
-            </div>
+            The collision detection consists of 3 main phases. The broad phase, the narrow phase and the collision response.
+            
+            <h5 class="section-heading">Broad phase (prune and sweep algorithm)</h5>
+            <img src="images/collision_broad.png" height="300" alt="Broad phase" class="img-responsive">
+            <p class="section-description">
+                The first phase implentents the prune and sweep algorithm, which objective it is to reduce number of number of computational expensiv narrow collision checks. We start by computing a axis aligned bounding box for each model we are simulating. This can be done is quite fast and the check for intersection is also easy to implement. Now we are sorting the element intervals for each axis x,y and z and chec if there are overlaps of object itnervals. If there is an overlap in all 3 axis we know that the two AABB are intersecting and we can continue with the narrow phase checks. Due to the fact that we are storing the lists for each axis and exploiting temporal coherence the resorting can be done in a few computational steps. Since it is unlikely that the objects move significatly between two steps.
+                (Quick sidenote: first, we defined all heavy scenes on the XY-plane, resulting to have this algorithm in the worst time complexitz of \(O(n^2)\), because on z-axis each object is a possible collision with each other. Without hierarchically solving this, we simply rotated the scenes to be not aligned with an axis) 
+            </p>
+            <h5 class="section-heading">Narrow phase (GJK and EPA)</h5>
+            <p class="section-description">
+                For the narrow phase in the collision detection, we implemented the GJK (Gilbert–Johnson–Keerthi distance algorithm) algorithm with the EPA (Expanding Polytope Algorithm).
+                GJK is used to build up iteratively the minkowski-sum, without the need to calculate the whole. In the first draft we've been using the miknowski-sum from CGAL, which is calculating the whole sum. This resulted in a drastically bad runtime. We could significantly reduce the runtime by the iterative implementation, since this algorithm is being said to be with a constant running time.
+                A good property of the algorithm is that
+            </p>
+            <img src="images/collision_gjk.png" alt="GJK-Algorithm" class="img-responsive">
+            <p class="section-description">
+                The steps for the GJK are basically the same as on the course slides.
+                
+                <ul>
+                    <li>Initialize a random direction: get the furthest point from one convex-hull and from the other the furthest in the opposite direction</li>
+                    <li>Repeat until convergence
+                        <ul>
+                            <li>Update the simplex with max 4 points</li>
+                            <li>Check if the origin is included or max-iteration steps are passed => stop with collision by starting EPA</li>
+                            <li>Search next point on support-function with directions to the origin.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </p>
+            <p class="section-description">
+                When  GJK has detected a collision, EPA needs to be run to find the correct intersection vector. Because EPA works now on a realy polytope instead of only a simplex, we need to convert this first. In the normal case, our simplex has four points. In this case it can be easily created a tetrahedron with the four faces and the correct orientation of the normal.
+            </p>
+            <img src="images/collision_epa.png" alt="EPA" class="img-responsive">
+            <p class="section-description">
+                The EPA is used to find the corresponding intersection vector between the objects. This will be used later for calculating the correct collision-response.
+                Following the steps for the EPA, which starts with the simplex found during the GJK:
 
+                <ul>
+                    <li>Repeat until convergence
+                        <ul>
+                            <li>Get closest face to the origin</li>
+                            <li>Get the support-function into the direction of the faces normal</li>
+                            <li>Expand the polytope with point from support-function and remove redundant faces</li>
+                            <li>If the expansion is below a given treshold or the point has already been added, it converged and can go to the final step</li>
+                        </ul>
+                    </li>
+                    <li>Calculate the intersection point on each object with the barycentric point from the interseciton-polytype</li>
+                </ul>
+
+                For expanding the polytope with a new support-point, following steps need to be done in order to still have a convex polytope:
+                <ul>
+                    <li>Detect each face which can be "seen" from the point</li>
+                    <li>Remove each of those faces, but remember the removed edges. Only if an edge is removed twice, it will not be contained in the new polytope. If it is removed only once, it is on the boarder of the removed faces.</li>
+                    <li>With the remaining boarders (which have removed exactly once) and the added point, all new faces can be generated</li>
+                </ul>
+
+                At the end, we have the global intersection vector, which can be further processed when calculating the collision-response.
+            </p>
+            
+            <h5 class="section-heading">Collision-response</h5>
+            <p class="section-description">
+                HERE we describe our collision response methode and add a two gif comparission for the different parameters.
+                @uros look at this example to see how to include them
+                <div class="row">
+                    <div class="twentytwenty-container">
+                        <img src="images/friction.gif" height="300" width="500" alt="With friction" class="img-responsive">
+                        <img src="images/nofriction.gif" height="300" width="500" alt="No friction" class="img-responsive">
+                    </div> <br>      
+                            
+                    <p>
+                        This image compares for each RGB channel the scattering materices as a result of the adding equations. The matrices represent a combined material, composed of gold and coating. The animation cycle trough the first 30 fourier levels.
+                    </p>
+                </div>
+            </p>
         </p>
     </div>
     <div class="docs-section" id="nbodyresults">
