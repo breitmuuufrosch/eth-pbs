@@ -49,21 +49,32 @@ namespace pbs17 {
 		const double G = 1.0; // 6.67408 * pow(10.0, -4.0);
 		const double EPS = 0.000000001;
 
+		//! Flag if the spatial grid is used or not.
 		bool _useSpatialGrid = false;
 
+		//! Bounding-box of the spatial-grid
 		Eigen::Vector3d _spatialBbMin;
 		Eigen::Vector3d _spatialBbMax;
 
+		//! Reoslution size (number of grids) and length of each grid.
 		Eigen::Vector3i _resolutionSize;
 		Eigen::Vector3d _resolution;;
 
+		//! Treshold used to cut of the influencer.
 		double _treshold = 0.1;
 
+		//! Spatial grid which contains the objects per grid
 		std::vector<std::vector<SpaceObject*>> _spatialGrid;
+		//! Grid-cells with the references of the influencer which have an impact on this cell
 		std::vector<std::map<long, SpaceObject*>> _influencer;
+
+		//! Positions in the grid of each object. (row => object, 3d vector of indices per object)
 		Eigen::MatrixXi _spatialPosition;
+
+		//! Number of cells in each dimension the objects have influence
 		Eigen::MatrixXi _influenceRadius;
 		
+
 		/**
 		 * \brief Get the position of the point in the spatial-index-grid for a given point.
 		 *
@@ -72,6 +83,7 @@ namespace pbs17 {
 		 * \return Position in the spatial-index
 		 */
 		Eigen::Vector3i binSpatialInformation(Eigen::Vector3d position);
+
 
 		/**
 		 * \brief Get the position of the point in the spatial-index-grid for a given point.
@@ -82,6 +94,9 @@ namespace pbs17 {
 		 */
 		unsigned int getIndex(Eigen::Vector3i position);
 
+		/**
+		 * \brief Add an influencer on the specified
+		 */
 		void addInfluencer(unsigned int i, SpaceObject* spaceObject, Eigen::Vector3i position);
 		void removeInfluencer(unsigned int i, SpaceObject* spaceObject, Eigen::Vector3i position);
 
