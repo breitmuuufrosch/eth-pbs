@@ -25,7 +25,9 @@ double SimulationManager::SIMULATION_DT = 0.01;;
 SimulationManager::SimulationManager(std::vector<SpaceObject*> spaceObjects)
 	: _spaceObjects(spaceObjects) {
     _nManager = new NBodyManager();
-	_nManager->initSpatialGrid(spaceObjects, Eigen::Vector3i(30, 30, 30));
+
+	// Todo: So far it is faster to let the simulation run on parallel-for-loop
+	//_nManager->initSpatialGrid(spaceObjects, Eigen::Vector3i(30, 30, 30));
     _cManager = new CollisionManager(spaceObjects);
 }
 
