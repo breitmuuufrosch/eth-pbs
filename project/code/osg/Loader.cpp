@@ -1,9 +1,9 @@
 ﻿/**
-* \brief Functionality for loading models.
-*
-* \Author: Alexander Lelidis (14-907-562), Andreas Emch (08-631-384), Uroš Tešić (17-950-346)
-* \Date:   2017-11-11
-*/
+ * \brief Functionality for loading models.
+ *
+ * \Author: Alexander Lelidis (14-907-562), Andreas Emch (08-631-384), Uroš Tešić (17-950-346)
+ * \Date:   2017-11-11
+ */
 
 #include "Loader.h"
 
@@ -31,7 +31,7 @@ using namespace pbs17;
  * \return Node which can be added to the scene graph.
  */
 osg::ref_ptr<osg::Node> Loader::loadModel(std::string filePath, float ratio, float scaling) {
-	std::cout << "Starting to load the model: \"" << filePath << "\"..." << std::endl;
+	//std::cout << "Starting to load the model: \"" << filePath << "\"..." << std::endl;
 	
 	osg::ref_ptr<osg::Node> model = osgDB::readNodeFile(filePath);
 
@@ -42,7 +42,12 @@ osg::ref_ptr<osg::Node> Loader::loadModel(std::string filePath, float ratio, flo
 
 	model->setName(filePath);
 
-	std::cout << "Loaded: OK!" << std::endl;
+	// Only simplify the node if desired.
+	if (ratio != 1.0) {
+		model = simplifyNode(model, ratio);
+	}
+
+	//std::cout << "Loaded: OK!" << std::endl;
 
 	return model;
 }
@@ -59,7 +64,7 @@ osg::ref_ptr<osg::Node> Loader::loadModel(std::string filePath, float ratio, flo
  * \return New simplified node which can be added to the scene graph.
  */
 osg::ref_ptr<osg::Node> Loader::simplifyNode(osg::ref_ptr<osg::Node> node, float ratio) {
-	std::cout << "Simplifing node \"" << node->getName() << "\" with the ratio " << ratio << std::endl;
+	//std::cout << "Simplifing node \"" << node->getName() << "\" with the ratio " << ratio << std::endl;
 
 	osgUtil::Simplifier simplifier;
 	simplifier.setSampleRatio(ratio);
@@ -80,7 +85,7 @@ osg::ref_ptr<osg::Node> Loader::simplifyNode(osg::ref_ptr<osg::Node> node, float
  * \return New scaled node which can be added to the scene graph.
  */
 osg::ref_ptr<osg::MatrixTransform> Loader::scaleNode(osg::ref_ptr<osg::Node> node, float scaling) {
-	std::cout << "Scaling node \"" << node->getName() << "\" with the ratio " << scaling << std::endl;
+	//std::cout << "Scaling node \"" << node->getName() << "\" with the ratio " << scaling << std::endl;
 
 	osg::ref_ptr<osg::MatrixTransform> scaled = new osg::MatrixTransform;
 	scaled->setMatrix(osg::Matrix::scale(scaling, scaling, scaling));
@@ -132,7 +137,7 @@ osg::ref_ptr<osg::Image> Loader::loadImage(std::string filename) {
 	osg::ref_ptr<osg::Image> image = osgDB::readImageFile(filename);
 
 	if (!image) {
-		std::cout << "Couldn't find image: \"" << filename << "\" is missing!" << std::endl;
+		std::cout << "Couldn't find image: \"" << filename << "\" is missing! Aborting..." << std::endl;
 		exit(0);
 	}
 

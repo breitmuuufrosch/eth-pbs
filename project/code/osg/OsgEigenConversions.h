@@ -1,3 +1,10 @@
+﻿/**
+ * \brief Conversions between osg- and eigen-datatypes.
+ *
+ * \Author: Alexander Lelidis (14-907-562), Andreas Emch (08-631-384), Uroš Tešić (17-950-346)
+ * \Date:   2017-11-29
+ */
+
 #pragma once
 
 #include <Eigen/Core>

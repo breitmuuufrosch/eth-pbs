@@ -1,11 +1,12 @@
 ﻿/**
-* \brief Functionality for managing loaded models to prevent loading multiple times the same model.
-*
-* \Author: Alexander Lelidis (14-907-562), Andreas Emch (08-631-384), Uroš Tešić (17-950-346)
-* \Date:   2017-11-11
-*/
+ * \brief Functionality for managing loaded models to prevent loading multiple times the same model.
+ *
+ * \Author: Alexander Lelidis (14-907-562), Andreas Emch (08-631-384), Uroš Tešić (17-950-346)
+ * \Date:   2017-11-11
+ */
 
 #include "ModelManager.h"
+
 #include "Loader.h"
 
 using namespace pbs17;
@@ -33,35 +34,36 @@ ModelManager* ModelManager::Instance() {
  * 
  * \param filePath
  *	    Complete path to the model to load.
- * \param ratio
- *      Ratio of the simplifier. (Supported values: [0..1])
- * \param scaling
- *      Scaling-factor to scale the model. (Supported values: ]0..inf]
+ * \param useLod
+ *      True if simplified models should be used if the camera is far away.
  *
  *  \return Model-node to attach to osg-nodes.
  */
-osg::ref_ptr<osg::Node> ModelManager::loadModel(std::string filePath, float ratio, float scaling) {
+osg::ref_ptr<osg::LOD> ModelManager::loadModel(std::string filePath, bool useLod) {
 	// try to find the model, if it's found => return it and otherwise load it new
-	osg::ref_ptr<osg::Node> retModel;
-	std::map<std::string, osg::ref_ptr<osg::Node> >::iterator found = _loaded.find(filePath);
+	osg::ref_ptr<osg::LOD> retModel;
+	std::map<std::string, osg::ref_ptr<osg::LOD> >::iterator found = _loaded.find(filePath);
 
 	if (found == _loaded.end()) {
 		// model wasn't found => load and store it in the manager and return it
-		retModel = Loader::loadModel(filePath, ratio, scaling);
-		_loaded.insert(std::pair<std::string, osg::ref_ptr<osg::Node> >(filePath, retModel));
+		osg::ref_ptr<osg::Node> modelL3 = Loader::loadModel(filePath, 1.0);
+		osg::ref_ptr<osg::Node> modelL2 = Loader::loadModel(filePath, 0.5);
+		osg::ref_ptr<osg::Node> modelL1 = Loader::loadModel(filePath, 0.1);
+
+		retModel = new osg::LOD;
+
+		if (useLod) {
+			retModel->addChild(modelL1.get(), 50.0f, FLT_MAX);
+			retModel->addChild(modelL2.get(), 10.0f, 50.0f);
+			retModel->addChild(modelL3.get(), 0.0f, 10.0f);
+		} else {
+			retModel->addChild(modelL3.get(), 0.0f, FLT_MAX);
+		}
+
+		_loaded.insert(std::pair<std::string, osg::ref_ptr<osg::LOD> >(filePath, retModel));
 	} else {
 		// take found.
 		retModel = _loaded[filePath];
-	}
-
-	// Only simplify the node if desired.
-	if (ratio != 1.0) {
-		retModel = Loader::simplifyNode(retModel, ratio);
-	}
-
-	// Only scale the node if desired.
-	if (scaling != 1.0) {
-		retModel = Loader::scaleNode(retModel, scaling);
 	}
 
 	return retModel;

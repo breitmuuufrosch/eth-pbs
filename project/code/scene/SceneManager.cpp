@@ -1,3 +1,10 @@
+﻿/**
+ * \brief Implementation of the scene manager to load and manage the scenes.
+ *
+ * \Author: Alexander Lelidis (14-907-562), Andreas Emch (08-631-384), Uroš Tešić (17-950-346)
+ * \Date:   2017-11-11
+ */
+
 #include "SceneManager.h"
 
 #include <math.h>
@@ -196,6 +203,8 @@ osg::ref_ptr<osg::Node> SceneManager::loadScene(json j) {
 	for (json d : objects) {
 		SpaceObject* so;
 
+		std::cout << d["id"] << std::endl;
+
 		if (d["type"].get<std::string>() == "planet") {
 			so = new Planet(d);
 		} else if (d["type"].get<std::string>() == "asteroid") {
@@ -212,6 +221,9 @@ osg::ref_ptr<osg::Node> SceneManager::loadScene(json j) {
 		_spaceObjects.push_back(so);
 		planets->addChild(so->getModel());
 	}
+
+	osgUtil::Optimizer optOSGFile;
+	optOSGFile.optimize(_scene.get());
 
 	return _scene;
 }
@@ -419,6 +431,8 @@ void SceneManager::addSkybox() const {
  * \return OSG-viewer which handles the rendering
  */
 osg::ref_ptr<osgViewer::Viewer> SceneManager::initViewer(osg::ref_ptr<osg::Node> scene) const {
+	_keyboardHandler->setObjects(_spaceObjects);
+
 	osg::ref_ptr<osgViewer::Viewer> viewer = new osgViewer::Viewer;
 	//viewer->setUpViewOnSingleScreen(0);
 	viewer->setUpViewInWindow(80, 80, 1000, 600, 0);
@@ -446,11 +460,11 @@ osg::ref_ptr<osgViewer::Viewer> SceneManager::initViewer(osg::ref_ptr<osg::Node>
 		osg::ref_ptr<osgGA::TrackballManipulator> manipulator = new osgGA::TrackballManipulator;
 		viewer->setCameraManipulator(manipulator);
 
-		//osg::Matrix rotation = osg::Matrix::rotate(-osg::PI / .6, osg::X_AXIS);
-		//osg::Matrix translation = osg::Matrix::translate(0.0f, 0.0f, 15.0f);
+		osg::Matrix rotation = osg::Matrix::rotate(-osg::PI / .6, osg::X_AXIS);
+		osg::Matrix translation = osg::Matrix::translate(0.0f, 0.0f, 15.0f);
 
-		//manipulator->setByMatrix(translation * rotation);
-		//manipulator->setByMatrix(translation);
+		manipulator->setByMatrix(translation * rotation);
+		manipulator->setByMatrix(translation);
 	}
 
 	viewer->setSceneData(scene);

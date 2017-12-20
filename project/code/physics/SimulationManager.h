@@ -1,10 +1,23 @@
+﻿/**
+ * \brief Implementation of the simulation manager which is called each frame.
+ *
+ * \Author: Alexander Lelidis (14-907-562), Andreas Emch (08-631-384), Uroš Tešić (17-950-346)
+ * \Date:   2017-11-11
+ */
+
 #pragma once
 
 #include <vector>
+#include <algorithm>
 
-#include "../scene/SpaceObject.h"
-#include "CollisionManager.h"
-#include "NBodyManager.h"
+
+// forward declarations
+namespace pbs17 {
+	class NBodyManager;
+	class CollisionManager;
+	class SpaceObject;
+}
+
 
 namespace pbs17 {
 

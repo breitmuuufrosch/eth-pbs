@@ -1,23 +1,27 @@
-/*!
-\file
-* \brief Source file for the class BumpmapShader.
-*
-* $Author: emcha1/pfafd1 $
-* $Date: 2013-01-12 $
-* $Revision: 1 $
-*/
+﻿/**
+ * \brief Functionality for sun-shading.
+ *
+ * \Author: Alexander Lelidis (14-907-562), Andreas Emch (08-631-384), Uroš Tešić (17-950-346)
+ * \Date:   2017-12-12
+ */
 
 #include "SunShader.h"
 
 #include <osg/Node>
 #include <osg/StateSet>
 #include <osg/Program>
-#include "../../config.h"
 
 using namespace pbs17;
 
 
-
+/**
+ * \brief Constructor. Initializes the shader-programms.
+ *
+ * \param texture
+ *      The image-texture to apply.
+ * \param normals
+ *      The normal-texture to apply.
+ */
 SunShader::SunShader(osg::ref_ptr<osg::Texture2D> texture, osg::ref_ptr<osg::Texture2D> normals)
 	: _texture(texture), _normals(normals) {
 	setVertShader(
@@ -68,32 +72,31 @@ SunShader::SunShader(osg::ref_ptr<osg::Texture2D> texture, osg::ref_ptr<osg::Tex
 }
 
 
-
+/**
+ * \brief Destructor.
+ */
 SunShader::~SunShader() {}
 
 
-
+/**
+ * \brief Apply the shader to the given node.
+ *
+ * \param node
+ *      The node to which the shader should be applied.
+ */
 void SunShader::apply(osg::Node* node) {
-	//osg::ref_ptr<osg::Shader> fragShader = new osg::Shader(osg::Shader::FRAGMENT);
-	//fragShader->loadShaderSourceFromFile(DATA_PATH + "/sunShader.glsl");
-
+	// Initialise the vertex and fragment shader and load the correct parameters.
 	osg::ref_ptr<osg::Program> program = new osg::Program;
 	program->addShader(new osg::Shader(osg::Shader::VERTEX, getVertShader()));
 	program->addShader(new osg::Shader(osg::Shader::FRAGMENT, getFragShader()));
 	program->addBindAttribLocation("random_noise", 6);
 	program->addBindAttribLocation("binormal", 7);
 
+	// Apply the textures to the state-set.
 	osg::StateSet* stateset = node->getOrCreateStateSet();
 	stateset->setAttributeAndModes(program.get());
 	stateset->addUniform(new osg::Uniform("colorTex", 0));
-	stateset->addUniform(new osg::Uniform("random_noise", 7));
-
-	osg::Uniform* uniform = stateset->getOrCreateUniform("iTime", osg::Uniform::FLOAT);
-	uniform->set(static_cast<float>(5.0));
-
-	uniform = stateset->getOrCreateUniform("iMouse", osg::Uniform::FLOAT_VEC2);
-	uniform->set(osg::Vec2(0.5, 0.5));
-	//stateset->addUniform(new osg::Uniform("normalTex", 1));
+	stateset->addUniform(new osg::Uniform("normalTex", 7));
 
 	osg::StateAttribute::GLModeValue value = osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE;
 	stateset->setTextureAttributeAndModes(0, _texture.get(), value);

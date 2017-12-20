@@ -363,8 +363,8 @@ bool GjkAlgorithm::EPA(Simplex &simplex, std::vector<Eigen::Vector3d>& convex1, 
 			Eigen::Vector3d poc1 = cartesian(bary, face[0]->getConvexHull1Point(), face[1]->getConvexHull1Point(), face[2]->getConvexHull1Point());
 			Eigen::Vector3d poc2 = cartesian(bary, face[0]->getConvexHull2Point(), face[1]->getConvexHull2Point(), face[2]->getConvexHull2Point());
 
-			collision.setFirstPOC(collision.getFirstObject()->toWorld(poc1));
-			collision.setSecondPOC(collision.getSecondObject()->toWorld(poc2));
+			collision.setFirstPOC(poc1);
+			collision.setSecondPOC(poc2);
 			collision.setIntersectionVector(d * normal);
 			collision.setUnitNormal((collision.getFirstObject()->getPosition() - collision.getSecondObject()->getPosition()).normalized());
 

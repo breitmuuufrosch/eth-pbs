@@ -1,10 +1,9 @@
 ﻿/**
-* \brief Functionality for managing loaded models to prevent loading multiple times the same model.
-* The code is copied from http://www.vis-sim.com/osg/code/osgcode_bbox1.htm and adapted to our use.
-*
-* \Author: Alexander Lelidis (14-907-562), Andreas Emch (08-631-384), Uroš Tešić (17-950-346)
-* \Date:   2017-11-11
-*/
+ * \brief Functionality for collecting all the vertices in a given node.
+ *
+ * \Author: Alexander Lelidis (14-907-562), Andreas Emch (08-631-384), Uroš Tešić (17-950-346)
+ * \Date:   2017-11-11
+ */
 
 #include "VertexListVisitor.h"
 
@@ -34,10 +33,6 @@ void VertexListVisitor::apply(osg::Geode& geode) {
 			
 		} else {
 			std::cout << "Consider using OBJ-files instead of shapes.";
-			//osg::ShapeDrawable* drawable = dynamic_cast<osg::ShapeDrawable*>(geode.getDrawable(i));
-			//curGeom = drawable->asGeometry();
-			//bbox.expandBy(geode.getDrawable(i)->getBound());
-			//bbox.expandBy(geode.getDrawable(i)->getBoundingBox());
 		}
 	}
 

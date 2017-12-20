@@ -1,3 +1,10 @@
+﻿/**
+ * \brief Implementation of the space object (base class).
+ *
+ * \Author: Alexander Lelidis (14-907-562), Andreas Emch (08-631-384), Uroš Tešić (17-950-346)
+ * \Date:   2017-11-11
+ */
+
 #pragma once
 
 #include <Eigen/Core>
@@ -159,17 +166,11 @@ namespace pbs17 {
 			return _orientation;
 		}
 
-		//void setOrientation(osg::Quat o) {
-		//	_orientation = o;
-		//	osg::Matrixd rotMat;
-		//	o.get(rotMat);
-		//	_rotation->setMatrix(rotMat);
-		//	calculateAABB();
-		//}
-
         virtual void updatePositionOrientation(Eigen::Vector3d p, osg::Quat newOrientation);
         
 		void calculateAABB();
+
+		void updateAABB();
 
 		void resetCollisionState();
 
@@ -208,11 +209,18 @@ namespace pbs17 {
 			osg::Matrix translation = osg::Matrix::translate(toOsg(_position));
 			osg::Matrix rotation;
 			_orientation.get(rotation);
+			
+			// Calculate the to-world matrix and take the inverse of it.
 			osg::Matrix transform = rotation * translation * scaling;
 			transform.inverse(transform);
+
 			return fromOsg(toOsg(v) * transform);
 		}
 
+
+		/**
+		 * \brief Initialize the texture-properties and shader.
+		 */
 		virtual void initTexturing();
 
 		void initFollowingRibbon(osg::Vec3 color, unsigned int numPoints, float halfWidth);
@@ -238,8 +246,6 @@ namespace pbs17 {
 		osg::ref_ptr<osg::ShapeDrawable> _aabbShape;
 		//! Local-rotation-node for the object
 		osg::ref_ptr<osg::MatrixTransform> _transformation;
-		//osg::ref_ptr<osg::MatrixTransform> _translation;
-		//osg::ref_ptr<osg::MatrixTransform> _rotation;
 
 		//! Scaling ratio
 		double _scaling = 1.0;
@@ -250,6 +256,8 @@ namespace pbs17 {
 		//! AABB of the object
 		osg::BoundingBox _aabbLocal;
 		osg::BoundingBox _aabbGlobal;
+		osg::BoundingBox _aabbLocalOrig;
+		osg::BoundingBox _aabbGlobalOrig;
 		//! ConvexHull of the object
 		ConvexHull3D* _convexHull = nullptr;
 

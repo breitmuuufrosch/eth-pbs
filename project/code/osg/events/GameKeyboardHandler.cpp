@@ -1,3 +1,10 @@
+﻿/**
+ * \brief Implementation for the keyboard-interaction in the game-mode.
+ *
+ * \Author: Alexander Lelidis (14-907-562), Andreas Emch (08-631-384), Uroš Tešić (17-950-346)
+ * \Date:   2017-12-05
+ */
+
 #include "GameKeyboardHandler.h"
 
 #include "../../physics/SimulationManager.h"
@@ -16,7 +23,8 @@ bool GameKeyboardHandler::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIAct
 			_showBoundingBox = !_showBoundingBox;
 
 			for (auto it = _objects.begin(); it != _objects.end(); ++it) {
-				(*it)->getModel()->setValue(1, _showBoundingBox);
+				osg::ref_ptr<osg::Switch> bbSwitch = (*it)->getModel();
+				bbSwitch->setValue(1, _showBoundingBox);
 			}
 
 			return true;
@@ -27,8 +35,9 @@ bool GameKeyboardHandler::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIAct
 			_showConvexHull = !_showConvexHull;
 
 			for (auto it = _objects.begin(); it != _objects.end(); ++it) {
-				(*it)->getConvexSwitch()->setValue(0, !_showConvexHull);
-				(*it)->getConvexSwitch()->setValue(1, _showConvexHull);
+				osg::ref_ptr<osg::Switch> bbSwitch = (*it)->getConvexSwitch();
+				bbSwitch->setValue(0, !_showConvexHull);
+				bbSwitch->setValue(1, _showConvexHull);
 			}
 
 			return true;

@@ -1,15 +1,16 @@
 ﻿/**
-* \brief Functionality for managing loaded models to prevent loading multiple times the same model.
-*
-* \Author: Alexander Lelidis (14-907-562), Andreas Emch (08-631-384), Uroš Tešić (17-950-346)
-* \Date:   2017-11-11
-*/
+ * \brief Functionality for managing loaded models to prevent loading multiple times the same model.
+ *
+ * \Author: Alexander Lelidis (14-907-562), Andreas Emch (08-631-384), Uroš Tešić (17-950-346)
+ * \Date:   2017-11-11
+ */
 
 #pragma once
 
 #include <map>
 
 #include <osg/Node>
+#include <osg/LOD>
 
 
 namespace pbs17 {
@@ -32,20 +33,18 @@ namespace pbs17 {
 		 * 
 		 * \param filePath
 		 *	    Complete path to the model to load.
-		 * \param ratio
-		 *      Ratio of the simplifier. (Supported values: [0..1])
-		 * \param scaling
-		 *      Scaling-factor to scale the model. (Supported values: ]0..inf]
+		 * \param useLod
+		 *      True if simplified models should be used if the camera is far away.
 		 *
 		 *  \return Model-node to attach to osg-nodes.
 		 */
-		osg::ref_ptr<osg::Node> loadModel(std::string filePath, float ratio = 1.0, float scaling = 1.0);
+		osg::ref_ptr<osg::LOD> loadModel(std::string filePath, bool useLod = true);
 
 
 	private:
 
 		//! All models which have been loaded already.
-		std::map<std::string, osg::ref_ptr<osg::Node> > _loaded;
+		std::map<std::string, osg::ref_ptr<osg::LOD> > _loaded;
 
 
 		//! Private constructor to be sure the class can't be created outside of this class.

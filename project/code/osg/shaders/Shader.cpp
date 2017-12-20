@@ -1,11 +1,9 @@
-/*!
-\file
-* \brief Source file for the class Shader.
-* 
-* $Author: emcha1/pfafd1 $
-* $Date: 2013-01-12 $
-* $Revision: 1 $
-*/
+﻿/**
+ * \brief Functionality for applying the shader to the object.
+ *
+ * \Author: Alexander Lelidis (14-907-562), Andreas Emch (08-631-384), Uroš Tešić (17-950-346)
+ * \Date:   2017-12-12
+ */
 
 #include "Shader.h"
 
@@ -13,15 +11,16 @@
 using namespace pbs17;
 
 
+/**
+ * \brief Constructor.
+ */
+Shader::Shader() {}
 
-Shader::Shader()
-{
-}
 
-
-
-Shader::~Shader()
-{
+/**
+ * \brief Destructor.
+ */
+Shader::~Shader() {
 	//if (_vertSource)
 	//	delete _vertSource;
 

@@ -1,12 +1,22 @@
+﻿/**
+ * \brief Implementation of the collision detection and handling.
+ *
+ * \Author: Alexander Lelidis (14-907-562), Andreas Emch (08-631-384), Uroš Tešić (17-950-346)
+ * \Date:   2017-11-11
+ */
+
 #pragma once
 
 #include <vector>
 #include <queue>
 
-#include "../scene/SpaceObject.h"
-#include "../scene/Planet.h"
 #include "Collision.h"
 #include <Eigen/Core>
+
+// Forward declarations
+namespace pbs17 {
+	class Planet;
+}
 
 namespace pbs17 {
 
@@ -53,8 +63,8 @@ namespace pbs17 {
 
 		std::priority_queue<Collision, std::vector<Collision>, CollisionCompareLess> _collisionQueue;
 
-        const double COEF_RESTITUTION = 0.5;
-		const double COEF_FRICTION = 0.2;
+        const double COEF_RESTITUTION = 0.9;
+		const double COEF_FRICTION = 0.8;
     };
 
 }

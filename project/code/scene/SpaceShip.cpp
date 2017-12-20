@@ -1,3 +1,10 @@
+﻿/**
+ * \brief Implementation of the space ship.
+ *
+ * \Author: Alexander Lelidis (14-907-562), Andreas Emch (08-631-384), Uroš Tešić (17-950-346)
+ * \Date:   2017-12-12
+ */
+
 #include "SpaceShip.h"
 
 #include <osgDB/ReadFile>
@@ -6,9 +13,10 @@
 #include <Eigen/Geometry>
 
 #include "../config.h"
-#include "../osg/ModelManager.h"
-#include "../osg/OsgEigenConversions.h"
 #include "../osg/JsonEigenConversions.h"
+#include "../osg/OsgEigenConversions.h"
+#include "../osg/Loader.h"
+#include "../osg/ModelManager.h"
 #include "../osg/visitors/ConvexHullVisitor.h"
 #include "../osg/particles/SmokeParticleSystem.h"
 
@@ -77,7 +85,12 @@ void SpaceShip::initOsg(Eigen::Vector3d position, double ratio, double scaling) 
 
 	// Load the model
 	std::string modelPath = DATA_PATH + "/" + _filename;
-	_modelFile = ModelManager::Instance()->loadModel(modelPath, ratio, scaling);
+	_modelFile = ModelManager::Instance()->loadModel(modelPath, true);
+
+	// Scale the model if needed
+	if (scaling != 1.0) {
+		_modelFile = Loader::scaleNode(_modelFile, scaling);
+	}
 
 	// Compute convex hull
 	osg::Matrix scalingMatrix = osg::Matrix::scale(_scaling, _scaling, _scaling);
@@ -235,17 +248,14 @@ void SpaceShip::turnRight() {
 
 void SpaceShip::accelerate() {
 	intensity = intensity * _acceleration;
-    if (intensity > 10.0) {
-        intensity = 10.0;
-    }
+	intensity = std::min(intensity, 20.0);
 
 	updateDirectionOrientation(Eigen::Vector3d(intensity, 0, 0), _orientation);
 }
 
 void SpaceShip::decelerate() {
 	intensity = intensity * _decelerate;
-	if (intensity < 1.0) {
-		intensity = 1.0;
-	}
+	intensity = std::max(intensity, 1.0);
+
 	updateDirectionOrientation(Eigen::Vector3d(intensity, 0, 0), _orientation);
 }

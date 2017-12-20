@@ -63,8 +63,8 @@ void ConvexHull3D::init(osg::Vec3Array* vertices) {
  *      Number of edges to keep maximally.
  */
 void ConvexHull3D::simplifyCgalModel(Polyhedron_3& polyhedron, int numEdges) {
-	std::cout << "\nStart with "
-		<< (polyhedron.size_of_halfedges() / 2) << "  edges." << std::endl;
+	//std::cout << "\nStart with "
+	//	<< (polyhedron.size_of_halfedges() / 2) << "  edges." << std::endl;
 
 	SMS::Count_stop_predicate<Polyhedron_3> stop(numEdges);
 	int r = SMS::edge_collapse(polyhedron,
@@ -75,8 +75,8 @@ void ConvexHull3D::simplifyCgalModel(Polyhedron_3& polyhedron, int numEdges) {
 		.get_placement(SMS::Midpoint_placement<Polyhedron_3>())
 	);
 
-	std::cout << "\nFinished...\n" << r << " edges removed. "
-		<< (polyhedron.size_of_halfedges() / 2) << " final edges." << std::endl;
+	//std::cout << "\nFinished...\n" << r << " edges removed. "
+	//	<< (polyhedron.size_of_halfedges() / 2) << " final edges." << std::endl;
 }
 
 
