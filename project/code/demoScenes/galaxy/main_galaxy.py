@@ -19,7 +19,6 @@ def rotation_matrix(axis, theta):
                      [2*(bd+ac), 2*(cd-ab), aa+dd-bb-cc]])
 
 
-
 def getVelocity(centerMass, objectCoordinates):
     v_norm = (1. * centerMass / ((objectCoordinates[0]**2 + objectCoordinates[1]**2)**0.5))**0.5
 

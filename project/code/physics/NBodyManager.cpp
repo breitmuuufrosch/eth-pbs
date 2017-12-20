@@ -30,21 +30,21 @@ void NBodyManager::simulateStep(double dt, std::vector<SpaceObject *> &spaceObje
 		forces[i] = Eigen::Vector3d(0.0, 0.0, 0.0);
 	}
 
-	for (int i = 0; i < cntSpaceObj; ++i) {
-		SpaceObject* curObject = spaceObjects[i];
-		// Calculate a rotation around the rotation-center of the object
-		Eigen::Vector3d curCenter = curObject->getPosition();
-		double m = curObject->getMass();
+	if (_useSpatialGrid) {
+		for (int i = 0; i < cntSpaceObj; ++i) {
+			SpaceObject* curObject = spaceObjects[i];
+			// Calculate a rotation around the rotation-center of the object
+			Eigen::Vector3d curCenter = curObject->getPosition();
+			double m = curObject->getMass();
 
-		// acceleration vector
-		std::vector<SpaceObject*> objectsToIterate;
+			// acceleration vector
+			std::vector<SpaceObject*> objectsToIterate;
 
-		if (_useSpatialGrid) {
 			Eigen::Vector3i gridPosition = _spatialPosition.row(i);
 			unsigned int index = getIndex(gridPosition);
 
 			//for (int j = 0; j < cntSpaceObj; ++j) {
-			if (index > 0 && index < _influencer[index].size()) {
+			if (index > 0 && index < _influencer.size()) {
 				for (std::map<long, SpaceObject*>::iterator it = _influencer[index].begin(); it != _influencer[index].end(); ++it) {
 					SpaceObject* compareObject = (*it).second;
 
@@ -65,11 +65,26 @@ void NBodyManager::simulateStep(double dt, std::vector<SpaceObject *> &spaceObje
 					forces[i] += f * d.normalized();
 				}
 			}
-		} else {
+		}
+	} else {
+
+#if defined(_OPENMP)
+#pragma omp parallel for
+#endif
+		for (int i = 0; i < cntSpaceObj; ++i) {
+			SpaceObject* curObject = spaceObjects[i];
+			// Calculate a rotation around the rotation-center of the object
+			Eigen::Vector3d curCenter = curObject->getPosition();
+			double m = curObject->getMass();
+
+			// acceleration vector
+			std::vector<SpaceObject*> objectsToIterate;
+
+
 			for (int j = 0; j < cntSpaceObj; ++j) {
 				if (i == j) continue; // do not compare the object with it self
 
-				// compare the objects based on the center of mass
+									  // compare the objects based on the center of mass
 				SpaceObject* compareObject = spaceObjects[j];
 				Eigen::Vector3d compareCenter = compareObject->getPosition();
 
@@ -86,6 +101,7 @@ void NBodyManager::simulateStep(double dt, std::vector<SpaceObject *> &spaceObje
 			}
 		}
 	}
+
 
 #if defined(_OPENMP)
 #pragma omp parallel for

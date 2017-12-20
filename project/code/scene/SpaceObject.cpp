@@ -180,8 +180,6 @@ void SpaceObject::updateAABB() {
 
 void SpaceObject::resetCollisionState() {
 	if (_collisionState == 0) {
-		//ColorVisitor colorVisitor(osg::Vec4(1, 1, 1, 1));
-		//_aabbRendering->accept(colorVisitor);
 		_aabbShape->setColor(osg::Vec4(1, 1, 1, 1));
 	}
 

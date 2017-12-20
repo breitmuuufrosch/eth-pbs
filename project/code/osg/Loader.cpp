@@ -36,7 +36,7 @@ osg::ref_ptr<osg::Node> Loader::loadModel(std::string filePath, float ratio, flo
 	osg::ref_ptr<osg::Node> model = osgDB::readNodeFile(filePath);
 
 	if (!model) {
-		//std::cout << "File not found! Aborting..." << std::endl;
+		std::cout << "File not found! Aborting..." << std::endl;
 		exit(0);
 	}
 
@@ -85,7 +85,7 @@ osg::ref_ptr<osg::Node> Loader::simplifyNode(osg::ref_ptr<osg::Node> node, float
  * \return New scaled node which can be added to the scene graph.
  */
 osg::ref_ptr<osg::MatrixTransform> Loader::scaleNode(osg::ref_ptr<osg::Node> node, float scaling) {
-	std::cout << "Scaling node \"" << node->getName() << "\" with the ratio " << scaling << std::endl;
+	//std::cout << "Scaling node \"" << node->getName() << "\" with the ratio " << scaling << std::endl;
 
 	osg::ref_ptr<osg::MatrixTransform> scaled = new osg::MatrixTransform;
 	scaled->setMatrix(osg::Matrix::scale(scaling, scaling, scaling));
@@ -137,7 +137,7 @@ osg::ref_ptr<osg::Image> Loader::loadImage(std::string filename) {
 	osg::ref_ptr<osg::Image> image = osgDB::readImageFile(filename);
 
 	if (!image) {
-		std::cout << "Couldn't find image: \"" << filename << "\" is missing!" << std::endl;
+		std::cout << "Couldn't find image: \"" << filename << "\" is missing! Aborting..." << std::endl;
 		exit(0);
 	}
 
