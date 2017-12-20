@@ -6,6 +6,8 @@
 <title>PBS Project</title> 
 
 <meta name="description" content=""> <meta name="viewport" content="width=device-width">
+<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+<link rel="icon" href="/favicon.ico" type="image/x-icon">
 <link href="http://fonts.googleapis.com/css?family=Raleway:300,400,600" rel="stylesheet" type="text/css"> 
 <style type="text/css">
 /*! normalize.css v3.0.2 | MIT License | git.io/normalize */
@@ -66,14 +68,6 @@ html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:1
     </div>   
 <div class="container">
     <section class="header" id="intro">
-        <!--
-        <div id="header">
-            <h2 class="title">Astroidfield Simulation</h2>
-            <p>
-                by Alexander Lelidis, Andreas Emch and Uros Tesic 
-            </p>
-        </div>
-        <hr>-->
         <p> 
             Simulating planets and astroids in space is an intersesting multi dimensional challange. Due to the nature of the set up, we have to solve a few hard challanges to achieve a real time engine. The first part of the problem is the numerical computation of gravitational forces. This problem is today only solved analytically for 2 bodies. Since our objective is to have an asteroid field we using numerical methodes to approximated these forces. Once the bodies start to move around the second challange is to handle collisions and compute phyiscally correct responses. Again this needs to be done in rather fast fasion to be able to run in real time. 
         </p>
@@ -140,16 +134,17 @@ while(true) {
             The first phase implentents the prune and sweep algorithm, which objective it is to reduce number of number of computational expensiv narrow collision checks. We start by computing a axis aligned bounding box for each model we are simulating. This can be done is quite fast and the check for intersection is also easy to implement. Now we are sorting the element intervals for each axis x,y and z and chec if there are overlaps of object itnervals. If there is an overlap in all 3 axis we know that the two AABB are intersecting and we can continue with the narrow phase checks. Due to the fact that we are storing the lists for each axis and exploiting temporal coherence the resorting can be done in a few computational steps. Since it is unlikely that the objects move significatly between two steps. 
         </p>
         <p class="section-description">
-            In the narrow phase we imple the GJK and EPA algorithm. TBD explain them a bit more.
+            In the narrow phase we imple the GJK and EPA algorithm. TBD @Andy explain them a bit more.
         </p>
         <p class="section-description">
             HERE we describe our collision response methode and add a two gif comparission for the different parameters.
             @uros look at this example to see how to include them
             <div class="row">
                 <div class="twentytwenty-container">
-                    <img src="images/reference/scattering.gif" height="600" width="800" alt="Reference" class="img-responsive">
-                    <img src="images/mine/scattering.gif" height="600" width="800" alt="Our" class="img-responsive">
-                </div> <br>                
+                    <img src="images/friction.gif" height="300" width="500" alt="With friction" class="img-responsive">
+                    <img src="images/nofriction.gif" height="300" width="500" alt="No friction" class="img-responsive">
+                </div> <br>      
+                           
                 <p>
                     This image compares for each RGB channel the scattering materices as a result of the adding equations. The matrices represent a combined material, composed of gold and coating. The animation cycle trough the first 30 fourier levels.
                 </p>
@@ -182,72 +177,114 @@ while(true) {
         </div>
         <hr>
         <h4 class="section-heading">Ellipical orbit (2 bodies)</h4>
-
-        <h4 class="section-heading">Figure eight (2 bodies)</h4>
-
-        
+        <p class="section-description">
+            The goal of this experiment is to get a planet circuling another planet in a elliptic way. Therefor we create a scene file (ellipticalOrbit.json) with a sun (m = 1000.0) and a earth (m = 0.1). The sun has zero linear an angular velocity and the earth 
+            $$
+                \vec{p} = \begin{pmatrix}
+                  -5.0  \\ 0 \\ 0
+                \end{pmatrix}
+                \vec{lv} =
+                \begin{pmatrix}
+                  0.0  \\ 16.7299316 \\ 0
+                \end{pmatrix}
+            $$
+        </p>
         <div class="row">
-            <div class="one-half column category" style="text-align: center;">
-                <h5 class="docs-header">BSDF fourier</h5>
-                <div class="twentytwenty-container">
-                    <img src="images/reference/MBSDF.png" height="600" width="800" alt="Reference" class="img-responsive">
-                    <img src="images/mine/MBSDFF.png" height="600" width="800" alt="Our" class="img-responsive">
-                </div> <br>                
-                    <p>Comparison of original microfacet BSDF and our reconstruction from 100 fourier coefficents. We used the following values:  \(\mu_i = 0.5\),
-                    \(\mu_o = -0.6\), \(\alpha = 0.05\) and \(\eta = 1.1\)</p>
-            </div>
-            <div class="one-half column category" style="text-align: center;">
-                <h5 class="docs-header">BSDF fourier</h5>
-                <div class="twentytwenty-container">
-                    <img src="images/reference/MBSDF.png" height="600" width="800" alt="Reference" class="img-responsive">
-                    <img src="images/mine/MBSDFF.png" height="600" width="800" alt="Our" class="img-responsive">
-                </div> <br>                
-                    <p>Comparison of original microfacet BSDF and our reconstruction from 100 fourier coefficents. We used the following values:  \(\mu_i = 0.5\),
-                    \(\mu_o = -0.6\), \(\alpha = 0.05\) and \(\eta = 1.1\)</p>
-            </div>
+            <video autoplay loop width="1000">
+                <source src="videos/ellipticalOrbit.mp4" type="video/mp4" />
+            </video>
         </div>
-       
-        <h4 class="section-heading">Adding equation</h4>
+        <hr>
+
+        <h4 class="section-heading">Figure eight (3 bodies)</h4>
+        <p class="section-description">
+            The goal of this experiment is test stable 3 body configuration. Therefor we create a scene file (figureEight.json) with three planets  each having a mass of one and the following positions and velocities.
+            $$
+                \vec{p_1} = \begin{pmatrix}
+                  -1.0  \\ 0 \\ 0
+                \end{pmatrix}
+                \vec{p_2} = \begin{pmatrix}
+                  1.0  \\ 0 \\ 1.0
+                \end{pmatrix}
+                \vec{p_3} = \begin{pmatrix}
+                  1.0  \\ 0 \\ 0
+                \end{pmatrix}
+                \vec{lv_1} =
+                \begin{pmatrix}
+                  0.347111  \\ 0.532728 \\ 0
+                \end{pmatrix}
+                \vec{lv_2} =
+                \begin{pmatrix}
+                  0.347111  \\ 0.532728 \\ 0
+                \end{pmatrix}
+                \vec{lv_3} =
+                \begin{pmatrix}
+                  -0.694222  \\ -1.065456 \\ 0
+                \end{pmatrix}
+            $$
+        </p>
         <div class="row">
-            <div class="twentytwenty-container">
-                <img src="images/reference/scattering.gif" height="600" width="800" alt="Reference" class="img-responsive">
-                <img src="images/mine/scattering.gif" height="600" width="800" alt="Our" class="img-responsive">
-            </div> <br>                
-            <p>
-                This image compares for each RGB channel the scattering materices as a result of the adding equations. The matrices represent a combined material, composed of gold and coating. The animation cycle trough the first 30 fourier levels.
-            </p>
+            <video autoplay loop width="1000">
+                <source src="videos/figureEight.mp4" type="video/mp4" />
+            </video>
         </div>
+        <hr>
         
-    </div>
 
     <div class="docs-section" id="collisionResults">
         <h3 class="section-heading">Collision detection results</h3>
         <p class="section-description">
-            In this section we are going to give an overview of the basic theory.
+            To see that all our parts of the collision detect are correctly working we created a scene rendered with debug informations. The first thing we add is a visualization of the AABB and color coding, where green means that we have an intersection in the broad phase, but not the narrow one. Red defines a real collision. 
         </p>
+        <div class="row">
+            <video autoplay loop width="1000">
+                <source src="videos/pruneandsweep.mp4" type="video/mp4" />
+            </video>
+        </div>
+        <hr>
         <p class="section-description">
-            We can add latex code if we want:
-            $$
-                \mathbb{R}^4 \to \mathbb{R} : f(\mu_i, \phi_i, \mu_o, \phi_o)
-            $$
-            oder like this: \(\mu_i\) and \(\mu_o\).
+            The following video show the collision of two asteroids in space.
         </p>
-
+        <div class="row">
+            <video autoplay loop width="1000">
+                <source src="videos/pruneandsweep.mp4" type="video/mp4" />
+            </video>
+        </div>
+        <hr>
     </div>
 
     <div class="docs-section" id="finalResults">
         <h3 class="section-heading">Final results</h3>
         <p class="section-description">
-            In this section we are going to give an overview of the basic theory.
+            We want to split this section in to two parts. First we tried our implementation in a big scale, by creating a asteroid field with a spiral pattern and a planet with astroid belt. To test our collision detect and handling we create a asteroid field colliding with a planet. 
         </p>
+        <div class="row">
+            <video autoplay loop width="1000" muted>
+                <source src="videos/galaxy.mp4" type="video/mp4" />
+            </video>
+        </div>
+        <hr>
+        <div class="row">
+            <video autoplay loop width="1000" muted>
+                <source src="videos/rings.mp4" type="video/mp4" />
+            </video>
+        </div>
+        <hr>
+        <div class="row">
+            <video autoplay loop width="1000" muted>
+                <source src="videos/figureEight.mp4" type="video/mp4" />
+            </video>
+        </div>
+        <hr>
         <p class="section-description">
-            We can add latex code if we want:
-            $$
-                \mathbb{R}^4 \to \mathbb{R} : f(\mu_i, \phi_i, \mu_o, \phi_o)
-            $$
-            oder like this: \(\mu_i\) and \(\mu_o\).
+            For the second part we implement a small space game, where the user flies in a aircraft through a metor field and tries to survive.
         </p>
-
+        <div class="row">
+            <video autoplay loop muted width="1000">
+                <source src="videos/gameplay.mp4" type="video/mp4" />
+            </video>
+        </div>
+        <hr>
     </div>
 
     <div class="docs-section" id="References">
