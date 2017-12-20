@@ -68,31 +68,85 @@ namespace pbs17 {
 		void initPhysics(double mass, Eigen::Vector3d linearVelocity, Eigen::Vector3d angularVelocity, Eigen::Vector3d force, Eigen::Vector3d torque) override;
 
 
+		/**
+		 * \brief Get the node which is used for correctly tracking the model.
+		 * 
+		 * \return Node which can be used as a tracking-information.
+		 */
 		osg::ref_ptr<osg::Node> getTrackingNode() const {
 			return _modelFile;
 		}
 
-		void updatePositionOrientation(Eigen::Vector3d p, osg::Quat newOrientation) override;
 
+		/**
+		 * \brief Update the position and orientation of the space-object.
+		 *
+		 * \param newPosition
+		 *      New position of the object.
+		 * \param newOrientation
+		 *      New orientation of the object.
+		 */
+		void updatePositionOrientation(Eigen::Vector3d newPosition, osg::Quat newOrientation) override;
+
+
+		/**
+		 * \brief Update the direction and orientation of the space-ship.
+		 * 
+		 * \param v
+		 *      New direction of the object.
+		 * \param newOrientation
+		 *      New orientation of the object.
+		 */
 		void updateDirectionOrientation(Eigen::Vector3d v, osg::Quat newOrientation);
 
+
+		/**
+		 * \brief Navigate the space-ship up-wards.
+		 */
 		void turnUp();
 
+
+		/**
+		 * \brief Navigate the space-ship down-wards.
+		 */
 		void turnDown();
 
+
+		/**
+		 * \brief Navigate the space-ship left.
+		 */
 		void turnLeft();
 
+
+		/**
+		 * \brief Navigate the space-ship right.
+		 */
 		void turnRight();
 
+
+		/**
+		 * \brief Accelerate the space-ship.
+		 */
 		void accelerate();
 
+
+		/**
+		 * \brief Slow down the space-ship.
+		 */
 		void decelerate();
 
 	private:
+
+		//! Root-node for the particles
 		osg::ref_ptr<osg::MatrixTransform> _particleRoot;
+
+		//! Acceleration-factor
 		double _acceleration = 1.2;
+		//! Deceleration-factor
 		double _decelerate = 0.8;
+		//! Rotation-angle
 		double _rotationAngle = 0.1; // randians ~ 5.7 degrees
+		// Intensity
 		double intensity = 1.0;
 	};
 

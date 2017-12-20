@@ -15,6 +15,7 @@
 #include <Eigen/Dense>
 // ReSharper restore CppUnusedIncludeDirective
 
+#include "../osg/OsgEigenConversions.h"
 #include "../scene/Planet.h"
 #include "../graphics/GjkAlgorithm.h"
 

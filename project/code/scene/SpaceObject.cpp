@@ -11,6 +11,7 @@
 #include <osg/ShapeDrawable>
 #include <osg/Material>
 
+#include "../osg/OsgEigenConversions.h"
 #include "../osg/visitors/BoundingBoxVisitor.h"
 #include "../osg/ImageManager.h"
 #include "../osg/visitors/ComputeTangentVisitor.h"
@@ -131,13 +132,38 @@ void SpaceObject::initPhysics(double mass, Eigen::Vector3d linearVelocity, Eigen
 }
 
 
-void SpaceObject::updatePositionOrientation(Eigen::Vector3d p, osg::Quat newOrientation) {
-	_position = p;
+/**
+ * \brief Set the position of the object.
+ *
+ * \param newPosition
+ *	    New position of the object.
+ */
+void SpaceObject::setPosition(Eigen::Vector3d newPosition) {
+	_position = newPosition;
+
+	osg::Matrixd rotation;
+	_orientation.get(rotation);
+
+	_transformation->setMatrix(rotation * osg::Matrix::translate(toOsg(newPosition)));
+	calculateAABB();
+}
+
+
+/**
+ * \brief Update the position and orientation of the space-object.
+ *
+ * \param newPosition
+ *      New position of the object.
+ * \param newOrientation
+ *      New orientation of the object.
+ */
+void SpaceObject::updatePositionOrientation(Eigen::Vector3d newPosition, osg::Quat newOrientation) {
+	_position = newPosition;
     _orientation = newOrientation;
 
 	osg::Matrixd rotation;
     newOrientation.get(rotation);
-	osg::Matrixd translation = osg::Matrix::translate(toOsg(p));
+	osg::Matrixd translation = osg::Matrix::translate(toOsg(newPosition));
 
     _transformation->setMatrix(rotation * translation);
 
@@ -145,6 +171,10 @@ void SpaceObject::updatePositionOrientation(Eigen::Vector3d p, osg::Quat newOrie
 }
 
 
+/**
+ * \brief Calculate the AABB for the object for it's current state.
+ * Here, the correct min-max of each vector is considered.
+ */
 void SpaceObject::calculateAABB() {
 	osg::Matrix scaling = osg::Matrix::scale(_scaling, _scaling, _scaling);
 	osg::Matrix translation = osg::Matrix::translate(toOsg(_position));
@@ -161,6 +191,12 @@ void SpaceObject::calculateAABB() {
 	_aabbRendering->setMatrix(osg::Matrix::scale(_aabbGlobal._max - _aabbGlobal._min) * osg::Matrix::translate(toOsg(_position)));
 }
 
+
+/**
+ * \brief Update the AABB. Here, only the 8 corners of the original AABB are
+ * rotated/translated correctly to speed up the calculateion. (to calculate the
+ * bounding box for each time step correclty over all vertices is too time consuming).
+ */
 void SpaceObject::updateAABB() {
 	osg::Matrix translation = osg::Matrix::translate(toOsg(_position));
 	osg::Matrix rotation;
@@ -178,6 +214,9 @@ void SpaceObject::updateAABB() {
 }
 
 
+/**
+ * \brief Reset the collision state to 0. Usually before each frame.
+ */
 void SpaceObject::resetCollisionState() {
 	if (_collisionState == 0) {
 		_aabbShape->setColor(osg::Vec4(1, 1, 1, 1));
@@ -186,10 +225,43 @@ void SpaceObject::resetCollisionState() {
 	_collisionState = 0;
 }
 
+
+/**
+ * \brief Set the collision state of the object.
+ *
+ * \param c
+ *      New collision-state. Possible values:
+ *          - 0 = no collision
+ *          - 1 = collision possible
+ *          - 2 = collision for sure
+ */
 void SpaceObject::setCollisionState(int c) {
 	_collisionState = std::max(_collisionState, c);
 
 	_aabbShape->setColor(c == 1 ? osg::Vec4(0, 1, 0, 1) : osg::Vec4(1, 0, 0, 1));
+}
+
+
+/**
+* \brief Get the convex hull with the correct global-vertex positions.
+*
+* \return List of vertices of the convex-hull in the global-world-space.
+*/
+std::vector<Eigen::Vector3d> SpaceObject::getConvexHull() const {
+	// Todo: use Eigen-transformations instead
+	osg::Matrix scaling = osg::Matrix::scale(_scaling, _scaling, _scaling);
+	osg::Matrix translation = osg::Matrix::translate(toOsg(_position));
+	osg::Matrix rotation;
+	_orientation.get(rotation);
+
+	std::vector<Eigen::Vector3d> transformed;
+	std::vector<Eigen::Vector3d> current = _convexHull->getVertices();
+
+	for (unsigned int i = 0; i < current.size(); ++i) {
+		transformed.push_back(fromOsg(toOsg(current[i]) * rotation * translation * scaling));
+	}
+
+	return transformed;
 }
 
 
@@ -231,6 +303,18 @@ void SpaceObject::initTexturing() {
 	stateset->setAttribute(material);
 }
 
+
+/**
+ * \brief Initialize the geometry for the ribbon which follows the object to see
+ * the object's trace.
+ *
+ * \param color
+ *      Color of the following ribbon.
+ * \param numPoints
+ *      Number of points which are used to generate the ribbon. Higher value => longer ribbon.
+ * \param halfWidth
+ *      Width of the ribbon.
+ */
 void SpaceObject::initFollowingRibbon(osg::Vec3 color, unsigned int numPoints, float halfWidth) {
 	FollowingRibbon* ribbon = new FollowingRibbon();
 	osg::Geometry* geometry = ribbon->init(toOsg(_position), color, numPoints, halfWidth);
@@ -244,4 +328,3 @@ void SpaceObject::initFollowingRibbon(osg::Vec3 color, unsigned int numPoints, f
 	_transformation->addUpdateCallback(new TrailerCallback(ribbon, geometry));
 	_modelRoot->addChild(geode);
 }
-

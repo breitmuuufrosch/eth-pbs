@@ -53,9 +53,13 @@ namespace pbs17 {
 
     private:
 		
+		//! Unique light id which is used for OpenGL.
 		int _lightId;
+
+		//! Osg-light with all settings
 		osg::ref_ptr<osg::LightSource> _light;
 
+		//! Global id counter for the light
 		static int LIGHT_ID;
 
     };

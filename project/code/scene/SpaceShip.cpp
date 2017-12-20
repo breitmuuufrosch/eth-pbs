@@ -37,7 +37,6 @@ SpaceShip::SpaceShip()
     Eigen::Vector3d torque = Eigen::Vector3d(0.0, 0.0, 0.0);;
 
     initPhysics(1.0, linearVelocity, angularVelocity, force, torque);
-
 }
 
 
@@ -149,13 +148,22 @@ void SpaceShip::initPhysics(double mass, Eigen::Vector3d linearVelocity, Eigen::
 	_momentOfInertia.setIdentity();
 }
 
-void SpaceShip::updatePositionOrientation(Eigen::Vector3d p, osg::Quat newOrientation) {
-	_position = p;
+
+/**
+ * \brief Update the position and orientation of the space-object.
+ *
+ * \param newPosition
+ *      New position of the object.
+ * \param newOrientation
+ *      New orientation of the object.
+ */
+void SpaceShip::updatePositionOrientation(Eigen::Vector3d newPosition, osg::Quat newOrientation) {
+	_position = newPosition;
 	_orientation = newOrientation;
 
 	osg::Matrixd rotation;
 	newOrientation.get(rotation);
-	osg::Matrixd translation = osg::Matrix::translate(toOsg(p));
+	osg::Matrixd translation = osg::Matrix::translate(toOsg(newPosition));
 	osg::Matrixd localRotation = osg::Matrix::rotate(-90, osg::Y_AXIS);
 
 	_transformation->setMatrix(rotation * translation);
@@ -165,6 +173,14 @@ void SpaceShip::updatePositionOrientation(Eigen::Vector3d p, osg::Quat newOrient
 }
 
 
+/**
+ * \brief Update the direction and orientation of the space-ship.
+ *
+ * \param v
+ *      New direction of the object.
+ * \param newOrientation
+ *      New orientation of the object.
+ */
 void SpaceShip::updateDirectionOrientation(Eigen::Vector3d v, osg::Quat newOrientation) {
 	_orientation = newOrientation;
 
@@ -182,6 +198,9 @@ void SpaceShip::updateDirectionOrientation(Eigen::Vector3d v, osg::Quat newOrien
 }
 
 
+/**
+ * \brief Navigate the space-ship up-wards.
+ */
 void SpaceShip::turnUp() {
     Eigen::Vector3d p = getPosition();
     osg::Quat q;
@@ -198,6 +217,10 @@ void SpaceShip::turnUp() {
 	updateDirectionOrientation(Eigen::Vector3d(intensity, 0, 0), newQ);
 }
 
+
+/**
+ * \brief Navigate the space-ship down-wards.
+ */
 void SpaceShip::turnDown() {
     Eigen::Vector3d p = getPosition();
     osg::Quat q;
@@ -214,6 +237,10 @@ void SpaceShip::turnDown() {
 	updateDirectionOrientation(Eigen::Vector3d(intensity, 0, 0), newQ);
 }
 
+
+/**
+ * \brief Navigate the space-ship left.
+ */
 void SpaceShip::turnLeft() {
     Eigen::Vector3d p = getPosition();
     osg::Quat q;
@@ -230,6 +257,10 @@ void SpaceShip::turnLeft() {
 	updateDirectionOrientation(Eigen::Vector3d(intensity, 0, 0), newQ);
 }
 
+
+/**
+ * \brief Navigate the space-ship right.
+ */
 void SpaceShip::turnRight() {
     Eigen::Vector3d p = getPosition();
     osg::Quat q;
@@ -246,6 +277,10 @@ void SpaceShip::turnRight() {
     updateDirectionOrientation(Eigen::Vector3d(intensity,0,0), newQ);
 }
 
+
+/**
+ * \brief Accelerate the space-ship.
+ */
 void SpaceShip::accelerate() {
 	intensity = intensity * _acceleration;
 	intensity = std::min(intensity, 20.0);
@@ -253,6 +288,10 @@ void SpaceShip::accelerate() {
 	updateDirectionOrientation(Eigen::Vector3d(intensity, 0, 0), _orientation);
 }
 
+
+/**
+ * \brief Slow down the space-ship.
+ */
 void SpaceShip::decelerate() {
 	intensity = intensity * _decelerate;
 	intensity = std::max(intensity, 1.0);
