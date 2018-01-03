@@ -1,5 +1,8 @@
-﻿# Project: Asteroid Fields
+# Project: Asteroid Fields
 
+## Final Movie
+
+The results can be viewed here: https://youtu.be/qUCG8pPnXn4 
 
 ## Getting Started
 
@@ -75,6 +78,3 @@ The structure is meant to be like this:
 * OSG/Visitors: All visitors which are used for OSG to traverse the graph to make calculations/changes on the nodes
 * Physics: All physics calculations (Collision-handling, NBody-handling, ...)
 * Scene: Used to build and manage the scene and the objects which are currently on the scene.
-
-
-<img src="version_1.png">
